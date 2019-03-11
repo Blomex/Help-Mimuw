@@ -1,2 +1,2 @@
 run:
-	dotnet run archive
+	cd archive && dotnet run .
