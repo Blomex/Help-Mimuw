@@ -4,7 +4,7 @@ run:
 
 .PHONY: migrate
 migrate:
-	cd archive && dotnet ef migrations ${NAME}
+	cd archive && dotnet ef migrations add ${NAME}
 
 .PHONY: update
 update:
