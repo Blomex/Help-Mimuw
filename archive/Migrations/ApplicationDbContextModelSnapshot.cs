@@ -16,7 +16,7 @@ namespace archive.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -203,13 +203,9 @@ namespace archive.Migrations
 
                     b.Property<int>("TaskId");
 
-                    b.Property<int>("TaskId1");
-
                     b.HasKey("Id");
 
                     b.HasIndex("TaskId");
-
-                    b.HasIndex("TaskId1");
 
                     b.ToTable("Solutions");
                 });
@@ -226,13 +222,9 @@ namespace archive.Migrations
 
                     b.Property<int>("TasksetId");
 
-                    b.Property<int>("TasksetId1");
-
                     b.HasKey("Id");
 
                     b.HasIndex("TasksetId");
-
-                    b.HasIndex("TasksetId1");
 
                     b.ToTable("Tasks");
                 });
@@ -244,8 +236,6 @@ namespace archive.Migrations
 
                     b.Property<int>("CourseId");
 
-                    b.Property<int>("CourseId1");
-
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -256,8 +246,6 @@ namespace archive.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
-
-                    b.HasIndex("CourseId1");
 
                     b.ToTable("Tasksets");
                 });
@@ -310,39 +298,24 @@ namespace archive.Migrations
             modelBuilder.Entity("archive.Data.Entities.Solution", b =>
                 {
                     b.HasOne("archive.Data.Entities.Task", "Task")
-                        .WithMany()
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("archive.Data.Entities.Task")
                         .WithMany("Solutions")
-                        .HasForeignKey("TaskId1")
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("archive.Data.Entities.Task", b =>
                 {
                     b.HasOne("archive.Data.Entities.Taskset", "Taskset")
-                        .WithMany()
-                        .HasForeignKey("TasksetId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("archive.Data.Entities.Taskset")
                         .WithMany("Tasks")
-                        .HasForeignKey("TasksetId1")
+                        .HasForeignKey("TasksetId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("archive.Data.Entities.Taskset", b =>
                 {
                     b.HasOne("archive.Data.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("archive.Data.Entities.Course")
                         .WithMany("Tasksets")
-                        .HasForeignKey("CourseId1")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

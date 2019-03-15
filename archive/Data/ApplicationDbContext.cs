@@ -44,10 +44,9 @@ namespace archive.Data
                     entity.Property(e => e.Name).IsRequired();
 
                     entity.HasOne(e => e.Course)
-                        .WithMany()
+                        .WithMany(e => e.Tasksets)
                         .HasForeignKey(e => e.CourseId);
 
-                    entity.HasMany(e => e.Tasks).WithOne();
                 });
 
             builder.Entity<Task>(
@@ -59,11 +58,9 @@ namespace archive.Data
                     entity.Property(e => e.Content);
 
                     entity.HasOne(e => e.Taskset)
-                        .WithMany()
+                        .WithMany(e => e.Tasks)
                         .HasForeignKey(e => e.TasksetId);
 
-                    entity.HasMany(e => e.Solutions)
-                        .WithOne();
                 });
 
             builder.Entity<Solution>(
@@ -74,7 +71,7 @@ namespace archive.Data
                     entity.Property(e => e.Content).IsRequired();
              
                     entity.HasOne(e => e.Task)
-                        .WithMany()
+                        .WithMany(e=> e.Solutions)
                         .HasForeignKey(e => e.TaskId);
                 });
         }
