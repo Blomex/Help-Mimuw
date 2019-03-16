@@ -10,7 +10,7 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190316204829_Wiped")]
+    [Migration("20190316212832_Wiped")]
     partial class Wiped
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
