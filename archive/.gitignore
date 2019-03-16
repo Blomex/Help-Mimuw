@@ -2,4 +2,3 @@ bin/
 obj/
 *.dll
 *.exe
-appsettings-local.json
