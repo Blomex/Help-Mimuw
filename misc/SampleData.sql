@@ -16,11 +16,11 @@ DECLARE
 BEGIN
     FOR course_id IN SELECT "Id" FROM "Courses" LOOP
         INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (0, 2018, 'Egzamin', course_id);
-        INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (0, 2018, 'Egzamin Pokrawkowy', course_id);
+        INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (0, 2018, 'Egzamin Poprawkowy', course_id);
         INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (1, 2018, 'Kolokwium', course_id);
         INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (1, 2018, 'Kolokwium Poprawkowe', course_id);
         INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (0, 2017, 'Egzamin', course_id);
-        INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (0, 2017, 'Egzamin Pokrawkowy', course_id);
+        INSERT INTO "Tasksets"("Type", "Year", "Name", "CourseId") VALUES (0, 2017, 'Egzamin Poprawkowy', course_id);
     END LOOP;
     RETURN;
 END
