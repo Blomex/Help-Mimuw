@@ -1,0 +1,14 @@
+@model TasksViewModel
+
+<h1>@Model.CourseName - @Model.TasksetName</h1>
+
+<h2>Zadania:</h2>
+@foreach (var task in Model.Tasks)
+{
+    <article class="border">
+        <h3>@task.Name</h3>
+        <p>
+            @task.Content
+        </p>
+    </article>
+}

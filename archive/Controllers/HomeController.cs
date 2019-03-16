@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using archive.Data;
 using Microsoft.AspNetCore.Mvc;
 using archive.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace archive.Controllers
 {
     public class HomeController : Controller
     {
-
         private readonly IRepository _repository;
 
         public HomeController(IRepository repository)
@@ -19,9 +19,25 @@ namespace archive.Controllers
             _repository = repository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var courses = _repository.Courses
+                .Select(c => new CourseViewModel(c.Name))
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            return View(await courses);
+        }
+
+        public async Task<IActionResult> Tasksets(string courseName)
+        {
+            var tasksets = _repository.Tasksets
+                .Where(t => t.Course.Name == courseName)
+                .Select(t => new TasksetViewModel(t.Type, t.Year, t.Name))
+                .OrderBy(t => t.Name)
+                .ToListAsync();
+            
+            return View("Tasksets", new TasksetsViewModel(await tasksets, courseName));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -30,7 +46,15 @@ namespace archive.Controllers
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
-        [HttpGet]
-        public JsonResult Test() => Json(_repository.Courses);
+        public async Task<IActionResult> Tasks(string courseName, string tasksetName)
+        {
+            var tasks = _repository.Tasks
+                .Where(t => t.Taskset.Name == tasksetName && t.Taskset.Course.Name == courseName)
+                .Select(t => new TaskViewModel(t.Name, t.Content))
+                .OrderBy(t => t.Name)
+                .ToListAsync();
+
+            return View("Tasks", new TasksViewModel(await tasks, tasksetName, courseName));
+        }
     }
 }

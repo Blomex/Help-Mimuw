@@ -1,11 +1,19 @@
 .PHONY: run
 run:
-	cd archive && dotnet run .
+	bash -c 'export PATH="$$PATH:/home/${USER}/.dotnet/tools" && cd archive && dotnet run .'
 
 .PHONY: migrate
 migrate:
-	cd archive && dotnet ef migrations add ${NAME}
+	bash -c 'export PATH="$$PATH:/home/${USER}/.dotnet/tools" && cd archive && dotnet ef migrations add ${NAME}'
 
 .PHONY: update
 update:
-	cd archive && dotnet ef database update
+	bash -c 'export PATH="$$PATH:/home/${USER}/.dotnet/tools" && cd archive && dotnet ef database update'
+
+
+DBNAME=archive_db
+FILE=misc/SampleData.sql
+
+.PHONY: insert
+insert:
+	psql -d ${DBNAME} -U postgres -a -f ${FILE}

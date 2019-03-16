@@ -1,8 +1,15 @@
-﻿@{
-    ViewData["Title"] = "Archiwum zadań";
-}
+﻿@model IEnumerable<CourseViewModel>
 
 <div class="text-center">
     <h1 class="display-4">Archwium zadań.</h1>
-    <a asp-controller="Home" asp-action="Test">TEST</a>
 </div>
+
+<h2>Przedmioty:</h2>
+@foreach (var course in Model)
+{
+    <a asp-controller="Home" asp-action="Tasksets"
+       asp-route-courseName="@course.Name">
+        @course.Name
+    </a>
+    <br/>
+}
