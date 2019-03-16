@@ -37,7 +37,7 @@ namespace archive.Controllers
                 .OrderBy(t => t.Name)
                 .ToListAsync();
             
-            return View("Tasksets", new TasksetsViewModel(await tasksets, courseName));
+            return View("Tasksets", new TasksetsViewModel(await tasksets, courseName, year));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
