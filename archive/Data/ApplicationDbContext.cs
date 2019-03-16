@@ -28,9 +28,8 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
-
-                    entity.Property(e => e.Name).IsRequired();
-
+                    entity.HasAlternateKey(e => e.Name);
+                  
                     entity.HasMany(e => e.Tasksets).WithOne();
                 });
 
@@ -46,7 +45,6 @@ namespace archive.Data
                     entity.HasOne(e => e.Course)
                         .WithMany(e => e.Tasksets)
                         .HasForeignKey(e => e.CourseId);
-
                 });
 
             builder.Entity<Task>(
