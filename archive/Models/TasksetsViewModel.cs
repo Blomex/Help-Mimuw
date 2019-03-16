@@ -6,13 +6,11 @@ namespace archive.Models
     {
         public IEnumerable<TasksetViewModel> Tasksets { get; }
         public string CourseName { get; }
-        public int Year { get; }
 
-        public TasksetsViewModel(IEnumerable<TasksetViewModel> tasksets, string courseName, int year)
+        public TasksetsViewModel(IEnumerable<TasksetViewModel> tasksets, string courseName)
         {
             Tasksets = tasksets;
             CourseName = courseName;
-            Year = year;
         }
     }
 }
