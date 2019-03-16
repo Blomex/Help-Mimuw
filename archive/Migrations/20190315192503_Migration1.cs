@@ -4,11 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace archive.Migrations
 {
-<<<<<<< HEAD:archive/Migrations/20190315192503_Migration1.cs
     public partial class Migration1 : Migration
-=======
-    public partial class Wiped : Migration
->>>>>>> devel:archive/Migrations/20190316212832_Wiped.cs
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -62,10 +58,7 @@ namespace archive.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Courses", x => x.Id);
-<<<<<<< HEAD:archive/Migrations/20190315192503_Migration1.cs
-=======
                     table.UniqueConstraint("AK_Courses_Name", x => x.Name);
->>>>>>> devel:archive/Migrations/20190316212832_Wiped.cs
                 });
 
             migrationBuilder.CreateTable(

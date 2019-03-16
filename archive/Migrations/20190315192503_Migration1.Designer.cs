@@ -10,13 +10,8 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<< HEAD:archive/Migrations/20190315192503_Migration1.Designer.cs
     [Migration("20190315192503_Migration1")]
     partial class Migration1
-=======
-    [Migration("20190316212832_Wiped")]
-    partial class Wiped
->>>>>>> devel:archive/Migrations/20190316212832_Wiped.Designer.cs
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -197,11 +192,8 @@ namespace archive.Migrations
 
                     b.HasKey("Id");
 
-<<<<<<< HEAD:archive/Migrations/20190315192503_Migration1.Designer.cs
-=======
                     b.HasAlternateKey("Name");
-
->>>>>>> devel:archive/Migrations/20190316212832_Wiped.Designer.cs
+                    
                     b.ToTable("Courses");
                 });
 
