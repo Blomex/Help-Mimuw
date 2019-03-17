@@ -17,3 +17,6 @@ Applying migrations:
 
 Inserting sample data:
 ```make insert```
+
+comnecting to heroku postgreSQL remotely
+```heroku pg:psql postgresql-symmetrical-49981 --app help-mimuw```
