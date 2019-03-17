@@ -1,7 +1,7 @@
 ﻿@page
 @model DeletePersonalDataModel
 @{
-    ViewData["Title"] = "Delete Personal Data";
+    ViewData["Title"] = "Usuń swoje dane";
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
 }
 
@@ -10,7 +10,7 @@
 <div class="alert alert-warning" role="alert">
     <p>
         <span class="glyphicon glyphicon-warning-sign"></span>
-        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+        <strong>Po usunięciu danych, całe Twoje konto zostanie umieszczone w najwyższej wieży najwyższego zamku na najwyższej górze Krainy Niebytu. Stamtąd nie ma powrotu...</strong>
     </p>
 </div>
 
@@ -25,7 +25,7 @@
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
         }
-        <button class="btn btn-danger" type="submit">Delete data and close my account</button>
+        <button class="btn btn-danger" type="submit">Tak, otwórzcie portal i przenieście moje dane do Krainy Niebytu</button>
     </form>
 </div>
 

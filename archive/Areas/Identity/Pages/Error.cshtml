@@ -1,16 +1,16 @@
 ﻿@page
 @model ErrorModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "Błąd";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<h1 class="text-danger">Błąd.</h1>
+<h2 class="text-danger">Wystąpił błąd przy przetwarzaniu zapytania.</h2>
 
 @if (Model.ShowRequestId)
 {
     <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        <strong>ID Zapytania:</strong> <code>@Model.RequestId</code>
     </p>
 }
 

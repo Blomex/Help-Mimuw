@@ -31,6 +31,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
         {
             [Required]
             [DataType(DataType.Password)]
+            [Display(Name ="Hasło")]
             public string Password { get; set; }
         }
 
