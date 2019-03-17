@@ -1,0 +1,26 @@
+﻿@page
+@model Disable2faModel
+@{
+    ViewData["Title"] = "Usuń dwuskładnikowe uwierzytelnianie";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>To tylko usunie 2FA.</strong>
+    </p>
+    <p>
+        Usunięcie 2FA nie służy do zmiany kluczy używanych w aplikacjach (np. przeniesienia aplikacji na inny telefon).
+        Jeżeli chcesz tylko zmienić aplikację, użyj <a asp-page="./ResetAuthenticator">tej strony</a>.
+    </p>
+</div>
+
+<div>
+    <form method="post" class="form-group">
+        <button class="btn btn-danger" type="submit">Usuń 2FA</button>
+    </form>
+</div>
