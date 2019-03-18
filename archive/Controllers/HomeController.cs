@@ -41,30 +41,19 @@ namespace archive.Controllers
             return View("Tasksets", new TasksetsViewModel(tasksets, courseName));
         }
 
-        public async Task<IActionResult> Tasks(string courseName, string tasksetName, int year)
+        public async Task<IActionResult> Tasks(string courseName, string tasksetName, int tasksetYear)
         {
-            var tasks = (await _taskService.FindForTasksetAsync(courseName, tasksetName, year))
+            var tasks = (await _taskService.FindForTasksetAsync(courseName, tasksetName, tasksetYear))
                 .Select(t => new TaskViewModel(t.Name, t.Content))
                 .OrderBy(t => t.Name);
 
-            return View("Tasks", new TasksViewModel(tasks, tasksetName, courseName));
+            return View("Tasks", new TasksViewModel(tasks, tasksetName, courseName, tasksetYear));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
-        }
-
-        public async Task<IActionResult> Tasks(string courseName, string tasksetName)
-        {
-            var tasks = _repository.Tasks
-                .Where(t => t.Taskset.Name == tasksetName && t.Taskset.Course.Name == courseName)
-                .Select(t => new TaskViewModel(t.Name, t.Content))
-                .OrderBy(t => t.Name)
-                .ToListAsync();
-
-            return View("Tasks", new TasksViewModel(await tasks, tasksetName, courseName));
         }
     }
 }

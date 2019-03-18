@@ -29,7 +29,7 @@ namespace archive.Data
                 {
                     entity.HasKey(e => e.Id);
                     entity.HasAlternateKey(e => e.Name);
-                  
+
                     entity.HasMany(e => e.Tasksets).WithOne();
                 });
 
@@ -37,6 +37,7 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
+                    entity.HasAlternateKey(e => new {e.CourseId, e.Name, e.Year});
 
                     entity.Property(e => e.Type).IsRequired();
                     entity.Property(e => e.Year).IsRequired();
@@ -58,7 +59,6 @@ namespace archive.Data
                     entity.HasOne(e => e.Taskset)
                         .WithMany(e => e.Tasks)
                         .HasForeignKey(e => e.TasksetId);
-
                 });
 
             builder.Entity<Solution>(
@@ -67,9 +67,9 @@ namespace archive.Data
                     entity.HasKey(e => e.Id);
 
                     entity.Property(e => e.Content).IsRequired();
-             
+
                     entity.HasOne(e => e.Task)
-                        .WithMany(e=> e.Solutions)
+                        .WithMany(e => e.Solutions)
                         .HasForeignKey(e => e.TaskId);
                 });
         }
