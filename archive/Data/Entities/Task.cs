@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace archive.Data.Entities
 {
     public class Task
     {
+        [Key]
         public int Id { get; set; }
         public string Name { get; set; }
         /* Tu gienieczko ma listę wersji zamiast pojedyńczej zawartości. */

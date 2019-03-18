@@ -2,6 +2,10 @@
 run:
 	bash -c 'export PATH="$$PATH:/home/${USER}/.dotnet/tools" && cd archive && dotnet run .'
 
+.PHONE: test
+test:
+	bash -c 'export PATH="$$PATH:/home/${USER}/.dotnet/tools" && cd archive.Tests && dotnet test .'
+
 .PHONY: migrate
 migrate:
 	bash -c 'export PATH="$$PATH:/home/${USER}/.dotnet/tools" && cd archive && dotnet ef migrations add ${NAME}'
