@@ -1,6 +1,8 @@
 @model TasksetsViewModel
 
-<h1>@Model.CourseName</h1>
+<div class="text-center">
+    <h1 class="display-4">@Model.CourseName</h1>
+</div>
 
 <h2>Zestawy zadań:</h2>
 @foreach (var taskset in Model.Tasksets)

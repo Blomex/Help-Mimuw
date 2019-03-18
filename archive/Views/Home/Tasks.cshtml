@@ -1,14 +1,18 @@
 @model TasksViewModel
 
-<h1>@Model.CourseName - @Model.TasksetName - @Model.TasksetYear</h1>
+<div class="text-center">
+    <h1 class="display-4">@Model.CourseName</h1>
+    <h1 class="display-4">@Model.TasksetName - @Model.TasksetYear</h1>
+</div>
 
-<h2>Zadania:</h2>
 @foreach (var task in Model.Tasks)
 {
-    <article class="border">
-        <h3>@task.Name </h3>
-        <p>
-            @task.Content
-        </p>
+    <article class="card">
+        <div class="card-body">
+            <h3>@task.Name </h3>
+            <p>
+                @task.Content
+            </p>
+        </div>
     </article>
 }
