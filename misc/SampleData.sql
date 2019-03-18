@@ -4,7 +4,7 @@ INSERT INTO "Courses"("Name") VALUES ('Inżynieria Oprogramowania');
 INSERT INTO "Courses"("Name") VALUES ('Funkcje Analityczne');
 INSERT INTO "Courses"("Name") VALUES ('Algebra');
 INSERT INTO "Courses"("Name") VALUES ('Systemy Operacyjne');
-INSERT INTO "Courses"("Name") VALUES ('Programowanie Współbierzne');
+INSERT INTO "Courses"("Name") VALUES ('Programowanie Współbieżne');
 INSERT INTO "Courses"("Name") VALUES ('Sieci Komputerowe');
 INSERT INTO "Courses"("Name") VALUES ('Języki, Automaty i Obliczenia');
 
