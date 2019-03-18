@@ -46,15 +46,15 @@ namespace archive.Controllers
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
-        public async Task<IActionResult> Tasks(string courseName, string tasksetName)
+        public async Task<IActionResult> Tasks(string courseName, string tasksetName, int tasksetYear)
         {
             var tasks = _repository.Tasks
-                .Where(t => t.Taskset.Name == tasksetName && t.Taskset.Course.Name == courseName)
+                .Where(t => t.Taskset.Name == tasksetName && t.Taskset.Course.Name == courseName && t.Taskset.Year == tasksetYear)
                 .Select(t => new TaskViewModel(t.Name, t.Content))
                 .OrderBy(t => t.Name)
                 .ToListAsync();
 
-            return View("Tasks", new TasksViewModel(await tasks, tasksetName, courseName));
+            return View("Tasks", new TasksViewModel(await tasks, tasksetName, courseName, tasksetYear));
         }
     }
 }
