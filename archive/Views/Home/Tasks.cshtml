@@ -1,9 +1,7 @@
 @model TasksViewModel
 
-<div class="text-center">
-    <h1 class="display-4">@Model.CourseName</h1>
-    <h1 class="display-4">@Model.TasksetName - @Model.TasksetYear</h1>
-</div>
+<h1>@Model.CourseName</h1>
+<h1>@Model.TasksetName - @Model.TasksetYear</h1>
 
 @foreach (var task in Model.Tasks)
 {

@@ -1,14 +1,12 @@
 @model TasksetsViewModel
 
-<div class="text-center">
-    <h1 class="display-4">@Model.CourseName</h1>
-</div>
+<h1>@Model.CourseName</h1>
 
 <h2>Zestawy zadań:</h2>
 @foreach (var taskset in Model.Tasksets)
 {
     <a asp-controller="Home" asp-action="Tasks"
-       asp-route-courseName="@Model.CourseName" 
+       asp-route-courseName="@Model.CourseName"
        asp-route-tasksetName="@taskset.Name"
        asp-route-tasksetYear="@taskset.Year">
         @taskset.Name (@taskset.Year)
