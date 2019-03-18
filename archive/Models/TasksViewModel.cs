@@ -9,11 +9,14 @@ namespace archive.Models
         public string TasksetName { get; }
         public string CourseName { get; }
 
-        public TasksViewModel(IEnumerable<TaskViewModel> tasks, string tasksetName, string courseName)
+        public int TasksetYear { get; }
+
+        public TasksViewModel(IEnumerable<TaskViewModel> tasks, string tasksetName, string courseName, int tasksetYear)
         {
             Tasks = tasks;
             TasksetName = tasksetName;
             CourseName = courseName;
+            TasksetYear = tasksetYear;
         }
     }
 }
