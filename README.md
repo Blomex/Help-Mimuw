@@ -9,6 +9,9 @@ dashboard: https://dashboard.heroku.com/apps/help-mimuw
 Building app on localhost:
 ```make run```
 
+Testing app on localhost:
+```make test```
+
 Generating migrations:
 ```make NAME=name_of_migration_here migrate```
 
@@ -18,5 +21,5 @@ Applying migrations:
 Inserting sample data:
 ```make insert```
 
-comnecting to heroku postgreSQL remotely
+connecting to heroku postgreSQL remotely:
 ```heroku pg:psql postgresql-symmetrical-49981 --app help-mimuw```
