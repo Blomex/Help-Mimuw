@@ -6,8 +6,10 @@
 @foreach (var taskset in Model.Tasksets)
 {
     <a asp-controller="Home" asp-action="Tasks"
-       asp-route-courseName="@Model.CourseName" asp-route-tasksetName="@taskset.Name">
-        @taskset.Name
+       asp-route-courseName="@Model.CourseName" 
+       asp-route-tasksetName="@taskset.Name"
+       asp-route-year="@taskset.Year">
+        @taskset.Name (@taskset.Year)
     </a>
     <br/>
 }

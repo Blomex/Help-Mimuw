@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using archive.Data.Enums;
 
 namespace archive.Data.Entities
 {
     public class Taskset
     {
+        [Key]
         public int Id { get; set; }
         public TasksetType Type { get; set; }
         public int Year { get; set; }
