@@ -1,0 +1,54 @@
+﻿@page
+@model EnableAuthenticatorModel
+@{
+    ViewData["Title"] = "Konfiguracja 2FA";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h4>@ViewData["Title"]</h4>
+<div>
+    <p>Żeby skonfigurować dwuskładnikowe uwierzytelnianie, postępuj zgodnie z poniższymi instrukcjami:</p>
+    <ol class="list">
+        <li>
+            <p>
+                Pobierz aplikację do dwuskładnikowego uwierzytalniania, na przykład
+                Google Authenticator (dla
+                <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Androida</a>,
+                <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOSa</a>)
+                lub Microsoft Authenticator (dla
+                <a href="https://go.microsoft.com/fwlink/?Linkid=825071">Windows Phone</a>,
+                <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Androida</a>,
+                <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOSa</a>).
+            </p>
+        </li>
+        <li>
+            <p>Zeskanuj kog QR lub spisz ten klucz: <kbd>@Model.SharedKey</kbd> do swojej aplikacji. Spacje i wielkość liter są nieistotne.</p>
+            <div class="alert alert-info">To enable QR code generation please read our <a href="https://go.microsoft.com/fwlink/?Linkid=852423">documentation</a>.</div>
+            <div id="qrCode"></div>
+            <div id="qrCodeData" data-url="@Html.Raw(@Model.AuthenticatorUri)"></div>
+        </li>
+        <li>
+            <p>
+                Kiedy już wpiszesz klucz lub zeskanujesz kod, aplikacja wyświetli wygenerowane hasło tymczasowe. Wpisz je tutaj:
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <form id="send-code" method="post">
+                        <div class="form-group">
+                            <label asp-for="Input.Code" class="control-label">Hasło tymczasowe</label>
+                            <input asp-for="Input.Code" class="form-control" autocomplete="off" />
+                            <span asp-validation-for="Input.Code" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Zatwierdź</button>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </li>
+    </ol>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

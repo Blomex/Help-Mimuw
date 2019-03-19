@@ -1,0 +1,27 @@
+﻿@page
+@model GenerateRecoveryCodesModel
+@{
+    ViewData["Title"] = "Wygeneruj zapasowe";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h4>@ViewData["Title"]</h4>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>Ukryj te kody w bezpiecznym miejscy i przywołaj żywiołaka co najmniej szóstego poziomu, żeby ich pilnował.</strong>
+    </p>
+    <p>
+        Jeżeli masz skonfigurowane 2FA i zgubisz telefon, to bez kodów zapasowych stracisz możliwość zalogowania się na swoje konto.
+    </p>
+    <p>
+        Dodanie kodów zapasowych nie służy do zmiany kluczy używanych w aplikacjach (np. przeniesienia aplikacji na inny telefon).
+        Jeżeli chcesz tylko zmienić aplikację, użyj <a asp-page="./ResetAuthenticator">tej strony</a>.
+    </p>
+</div>
+<div>
+    <form method="post" class="form-group">
+        <button class="btn btn-danger" type="submit">Wygeneruj kody zapasowe</button>
+    </form>
+</div>
