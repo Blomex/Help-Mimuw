@@ -1,6 +1,8 @@
 @model TasksViewModel
+
 <h1>@Model.CourseName</h1>
 <h1>@Model.TasksetName - @Model.TasksetYear</h1>
+
 @foreach (var task in Model.Tasks)
 {
     <article class="card">
