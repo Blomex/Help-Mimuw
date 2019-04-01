@@ -1,8 +1,17 @@
 ﻿@model SolutionViewModel
 @{
-    ViewData["Title"] = Model.TaskName + " (Rozwiązanie)";
+    ViewData["Title"] = Model.Task.Name + " (Rozwiązanie)";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@Model.TaskName (Rozwiązanie)</h1>
+<h1>@Model.Task.Name (Rozwiązanie)</h1>
+<article>
+    <section>
+        <pre>@Model.Task.Content</pre>
+    </section>
+    <section>
+        <p><em>Rozwiązanie:</em></p>
+        <pre style="margin-left: 5mm">@Model.Solution.Content</pre>
+    </section>
+</article>
 
