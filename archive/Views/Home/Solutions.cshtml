@@ -1,0 +1,10 @@
+﻿@model SolutionsViewModel
+
+@foreach (var task in Model.Solutions)
+{
+    <article class="card">
+        <div class="card-body">
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
+        </div>
+    </article>
+}
