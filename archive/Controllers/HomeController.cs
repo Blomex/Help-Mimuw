@@ -16,12 +16,15 @@ namespace archive.Controllers
         private readonly ICourseService _courseService;
         private readonly ITasksetService _tasksetService;
         private readonly ITaskService _taskService;
+        private readonly IRepository _repository; // FIXME
 
-        public HomeController(ICourseService courseService, ITasksetService tasksetService, ITaskService taskService)
+        public HomeController(ICourseService courseService, ITasksetService tasksetService, ITaskService taskService,
+            IRepository repository)
         {
             _courseService = courseService;
             _tasksetService = tasksetService;
             _taskService = taskService;
+            _repository = repository;
         }
 
         public async Task<IActionResult> Index()
@@ -44,8 +47,10 @@ namespace archive.Controllers
         public async Task<IActionResult> Tasks(string courseName, string tasksetName, int tasksetYear)
         {
             var tasks = (await _taskService.FindForTasksetAsync(courseName, tasksetName, tasksetYear))
-                .Select(t => new TaskViewModel(t.Name, t.Content))
+//            var tasks = await _repository.Tasks.Include(t => t.Solutions) // FIXME
+                .Select(t => new TaskViewModel(t.Id, t.Name, t.Content, t.Solutions))
                 .OrderBy(t => t.Name);
+//                .ToListAsync();
 
             return View("Tasks", new TasksViewModel(tasks, tasksetName, courseName, tasksetYear));
         }

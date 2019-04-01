@@ -9,6 +9,20 @@
         <div class="card-body">
             <h3>@task.Name </h3>
             <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
+            <a href="/solution/create/@task.Id">Dodaj rozwiązanie</a>
         </div>
     </article>
+    
+    foreach (var solution in task.Solutions)
+    {
+        // FIXME copy & paste
+        <article>
+            <section>
+                <p><em>Rozwiązanie:</em></p>
+                <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;">
+                    @solution.Content
+                </pre>
+            </section>
+        </article>
+    }
 }
