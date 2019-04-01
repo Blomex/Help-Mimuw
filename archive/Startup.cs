@@ -76,9 +76,8 @@ namespace archive
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                routes.MapRoute("Solution", "solution/{solutionId}", defaults: new { controller = "Solution", action = "Show" })
+                    .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
 
