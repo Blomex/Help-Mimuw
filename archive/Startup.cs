@@ -51,7 +51,7 @@ namespace archive
             services.AddScoped<ITasksetService, TasksetService>();
             services.AddScoped<ITaskService, TaskService>();
             services.AddScoped<ISolutionService, SolutionService>();
-            
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -82,6 +82,7 @@ namespace archive
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
+                /*przy dodawaniu innych kontrolerów
                 routes.MapRoute(
                     name: "Courses",
                     template: "{controller=Courses}/{action=Index}/{id?}");
@@ -89,6 +90,7 @@ namespace archive
                 routes.MapRoute(
                     name: "Tasks",
                     template: "{controller=Tasks}/{action=Index}/{id?}");
+            */
             });
         }
 
