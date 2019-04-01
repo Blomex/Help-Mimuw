@@ -1,0 +1,62 @@
+@model archive.Models.CreateTaskViewModel
+@{
+    ViewData["Title"] = "Nowe zadanie";
+}
+
+<h4>@Html.DisplayNameFor(model => model)</h4>
+<hr/>
+<div class="row">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Courses"></label>
+            <select id="course-select" asp-items="Model.Courses" class="form-control"
+                    onchange="showTasksetsForCourse(this.value)">
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="TasksetId"></label>
+            <select id="taskset-select" asp-for="TasksetId" asp-items="Model.Tasksets" class="form-control">
+                <option value="">--- Wybierz zbiór zadań ---</option>
+            </select>
+            <span asp-validation-for="TasksetId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control"/>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Content"></label>
+            <textarea asp-for="Content" class="form-control"></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Dodaj" class="btn btn-primary"/>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function showTasksetsForCourse(courseName) {
+            // Hide other courses tasksets
+            $("#taskset-select").find("optgroup").each(function(_, optgroup) {
+                optgroup.hidden = (optgroup.label !== courseName);
+            });
+            // Reset to default option
+            $("#taskset-select").val("");
+        }
+
+        // Hide also after page load
+        $(function() {
+            var value = $("#course-select option:selected").text();
+            showTasksetsForCourse(value);
+        });
+    </script>
+}
