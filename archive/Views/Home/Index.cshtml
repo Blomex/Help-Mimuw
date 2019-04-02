@@ -4,8 +4,8 @@
 <h2>Przedmioty:</h2>
 @foreach (var course in Model)
 {
-    <a asp-controller="Home" asp-action="Tasksets"
-       asp-route-courseName="@course.Name">
+    <a asp-controller="Taskset" asp-action="Index"
+       asp-route-id="@course.Id">
         @course.Name
     </a>
     <br/>
