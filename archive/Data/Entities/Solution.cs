@@ -11,7 +11,6 @@ namespace archive.Data.Entities
         
         public int TaskId { get; set; }
         
-        [ForeignKey(nameof(TaskId))]
         public virtual Task Task { get; set; }
     }
 }
