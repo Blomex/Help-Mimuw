@@ -69,22 +69,6 @@ Tworzymy egzemplarz bazy danych, z ktorego będzie korzystać aplikacja, przy cz
 postgres=# CREATE DATABASE archive_db;
 ```
 
-### Konfiguracja środowiska dotnet
-Instalujemy pakiet sdk środowiska dotnet:
-```
-[user@host ~]$ sudo pacman -S dotnet-sdk
-```
-
-Instalujemy entity framework.
-```
-[user@host ~]$ dotnet tool install --global dotnet-ef
-```
-
-Ustawiamy odpowiednie ścieżki -- mozna zrobić to permanentnie, np. w `.profile`.
-```
-export PATH="$PATH:/home/$USER/.dotnet/tools"
-```
-
 Ustawiamy w aplikacji dane do logowania dla naszej bazy danych:
 ```
 [user@host archive]$ vim appsettings-local.json 
@@ -99,6 +83,22 @@ Ustawiamy w aplikacji dane do logowania dla naszej bazy danych:
   },
   "AllowedHosts": "*"
 }
+```
+
+### Konfiguracja środowiska dotnet
+Instalujemy pakiet sdk środowiska dotnet:
+```
+[user@host ~]$ sudo pacman -S dotnet-sdk
+```
+
+Instalujemy entity framework.
+```
+[user@host ~]$ dotnet tool install --global dotnet-ef
+```
+
+Ustawiamy odpowiednie ścieżki -- mozna zrobić to permanentnie, np. w `.profile`.
+```
+export PATH="$PATH:/home/$USER/.dotnet/tools"
 ```
 
 Aplikujemy pliki migracji, które powinny być już w repozytorium, wygenerowane wcześniej:
