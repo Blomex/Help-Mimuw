@@ -1,0 +1,33 @@
+@model archive.Models.Taskset.IndexViewModel
+
+<h1>Archwium zadań</h1>
+
+<h2>Lista egzaminów:</h2>
+@{
+    int lastYear = 0;
+}
+@foreach (var taskset in Model.Tasksets)
+{
+    if (lastYear != taskset.Year) {
+        if(lastYear != 0)
+        {
+            @:</ul>
+        }
+        <h3>
+            @taskset.Year
+        </h3>
+        @:<ul>
+        lastYear = taskset.Year;
+    }
+    
+    <li><a asp-controller="Taskset" asp-action="ShowTaskset"
+       asp-route-id="@taskset.Id">
+       @taskset.Name
+    </a>
+    </li>
+
+}
+@if (lastYear != 0)
+{
+    @:</ul>
+}

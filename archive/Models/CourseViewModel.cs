@@ -4,9 +4,12 @@ namespace archive.Models
     {
         public string Name { get; }
 
-        public CourseViewModel(string name)
+        public int Id {get;}
+
+        public CourseViewModel(string name, int id)
         {
             Name = name;
+            Id = id;
         }
     }
 }

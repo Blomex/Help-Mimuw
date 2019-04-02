@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace archive.Migrations
 {
-    public partial class Migration1 : Migration
+    public partial class RebuiltDatabase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -181,6 +181,7 @@ namespace archive.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tasksets", x => x.Id);
+                    table.UniqueConstraint("AK_Tasksets_CourseId_Name_Year", x => new { x.CourseId, x.Name, x.Year });
                     table.ForeignKey(
                         name: "FK_Tasksets_Courses_CourseId",
                         column: x => x.CourseId,
@@ -276,11 +277,6 @@ namespace archive.Migrations
                 name: "IX_Tasks_TasksetId",
                 table: "Tasks",
                 column: "TasksetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tasksets_CourseId",
-                table: "Tasksets",
-                column: "CourseId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

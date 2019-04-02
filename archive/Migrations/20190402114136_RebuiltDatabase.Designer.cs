@@ -10,15 +10,15 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190318220904_Migration3")]
-    partial class Migration3
+    [Migration("20190402114136_RebuiltDatabase")]
+    partial class RebuiltDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

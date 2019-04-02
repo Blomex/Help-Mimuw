@@ -30,7 +30,7 @@ namespace archive.Controllers
         public async Task<IActionResult> Index()
         {
             return View((await _courseService.FindAllAsync())
-                .Select(c => new CourseViewModel(c.Name))
+                .Select(c => new CourseViewModel(c.Name, c.Id))
                 .OrderBy(c => c.Name));
         }
 
