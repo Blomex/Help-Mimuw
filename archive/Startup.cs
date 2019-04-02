@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using archive.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -49,6 +50,7 @@ namespace archive
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<ITasksetService, TasksetService>();
             services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<ISolutionService, SolutionService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -82,7 +84,16 @@ namespace archive
                     .MapRoute("Solution", "solution/create/{forTaskId}",
                         defaults: new {controller = "Solution", action = "Create"})
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
-            });
+		  /*przy dodawaniu innych kontrolerów
+                routes.MapRoute(
+                    name: "Courses",
+                    template: "{controller=Courses}/{action=Index}/{id?}");
+
+                routes.MapRoute(
+                    name: "Tasks",
+                    template: "{controller=Tasks}/{action=Index}/{id?}");
+            */            
+		});
         }
 
         protected void ConfigureIdentityOptions(IdentityOptions options)

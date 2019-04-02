@@ -16,14 +16,15 @@ namespace archive.Controllers
         private readonly ICourseService _courseService;
         private readonly ITasksetService _tasksetService;
         private readonly ITaskService _taskService;
+        private readonly ISolutionService _solutionService;
         private readonly IRepository _repository; // FIXME
 
-        public HomeController(ICourseService courseService, ITasksetService tasksetService, ITaskService taskService,
-            IRepository repository)
+        public HomeController(ICourseService courseService, ITasksetService tasksetService, ITaskService taskService, ISolutionService solutionService, IRepository repository)
         {
             _courseService = courseService;
             _tasksetService = tasksetService;
             _taskService = taskService;
+            _solutionService = solutionService;
             _repository = repository;
         }
 
@@ -53,6 +54,16 @@ namespace archive.Controllers
 //                .ToListAsync();
 
             return View("Tasks", new TasksViewModel(tasks, tasksetName, courseName, tasksetYear));
+        }
+
+        public async Task<IActionResult> Solutions(string taskName, string tasksetName, string courseName,
+            int tasksetYear)
+        {
+            var solutions = (await _solutionService.FindForTaskAsync(taskName, tasksetName, courseName, tasksetYear))
+                .Select(s => new SolutionViewModel(null, s))
+                .OrderBy(s => s.Solution.Content); // FIXME ?
+
+            return View("Solutions", new SolutionsViewModel(solutions, taskName, tasksetName, courseName, tasksetYear));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

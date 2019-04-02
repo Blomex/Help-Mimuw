@@ -9,7 +9,14 @@
         <div class="card-body">
             <h3>@task.Name </h3>
             <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
-            <a href="/solution/create/@task.Id">Dodaj rozwiązanie</a>
+            <a href="/solution/create/@task.Id">Dodaj rozwiązanie</a>            
+		<a asp-controller="Home" asp-action="Solutions"
+               asp-route-taskName="@task.Name"
+               asp-route-courseName="@Model.CourseName"
+               asp-route-tasksetName="@Model.TasksetName"
+               asp-route-tasksetYear="@Model.TasksetYear">
+                Rozwiazania
+            </a>
         </div>
     </article>
     
