@@ -1,6 +1,5 @@
 using archive.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using Job = System.Threading.Tasks.Task;
 
 namespace archive.Data
 {
@@ -11,6 +10,6 @@ namespace archive.Data
         DbSet<Task> Tasks { get; }
         DbSet<Solution> Solutions { get; }
         
-        Job SaveChangesAsync();
+        System.Threading.Tasks.Task SaveChangesAsync();
     }
 }

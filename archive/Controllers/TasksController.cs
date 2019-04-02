@@ -28,6 +28,7 @@ namespace archive.Controllers
         
         [Authorize]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(CreateTaskViewModel task)
         {
             _repository.Tasks

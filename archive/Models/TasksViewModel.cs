@@ -8,7 +8,6 @@ namespace archive.Models
         public IEnumerable<TaskViewModel> Tasks { get; }
         public string TasksetName { get; }
         public string CourseName { get; }
-
         public int TasksetYear { get; }
 
         public TasksViewModel(IEnumerable<TaskViewModel> tasks,

@@ -11,11 +11,17 @@ namespace archive.Models
     [Display(Name = "Utwórz zbiór zadań.")]
     public class CreateTasksetViewModel
     {
-        [Display(Name = "Typ")] [Required] public string Type { get; set; }
+        [Display(Name = "Typ")] 
+        [Required] 
+        public string Type { get; set; }
 
-        [Display(Name = "Rok")] [Required] public int Year { get; set; }
+        [Display(Name = "Rok")] 
+        [Required] 
+        public int Year { get; set; }
 
-        [Display(Name = "Nazwa")] [Required] public string Name { get; set; }
+        [Display(Name = "Nazwa")]
+        [Required] 
+        public string Name { get; set; }
 
         [Display(Name = "Przedmiot")]
         [Required]

@@ -17,15 +17,14 @@ namespace archive.Controllers
         private readonly ITasksetService _tasksetService;
         private readonly ITaskService _taskService;
         private readonly ISolutionService _solutionService;
-        private readonly IRepository _repository; // FIXME
 
-        public HomeController(ICourseService courseService, ITasksetService tasksetService, ITaskService taskService, ISolutionService solutionService, IRepository repository)
+        public HomeController(ICourseService courseService, ITasksetService tasksetService,
+            ITaskService taskService, ISolutionService solutionService)
         {
             _courseService = courseService;
             _tasksetService = tasksetService;
             _taskService = taskService;
             _solutionService = solutionService;
-            _repository = repository;
         }
 
         public async Task<IActionResult> Index()
@@ -48,10 +47,8 @@ namespace archive.Controllers
         public async Task<IActionResult> Tasks(string courseName, string tasksetName, int tasksetYear)
         {
             var tasks = (await _taskService.FindForTasksetAsync(courseName, tasksetName, tasksetYear))
-//            var tasks = await _repository.Tasks.Include(t => t.Solutions) // FIXME
                 .Select(t => new TaskViewModel(t.Id, t.Name, t.Content, t.Solutions))
                 .OrderBy(t => t.Name);
-//                .ToListAsync();
 
             return View("Tasks", new TasksViewModel(tasks, tasksetName, courseName, tasksetYear));
         }
@@ -61,7 +58,9 @@ namespace archive.Controllers
         {
             var solutions = (await _solutionService.FindForTaskAsync(taskName, tasksetName, courseName, tasksetYear))
                 .Select(s => new SolutionViewModel(null, s))
-                .OrderBy(s => s.Solution.Content); // FIXME ?
+                .OrderBy(s =>
+                    s.Solution
+                        .Content); // FIXME Tutaj pewnie po dacie dodanie/ostatniej zmiany przydało by się sortować
 
             return View("Solutions", new SolutionsViewModel(solutions, taskName, tasksetName, courseName, tasksetYear));
         }

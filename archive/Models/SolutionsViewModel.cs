@@ -18,8 +18,6 @@ namespace archive.Models
             TasksetName = tasksetName;
             CourseName = courseName;
             TasksetYear = tasksetYear;
-
         }
-
     }
 }
