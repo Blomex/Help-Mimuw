@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using archive.Models.Solution;
 
 namespace archive.Models
 {
@@ -18,8 +19,6 @@ namespace archive.Models
             TasksetName = tasksetName;
             CourseName = courseName;
             TasksetYear = tasksetYear;
-
         }
-
     }
 }
