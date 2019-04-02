@@ -84,7 +84,7 @@ namespace archive
                     .MapRoute("Solution", "solution/create/{forTaskId}",
                         defaults: new {controller = "Solution", action = "Create"})
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
-		  /*przy dodawaniu innych kontrolerów
+		    /* FIXME - zrobić porządek ze ścieżkami
                 routes.MapRoute(
                     name: "Courses",
                     template: "{controller=Courses}/{action=Index}/{id?}");

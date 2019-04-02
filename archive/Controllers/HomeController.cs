@@ -58,9 +58,7 @@ namespace archive.Controllers
         {
             var solutions = (await _solutionService.FindForTaskAsync(taskName, tasksetName, courseName, tasksetYear))
                 .Select(s => new SolutionViewModel(null, s))
-                .OrderBy(s =>
-                    s.Solution
-                        .Content); // FIXME Tutaj pewnie po dacie dodanie/ostatniej zmiany przydało by się sortować
+                .OrderBy(s => s.Solution.Content); // FIXME Tutaj pewnie po dacie dodanie/ostatniej zmiany przydało by się sortować
 
             return View("Solutions", new SolutionsViewModel(solutions, taskName, tasksetName, courseName, tasksetYear));
         }
