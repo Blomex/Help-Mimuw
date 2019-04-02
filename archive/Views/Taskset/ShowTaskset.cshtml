@@ -2,11 +2,11 @@
 
 <h1>Archwium zadań</h1>
 
-<h2>@Model.Taskset.Name:</h2>
+<h2>@Model.Taskset.Name (@Model.Taskset.Year):</h2>
 @foreach (var task in Model.Tasks)
 {
     <h3>
     @task.Name
     </h3>
-    <pre>@task.Content</pre>
+    <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
 }

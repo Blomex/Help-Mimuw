@@ -28,8 +28,10 @@ namespace archive.Controllers
         public async Task<IActionResult> Index(int id)
         {
             _logger.LogDebug($"Requested taskset for course id={id}");
-            var tasksets = await _repository.Tasksets.Where(s => s.CourseId == id).ToListAsync();
-            return View("Index", tasksets);
+            var tasksets = await _repository.Tasksets.Where(s => s.CourseId == id).OrderByDescending(s => s.Year).ToListAsync();
+
+            var model = new IndexViewModel {Tasksets = tasksets};
+            return View("Index", model);
         }
 
         public async Task<IActionResult> ShowTaskset(int id)
