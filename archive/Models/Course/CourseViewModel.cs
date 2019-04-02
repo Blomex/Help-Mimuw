@@ -1,4 +1,4 @@
-namespace archive.Models
+namespace archive.Models.Course
 {
     public class CourseViewModel
     {

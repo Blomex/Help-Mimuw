@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using archive.Data;
 using Microsoft.AspNetCore.Mvc;
 using archive.Models;
+using archive.Models.Course;
+using archive.Models.Taskset;
 using archive.Services;
 using Microsoft.EntityFrameworkCore;
 

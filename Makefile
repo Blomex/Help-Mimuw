@@ -16,7 +16,7 @@ update:
 
 
 DBNAME=archive_db
-FILE=misc/SampleData.sql
+FILE=scripts/SampleData.sql
 
 .PHONY: insert
 insert:

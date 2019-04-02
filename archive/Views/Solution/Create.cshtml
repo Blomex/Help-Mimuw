@@ -1,6 +1,6 @@
-﻿@model archive.Models.SolutionViewModel
+﻿@model archive.Models.Solution.SolutionViewModel
 @{
-    ViewData["Title"] = "FIXME?";
+    ViewData["Title"] = "Nowe rozwiązanie";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -21,7 +21,7 @@
                 <span asp-validation-for="Solution.Content" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Dodaj" class="btn btn-primary" />
             </div>
         </form>
     </div>

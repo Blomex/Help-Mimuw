@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using archive.Data.Entities;
 
 
 namespace archive.Models.Taskset
@@ -8,12 +9,6 @@ namespace archive.Models.Taskset
         public Data.Entities.Taskset Taskset { get; set; }
         public IEnumerable<Data.Entities.Task> Tasks { get; set; }
 
-        public new Dictionary<int, List<Data.Entities.Solution>> ListOfSolutions{ get; set;}
-
-
-
-
-
+        public Dictionary<int, List<Data.Entities.Solution>> ListOfSolutions { get; set;}
     }
-
 }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
 using archive.Models;
+using archive.Models.Solution;
 using archive.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -46,6 +48,7 @@ namespace archive.Controllers
             return View("Show", new SolutionViewModel(task, solution));
         }
 
+        [Authorize]
         public async Task<IActionResult> Create(int forTaskId)
         {
             _logger.LogDebug($"Requested solution creation form for task {forTaskId}");
@@ -68,6 +71,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TaskId,Content")] Solution solution)
         {

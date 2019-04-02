@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 
-namespace archive.Models
+namespace archive.Models.Taskset
 {
     public class TasksetsViewModel
     {
-        public IEnumerable<TasksetViewModel> Tasksets { get; }
+        public IEnumerable<Data.Entities.Taskset> Tasksets { get; }
         public string CourseName { get; }
 
-        public TasksetsViewModel(IEnumerable<TasksetViewModel> tasksets, string courseName)
+        public TasksetsViewModel(IEnumerable<Data.Entities.Taskset> tasksets, string courseName)
         {
             Tasksets = tasksets;
             CourseName = courseName;

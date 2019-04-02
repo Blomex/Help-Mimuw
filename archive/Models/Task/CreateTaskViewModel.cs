@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using archive.Data.Entities;
-using archive.Data.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace archive.Models
+namespace archive.Models.Task
 {
     [Display(Name = "Dodaj zadanie")]
     public class CreateTaskViewModel
@@ -31,7 +28,7 @@ namespace archive.Models
         {
         }
 
-        public CreateTaskViewModel(List<Taskset> tasksets)
+        public CreateTaskViewModel(List<Data.Entities.Taskset> tasksets)
         {
             var coursesNames = tasksets
                 .Select(t => t.Course.Name)
@@ -57,6 +54,11 @@ namespace archive.Models
                     Group = courseGroups[t.Course.Name]
                 })
                 .ToList();
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Name)}: {Name}, {nameof(Content)}: {Content}, {nameof(TasksetId)}: {TasksetId}";
         }
     }
 }
