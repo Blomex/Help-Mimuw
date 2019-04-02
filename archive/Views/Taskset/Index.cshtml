@@ -1,0 +1,13 @@
+@model IEnumerable<archive.Data.Entities.Taskset>
+
+<h1>Archwium zadań</h1>
+
+<h2>Lista egzaminów:</h2>
+@foreach (var taskset in Model)
+{
+    <a asp-controller="Taskset" asp-action="ShowTaskset"
+       asp-route-id="@taskset.Id">
+        @taskset.Name
+    </a>
+    <br/>
+}

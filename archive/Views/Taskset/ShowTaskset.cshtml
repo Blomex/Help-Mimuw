@@ -1,0 +1,12 @@
+@model archive.Models.Taskset.TasksetViewModel
+
+<h1>Archwium zadań</h1>
+
+<h2>@Model.Taskset.Name:</h2>
+@foreach (var task in Model.Tasks)
+{
+    <h3>
+    @task.Name
+    </h3>
+    <pre>@task.Content</pre>
+}
