@@ -9,4 +9,27 @@
     @task.Name
     </h3>
     <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
+
+    int counter = 0;
+
+    foreach (var solution in Model.ListOfSolutions[task.Id])
+    {
+        if(counter != 0)
+        {
+            @:</ul>
+        }
+        counter++;
+        <li>
+        <a asp-controller="Solution" asp-action="show"
+        asp-route-solutionId="@solution.Id" >rozwiązanie @counter
+        </a>
+        </li>
+       
+
+    }
+
+    @if (counter != 0)
+    {
+    @:</ul>
+    }
 }

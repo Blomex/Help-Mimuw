@@ -8,6 +8,12 @@ namespace archive.Models.Taskset
         public Data.Entities.Taskset Taskset { get; set; }
         public IEnumerable<Data.Entities.Task> Tasks { get; set; }
 
+        public new Dictionary<int, List<Data.Entities.Solution>> ListOfSolutions{ get; set;}
+
+
+
+
+
     }
 
 }

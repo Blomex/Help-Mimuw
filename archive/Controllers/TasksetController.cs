@@ -43,9 +43,17 @@ namespace archive.Controllers
                 return new StatusCodeResult(404);
             }
 
+
             var tasks = await _repository.Tasks.Where(s => s.TasksetId == id).ToListAsync();
 
-            var model = new TasksetViewModel {Taskset = taskset, Tasks = tasks};
+            var listOfSolutions = new Dictionary<int, List<Solution>>();
+
+            foreach (var task in tasks) {
+                var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
+                listOfSolutions.Add(task.Id, solutions);
+            }
+
+            var model = new TasksetViewModel {Taskset = taskset, Tasks = tasks, ListOfSolutions = listOfSolutions};
 
             return View("ShowTaskset", model);
         }
