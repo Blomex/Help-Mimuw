@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using archive.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -49,7 +50,8 @@ namespace archive
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<ITasksetService, TasksetService>();
             services.AddScoped<ITaskService, TaskService>();
-            
+            services.AddScoped<ISolutionService, SolutionService>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

@@ -16,12 +16,14 @@ namespace archive.Controllers
         private readonly ICourseService _courseService;
         private readonly ITasksetService _tasksetService;
         private readonly ITaskService _taskService;
+        private readonly ISolutionService _solutionService;
 
-        public HomeController(ICourseService courseService, ITasksetService tasksetService, ITaskService taskService)
+        public HomeController(ICourseService courseService, ITasksetService tasksetService, ITaskService taskService, ISolutionService solutionService)
         {
             _courseService = courseService;
             _tasksetService = tasksetService;
             _taskService = taskService;
+            _solutionService = solutionService;
         }
 
         public async Task<IActionResult> Index()
@@ -48,6 +50,16 @@ namespace archive.Controllers
                 .OrderBy(t => t.Name);
 
             return View("Tasks", new TasksViewModel(tasks, tasksetName, courseName, tasksetYear));
+        }
+
+        public async Task<IActionResult> Solutions(string taskName, string tasksetName, string courseName,
+            int tasksetYear)
+        {
+            var solutions = (await _solutionService.FindForTaskAsync(taskName, tasksetName, courseName, tasksetYear))
+                .Select(t => new SolutionViewModel(t.Content))
+                .OrderBy(t => t.Content);
+
+            return View("Solutions", new SolutionsViewModel(solutions, taskName, tasksetName, courseName, tasksetYear));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
