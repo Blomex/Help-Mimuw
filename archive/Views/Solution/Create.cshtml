@@ -3,8 +3,10 @@
     ViewData["Title"] = "Nowe rozwiązanie";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h1>@Model.Task.Name</h1>
+<h1>@Model.Task.Taskset.Course.Name</h1>
+<h2>@Model.Task.Taskset.Name (@Model.Task.Taskset.Year)</h2>
+<hr/>
+<h2>@Model.Task.Name</h2>
 <section>
     <pre style="white-space: pre-wrap; word-wrap: break-word;">@Model.Task.Content</pre>
 </section>

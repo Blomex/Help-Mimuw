@@ -1,8 +1,11 @@
 @model archive.Models.Taskset.TasksetViewModel
 
-<h1>Archwium zadań</h1>
-
+<h1>@Model.Taskset.Course.Name</h1>
 <h2>@Model.Taskset.Name (@Model.Taskset.Year):</h2>
+<a asp-controller="Task" asp-action="Create"
+   asp-route-forTasksetId="@Model.Taskset.Id">Dodaj zadanie</a>
+<hr/>
+
 @foreach (var task in Model.Tasks)
 {
     @:<section>

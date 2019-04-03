@@ -28,15 +28,14 @@ namespace archive.Models.Taskset
         public int CourseId { get; set; }
 
         public List<SelectListItem> Types { get; }
+
         public TasksetType TypeAsEnum => Enum.Parse<TasksetType>(Type);
+
+        public Data.Entities.Course Course { get; }
 
         public List<SelectListItem> Courses { get; }
 
         public CreateTasksetViewModel()
-        {
-        }
-
-        public CreateTasksetViewModel(List<Data.Entities.Course> courses)
         {
             var translation = new Dictionary<string, string>();
             translation[TasksetType.Exam.ToString()] = "Egzamin";
@@ -47,7 +46,15 @@ namespace archive.Models.Taskset
             Types = Enum.GetNames(typeof(TasksetType))
                 .Select(t => new SelectListItem(translation[t], t))
                 .ToList();
+        }
 
+        public CreateTasksetViewModel(Data.Entities.Course course) : this()
+        {
+            Course = course;
+        }
+
+        public CreateTasksetViewModel(List<Data.Entities.Course> courses) : this()
+        {
             Courses = courses
                 .Select(c => new SelectListItem(c.Name, c.Id.ToString()))
                 .ToList();

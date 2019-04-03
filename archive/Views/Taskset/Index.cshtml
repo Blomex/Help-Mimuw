@@ -1,6 +1,9 @@
 @model archive.Models.Taskset.IndexViewModel
 
-<h1>Archwium zadań</h1>
+<h1>@Model.Course.Name</h1>
+<a asp-controller="Taskset" asp-action="Create"
+   asp-route-forCourseId="@Model.Course.Id">Dodaj egzamin</a>
+<hr/>
 
 <h2>Lista egzaminów:</h2>
 @{

@@ -13,12 +13,13 @@ namespace archive.Models.Task
         public string Name { get; set; }
 
         [Display(Name = "Treść")] 
-        public string Content { get; set; }
-
-        [Display(Name = "Zbiór zadań")]
+        public string Content { get; set; } = "Tu wpisz treść zadania...";
+        
+        [Display(Name = "Egzamin")]
         [Required]
         public int TasksetId { get; set; }
 
+        public Data.Entities.Taskset Taskset { get; set; }
         public List<SelectListItem> Tasksets { get; }
 
         [Display(Name = "Przedmiot")]
@@ -26,6 +27,11 @@ namespace archive.Models.Task
 
         public CreateTaskViewModel()
         {
+        }
+
+        public CreateTaskViewModel(Data.Entities.Taskset taskset)
+        {
+            Taskset = taskset;
         }
 
         public CreateTaskViewModel(List<Data.Entities.Taskset> tasksets)
