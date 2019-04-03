@@ -21,6 +21,7 @@ Wygenerowanie testowych danych w lokalnej bazie: ```make insert```
 
 ## Heroku
 Aktualnie aplikacja jest automatycznie budowana z jednego z branchy.
+Istnieje też możliwość manualnego zbudowania aplikacji: https://dashboard.heroku.com/apps/help-mimuw/deploy/github.
 Do automatycznego budowania używamy buildpacka: https://github.com/jincod/dotnetcore-buildpack.
 Applikacja znajduje się pod adresem: http://help-mimuw.herokuapp.com/.
 Dostęp do środowiska uzyskać można poprzez dashboard: https://dashboard.heroku.com/apps/help-mimuw,
