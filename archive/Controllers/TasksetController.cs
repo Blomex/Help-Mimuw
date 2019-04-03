@@ -30,13 +30,14 @@ namespace archive.Controllers
 
         public async Task<IActionResult> ShowTaskset(int id)
         {
-            var taskset = await _repository.Tasksets.FindAsync(id);
+            var taskset = await _repository.Tasksets
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (taskset == null)
             {
                 return new StatusCodeResult(404);
             }
-
 
             var tasks = await _repository.Tasks.Where(s => s.TasksetId == id).ToListAsync();
 
@@ -55,19 +56,36 @@ namespace archive.Controllers
         public async Task<IActionResult> Index(int id)
         {
             _logger.LogDebug($"Requested taskset for course id={id}");
+
+            var course = await _repository.Courses.FindAsync(id);
+            if (course == null)
+            {
+                _logger.LogDebug($"Cannot find course with id={id}");
+                return new StatusCodeResult(404);
+            }
+            
             var tasksets = await _repository.Tasksets
                 .Where(s => s.CourseId == id)
                 .OrderByDescending(s => s.Year)
                 .ToListAsync();
 
-            var model = new IndexViewModel {Tasksets = tasksets};
+            var model = new IndexViewModel {Tasksets = tasksets, Course = course};
             return View("Index", model);
         }
 
         [Authorize]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? forCourseId)
         {
-            var courses = (await _repository.Courses.ToListAsync());
+            var course = await _repository.Courses
+                .Where(c => c.Id == forCourseId)
+                .FirstOrDefaultAsync();
+
+            if (course != null)
+            {
+                return View(new CreateTasksetViewModel(course));
+            }
+            
+            var courses = await _repository.Courses.ToListAsync();
             return View(new CreateTasksetViewModel(courses));
         }
 

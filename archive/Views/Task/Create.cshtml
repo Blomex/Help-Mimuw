@@ -3,24 +3,40 @@
     ViewData["Title"] = "Nowe zadanie";
 }
 
-<h4>@Html.DisplayNameFor(model => model)</h4>
+@if (Model.Taskset != null)
+{
+    <h1>@Model.Taskset.Course.Name</h1>
+    <h2>@Model.Taskset.Name (@Model.Taskset.Year)</h2>  
+    <hr/>
+}
+
+<h2>@Html.DisplayNameFor(model => model)</h2>
 <hr/>
+
 <div class="row">
     <form asp-action="Create">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
-            <label asp-for="Courses"></label>
-            <select id="course-select" asp-items="Model.Courses" class="form-control"
-                    onchange="showTasksetsForCourse(this.value)">
-            </select>
-        </div>
-        <div class="form-group">
-            <label asp-for="TasksetId"></label>
-            <select id="taskset-select" asp-for="TasksetId" asp-items="Model.Tasksets" class="form-control">
-                <option value="">--- Wybierz zbiór zadań ---</option>
-            </select>
-            <span asp-validation-for="TasksetId" class="text-danger"></span>
-        </div>
+        
+        @if (Model.Taskset == null) /* No taskset specified */
+        {
+            <div class="form-group">
+                <label asp-for="Courses"></label>
+                <select id="course-select" asp-items="Model.Courses" class="form-control"
+                        onchange="showTasksetsForCourse(this.value)">
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="TasksetId"></label>
+                <select id="taskset-select" asp-for="TasksetId" asp-items="Model.Tasksets" class="form-control">
+                    <option value="">--- Wybierz zbiór zadań ---</option>
+                </select>
+                <span asp-validation-for="TasksetId" class="text-danger"></span>
+            </div>
+        }
+        else /* Create task for particular taskset */
+        {
+            <input asp-for="TasksetId" value="@Model.Taskset.Id" hidden/>
+        }
         <div class="form-group">
             <label asp-for="Name"></label>
             <input asp-for="Name" class="form-control"/>
@@ -28,7 +44,7 @@
         </div>
         <div class="form-group">
             <label asp-for="Content"></label>
-            <textarea asp-for="Content" class="form-control"></textarea>
+            <textarea asp-for="Content" class="form-control" cols="120" rows="20" autofocus></textarea>
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
 
@@ -43,20 +59,23 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script>
-        function showTasksetsForCourse(courseName) {
-            // Hide other courses tasksets
-            $("#taskset-select").find("optgroup").each(function(_, optgroup) {
-                optgroup.hidden = (optgroup.label !== courseName);
-            });
-            // Reset to default option
-            $("#taskset-select").val("");
-        }
+    @if (Model.Taskset == null)
+    {
+        <script>
+            function showTasksetsForCourse(courseName) {
+                // Hide other courses tasksets
+                $("#taskset-select").find("optgroup").each(function(_, optgroup) {
+                    optgroup.hidden = (optgroup.label !== courseName);
+                });
+                // Reset to default option
+                $("#taskset-select").val("");
+            }
 
-        // Hide also after page load
-        $(function() {
-            var value = $("#course-select option:selected").text();
-            showTasksetsForCourse(value);
-        });
-    </script>
+            // Hide also after page load
+            $(function() {
+                var value = $("#course-select option:selected").text();
+                showTasksetsForCourse(value);
+            });
+        </script>
+    }
 }

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using archive.Data;
+using archive.Data.Entities;
 using archive.Models;
 using archive.Models.Task;
 using Microsoft.AspNetCore.Authorization;
@@ -22,8 +23,14 @@ namespace archive.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? forTasksetId = null)
         {
+            var taskset = await TasksetOrDefaultAsync(forTasksetId);
+            if (taskset != null)
+            {
+                return View(new CreateTaskViewModel(taskset));
+            }
+            
             var tasksets = (await _repository.Tasksets
                 .Include(t => t.Course)
                 .ToListAsync());
@@ -35,9 +42,7 @@ namespace archive.Controllers
         public async Task<IActionResult> Create(CreateTaskViewModel task)
         {
             _logger.LogDebug($"Requested to add task: " + task);
-            var tasksetForTask = await _repository.Tasksets
-                .Where(t => t.Id == task.TasksetId)
-                .FirstOrDefaultAsync();
+            var tasksetForTask = await TasksetOrDefaultAsync(task.TasksetId);
                 
             if (tasksetForTask == null || !ModelState.IsValid)
             {
@@ -55,6 +60,14 @@ namespace archive.Controllers
             
             await _repository.SaveChangesAsync();
             return RedirectToAction("ShowTaskset", "Taskset", new { id = task.TasksetId });
+        }
+
+        private Task<Taskset> TasksetOrDefaultAsync(int? id)
+        {
+            return _repository.Tasksets
+                .Where(t => t.Id == id)
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync();
         }
     }
 }

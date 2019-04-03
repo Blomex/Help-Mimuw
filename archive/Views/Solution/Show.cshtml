@@ -4,7 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@Model.Task.Name (Rozwiązanie)</h1>
+<h1>@Model.Task.Taskset.Course.Name</h1>
+<h2>@Model.Task.Taskset.Name (@Model.Task.Taskset.Year)</h2>
+<hr/>
+
+<h2>@Model.Task.Name (Rozwiązanie)</h2>
 <article>
     <section>
         <pre>@Model.Task.Content</pre>
