@@ -10,6 +10,7 @@ using archive.Models.Solution;
 using archive.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace archive.Controllers
@@ -36,7 +37,9 @@ namespace archive.Controllers
                 return new StatusCodeResult(404);
             }
 
-            var task = await _repository.Tasks.FindAsync(solution.TaskId);
+            var task = await _repository.Tasks
+                .Include(t => t.Taskset.Course)
+                .FirstOrDefaultAsync(t => t.Id == solution.TaskId);
             if (task == null)
             {
                 _logger.LogWarning($"Solution with id={solutionId} exists but references task with " +
@@ -54,7 +57,9 @@ namespace archive.Controllers
             _logger.LogDebug($"Requested solution creation form for task {forTaskId}");
 
             // Retrieve task from DB
-            var task = await _repository.Tasks.FindAsync(forTaskId);
+            var task = await _repository.Tasks
+                .Include(t => t.Taskset.Course)
+                .FirstOrDefaultAsync(t => t.Id == forTaskId);
             if (task == null)
             {
                 _logger.LogDebug($"Task not found {forTaskId}, no solution can be added");
