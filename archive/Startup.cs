@@ -75,10 +75,14 @@ namespace archive
             app.UseCookiePolicy();
 
             app.UseAuthentication();
-
+            
             app.UseMvc(routes =>
             {
-                routes.MapRoute("Solution", "solution/{solutionId}", defaults: new { controller = "Solution", action = "Show" })
+                routes
+                    .MapRoute("Solution", "solution/{solutionId}",
+                        defaults: new {controller = "Solution", action = "Show"})
+                    .MapRoute("Solution", "solution/create/{forTaskId}",
+                        defaults: new {controller = "Solution", action = "Create"})
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
@@ -99,7 +103,7 @@ namespace archive
 
             // User settings.
             options.User.AllowedUserNameCharacters =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             options.User.RequireUniqueEmail = false;
         }
     }

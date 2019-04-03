@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using Task = archive.Data.Entities.Task;
+using Task = System.Threading.Tasks.Task;
 
 namespace archive.Services
 {
@@ -22,6 +22,12 @@ namespace archive.Services
             return _repository.Tasksets
                 .Where(t => t.Course.Name == courseName)
                 .ToListAsync();
+        }
+
+        public Task AddTasksetAsync(Taskset taskset)
+        {
+            _repository.Tasksets.Add(taskset);
+            return _repository.SaveChangesAsync();
         }
     }
 }

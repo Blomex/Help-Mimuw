@@ -10,6 +10,7 @@ namespace archive.Data.Entities
         public string Content { get; set; }
         
         public int TaskId { get; set; }
+        
         public virtual Task Task { get; set; }
     }
 }
