@@ -1,4 +1,4 @@
------- PRZYKŁDOWE PRZEDMIOTY ------
+------ PRZYKŁADOWE PRZEDMIOTY ------
 INSERT INTO "Courses"("Name") VALUES ('Rachunek Prawdopodobieństwa');
 INSERT INTO "Courses"("Name") VALUES ('Inżynieria Oprogramowania');
 INSERT INTO "Courses"("Name") VALUES ('Funkcje Analityczne');
