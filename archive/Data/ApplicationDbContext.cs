@@ -15,6 +15,8 @@ namespace archive.Data
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Solution> Solutions { get; set; }
 
+        public DbSet<Rating> Ratings {get; set;}
+
         public DbSet<Comment> Comments { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -25,6 +27,12 @@ namespace archive.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<Rating>(
+                entity =>
+                {
+                    entity.HasKey(e => e.Id);
+                });
 
             builder.Entity<Course>(
                 entity =>

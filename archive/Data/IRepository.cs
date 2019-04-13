@@ -10,6 +10,9 @@ namespace archive.Data
         DbSet<Taskset> Tasksets { get; }
         DbSet<Task> Tasks { get; }
         DbSet<Solution> Solutions { get; }
+
+        DbSet<Rating> Ratings {get;}
+        
         DbSet<Comment> Comments { get; }
         Job SaveChangesAsync();
     }

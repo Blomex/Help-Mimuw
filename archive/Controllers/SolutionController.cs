@@ -60,8 +60,17 @@ namespace archive.Controllers
             {
                 _logger.LogDebug($"There are no comments for solution with id={solutionId}");
             }
+            
+            // var rating_list = _repository.Ratings.Where(r => r.IdSolution = solutionId).ToListAsync();
+            int rating = 0;
+            //sumujemy oceny
+            // foreach (var r in rating_list)
+            // {
+            //     rating += r.Value;
+            // }
+
             //just to check if they are seen correctly
-            return View("Show", new SolutionViewModel(task, solution, comments));
+            return View("Show", new SolutionViewModel(task, solution, comments, rating));
         }
 
         [Authorize]
@@ -85,8 +94,7 @@ namespace archive.Controllers
                 TaskId = forTaskId
             };
 
-            List<Comment> a = new List<Comment>();
-            return View("Create", new SolutionViewModel(task, solution,a));
+            return View("Create", new SolutionViewModel(task, solution, new List<Comment>(), 0));
         }
 
         [HttpPost]
