@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,5 +15,6 @@ namespace archive.Data.Entities
         public int TaskId { get; set; }
         
         public virtual Task Task { get; set; }
+        public IEnumerable<Comment> Comments { get; set; }
     }
 }

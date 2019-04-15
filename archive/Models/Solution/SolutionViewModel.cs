@@ -1,4 +1,5 @@
-﻿using archive.Data.Entities;
+﻿using System.Collections.Generic;
+using archive.Data.Entities;
 
 namespace archive.Models.Solution
 {
@@ -7,10 +8,12 @@ namespace archive.Models.Solution
         public Data.Entities.Task Task { get; }
         public Data.Entities.Solution Solution { get; }
 
-        public SolutionViewModel(Data.Entities.Task task, Data.Entities.Solution solution)
+        public List<Data.Entities.Comment> Comments { get; }
+        public SolutionViewModel(Data.Entities.Task task, Data.Entities.Solution solution, List<Data.Entities.Comment> comments)
         {
             Task = task;
             Solution = solution;
+            Comments = comments;
         }
     }
 }
