@@ -10,8 +10,8 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190413213140_addRating1")]
-    partial class addRating1
+    [Migration("20190415180815_newMigration6")]
+    partial class newMigration6
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -204,7 +204,7 @@ namespace archive.Migrations
 
                     b.Property<int>("IdSolution");
 
-                    b.Property<int>("IdUser");
+                    b.Property<string>("NameUser");
 
                     b.Property<int>("Value");
 
