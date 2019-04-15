@@ -49,8 +49,8 @@ namespace archive.Controllers
             }
 
             var model = new TasksetViewModel {Taskset = taskset, Tasks = tasks, ListOfSolutions = listOfSolutions};
-
-            return View("ShowTaskset", model);
+            // We need full path (see Index(id))
+            return View("/Views/Taskset/ShowTaskset.cshtml", model);
         }
 
         public async Task<IActionResult> Index(int id)
@@ -70,7 +70,8 @@ namespace archive.Controllers
                 .ToListAsync();
 
             var model = new IndexViewModel {Tasksets = tasksets, Course = course};
-            return View("Index", model);
+            // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
+            return View("/Views/Taskset/Index.cshtml", model);
         }
 
         [Authorize]
