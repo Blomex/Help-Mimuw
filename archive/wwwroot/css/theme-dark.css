@@ -1,0 +1,36 @@
+﻿@import url('https://fonts.googleapis.com/css?family=Cutive+Mono|Raleway:400,700');
+body {
+    color: #f1f8e9;
+    background: #292a29;
+    font-family: 'Raleway', sans-serif;
+}
+
+a {
+    color: #48a999;
+}
+
+a:visited {
+    color: #729d96;
+}
+
+hr {
+    border: 1px solid #729d96;
+}
+
+nav a {
+    background: #2e4034;
+}
+
+nav a:hover {
+    background: #415e4b;
+}
+
+h1, h2, h3, h4, h5, h6, h7{
+    color: #388e3c;
+    border-color: #388e3c;
+}
+
+.Info {
+    background-color: #373837;
+    border-color: #465e46 !important;
+}
