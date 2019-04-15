@@ -32,6 +32,7 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
+
                 });
 
             builder.Entity<Course>(
