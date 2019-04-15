@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Migrations\20190415183757_ratings.cs" />
+      <Compile Remove="Migrations\20190415183757_ratings.Designer.cs" />
       <Compile Remove="Migrations\20190414200900_Comments.cs" />
       <Compile Remove="Migrations\20190414200900_Comments.Designer.cs" />
       <Compile Remove="Migrations\20190415152111_Comment2.cs" />

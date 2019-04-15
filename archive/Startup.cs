@@ -79,12 +79,14 @@ namespace archive
             app.UseAuthentication();
             
             app.UseMvc(routes =>
-            {
-                routes
-                    .MapRoute("Solution", "solution/{solutionId}",
-                        defaults: new {controller = "Solution", action = "Show"})
-                    .MapRoute("Solution", "solution/create/{forTaskId}",
-                        defaults: new {controller = "Solution", action = "Create"})
+                {
+                    routes
+                        .MapRoute("Solution", "solution/{solutionId}",
+                            defaults: new {controller = "Solution", action = "Show"})
+                        .MapRoute("Solution", "solution/create/{forTaskId}",
+                            defaults: new {controller = "Solution", action = "Create"})
+                        .MapRoute("Rating", "solution/addrating/{rating}/{solutionId}",
+                            new{ controller = "Solution", action = "AddRating"})
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
