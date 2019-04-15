@@ -15,6 +15,8 @@ namespace archive.Data
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Solution> Solutions { get; set; }
 
+        public DbSet<Comment> Comments { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -46,6 +48,20 @@ namespace archive.Data
                     entity.HasOne(e => e.Course)
                         .WithMany(e => e.Tasksets)
                         .HasForeignKey(e => e.CourseId);
+                });
+
+            builder.Entity<Comment>(
+                entity =>
+                {
+                    entity.HasKey(e => e.Id);
+
+                    entity.Property(e => e.author).IsRequired();
+                    entity.Property(e => e.content).IsRequired();
+                    entity.Property(e => e.CommentDate).IsRequired();
+
+                    entity.HasOne(e => e.Solution)
+                        .WithMany(e => e.Comments);
+
                 });
 
             builder.Entity<Task>(

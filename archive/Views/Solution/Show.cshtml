@@ -1,4 +1,6 @@
-﻿@model archive.Models.Solution.SolutionViewModel
+﻿@using archive.Data.Entities
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@model archive.Models.Solution.SolutionViewModel
 @{
     ViewData["Title"] = Model.Task.Name + " (Rozwiązanie)";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -16,6 +18,33 @@
     <section>
         <p><em>Rozwiązanie:</em></p>
         <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;">@Model.Solution.Content</pre>
+        <section>
+            <p><em>Komentarze:</em></p>
+            @if (Model.Solution.Comments != null)
+            {
+                foreach (var a in Model.Solution.Comments)
+                 {
+            <div style="border: solid 1px black; margin: 1px;">
+                <p style="font-family: Tahoma";>
+                    Autor: @a.author
+                </p>
+                <p>
+                    Data:
+                    @a.CommentDate
+                </p>
+                <p>Treść:</p>
+                <div>@a.content</div>
+
+            </div>
+                 }
+            }
+            @if(Model.Solution.Comments == null || Model.Solution.Comments?.Count() == 0){
+            <p>brak</p>
+            }
+            <br>
+            <a asp-controller="Solution" asp-action="CreateComment"
+               asp-route-forSolutionId="@Model.Solution.Id">Dodaj komentarz</a>
+        </section>
     </section>
 </article>
 
