@@ -54,7 +54,8 @@ namespace archive
             services.AddScoped<ISolutionService, SolutionService>();
             services.AddScoped<IRatingService, RatingService>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().AddControllersAsServices()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,14 +80,15 @@ namespace archive
             app.UseAuthentication();
             
             app.UseMvc(routes =>
-                {
-                    routes
-                        .MapRoute("Solution", "solution/{solutionId}",
-                            defaults: new {controller = "Solution", action = "Show"})
-                        .MapRoute("Solution", "solution/create/{forTaskId}",
-                            defaults: new {controller = "Solution", action = "Create"})
-                        .MapRoute("Rating", "solution/addrating/{solutionId}",
-                            new{ controller = "Solution", action = "AddRating"})
+            {
+                routes
+                    .MapRoute("Solution", "solution/{solutionId}",
+                        defaults: new { controller = "Solution", action = "Show" })
+                    .MapRoute("Solution", "solution/create/{forTaskId}",
+                        defaults: new { controller = "Solution", action = "Create" })
+                    .MapRoute("Shortcut", "s/{shcCourse}/{shcTaskset?}", new { controller = "Home", action = "Shortcut" })
+                    // TODO Może kiedyś się to zrobi:
+                    // .MapRoute("shortcut", "s/{shcCourse}/{shcTaskset}/{shcTask?}", new { controller = "Home", action = "Shortcut" })
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
