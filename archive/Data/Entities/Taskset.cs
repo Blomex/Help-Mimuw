@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using archive.Data.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace archive.Data.Entities
 {
@@ -8,6 +10,8 @@ namespace archive.Data.Entities
     {
         [Key]
         public int Id { get; set; }
+        [Column(TypeName = "VARCHAR(8)")]
+        public string ShortcutCode { get; set; }
         public TasksetType Type { get; set; }
         public int Year { get; set; }
         public string Name { get; set; }

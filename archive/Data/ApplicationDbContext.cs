@@ -40,7 +40,9 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
-                    entity.HasAlternateKey(e => e.Name);
+                    entity.HasIndex(e => e.ShortcutCode).IsUnique();
+
+                    entity.Property(e => e.Name).IsRequired();
 
                     entity.HasMany(e => e.Tasksets).WithOne();
                 });
@@ -49,7 +51,7 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
-                    entity.HasAlternateKey(e => new {e.CourseId, e.Name, e.Year});
+                    entity.HasIndex(e => new { e.CourseId, e.ShortcutCode }).IsUnique().ForNpgsqlHasMethod("btree");
 
                     entity.Property(e => e.Type).IsRequired();
                     entity.Property(e => e.Year).IsRequired();
@@ -79,8 +81,10 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
+                    // entity.HasIndex(e => e.TasksetId);  //< according to EXPLAIN this did not a difference
+                    entity.HasIndex(e => new { e.TasksetId, e.InTasksetNumber }).IsUnique().ForNpgsqlHasMethod("btree");
 
-                    entity.Property(e => e.Name).IsRequired();
+                    entity.Property(e => e.Name);
                     entity.Property(e => e.Content);
 
                     entity.HasOne(e => e.Taskset)
