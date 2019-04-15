@@ -8,7 +8,7 @@ namespace archive.Data.Entities
         [Key]
         public int Id { get; set; }
         public int IdSolution { get; set; }
-        public int IdUser { get; set; }
+        public string NameUser { get; set; }
         public int Value {get; set; }
 
     }

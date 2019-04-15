@@ -227,7 +227,7 @@ namespace archive.Migrations
 
                     b.Property<int>("IdSolution");
 
-                    b.Property<int>("IdUser");
+                    b.Property<string>("NameUser");
 
                     b.Property<int>("Value");
 

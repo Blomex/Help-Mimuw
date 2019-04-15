@@ -64,10 +64,10 @@ namespace archive.Controllers
             // var rating_list = _repository.Ratings.Where(r => r.IdSolution = solutionId).ToListAsync();
             int rating = 0;
             //sumujemy oceny
-            // foreach (var r in rating_list)
-            // {
-            //     rating += r.Value;
-            // }
+            foreach (var r in rating_list)
+            {
+                rating += r.Value;
+            }
 
             //just to check if they are seen correctly
             return View("Show", new SolutionViewModel(task, solution, comments, rating));
@@ -169,6 +169,46 @@ namespace archive.Controllers
             await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
             return RedirectToAction("Show", new { solutionId = comment.SolutionId });
 
+        }
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddRating(int rating, int solutionId)
+        {
+            /* Czemu Bind działa bez `Solution.`? */
+            _logger.LogDebug($"Requested to add rating for {solutionId}; ");
+
+            //sprawdzamy czy istnieje rozwiazanie do którego chcemy dodać ocenę
+            if (await _repository.Solutions.FindAsync(_repository.Ratings) == null)
+            {
+                _logger.LogDebug($"Solution not found {solutionId}, no rating can be added");
+                return new StatusCodeResult(400);
+            }
+
+            //sprawdzamy czy już oceniał wcześniej
+            var userID = this.User.Identity.Name;
+            var old_rating = await _repository.Ratings.Where(r => r.IdSolution == solutionId && r.NameUser == userID).ToListAsync();
+
+            if(old_rating.Count == 0){
+                _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
+                await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
+            }
+            else{
+                //usuwamy najpierw starszą ocenę
+                _repository.Ratings.Remove(old_rating[0]);
+
+                _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
+                await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
+
+            }
+            // Validate
+            if (!ModelState.IsValid) /* huh? */
+            {
+                _logger.LogDebug($"Model state is not valid");
+                return new StatusCodeResult(400);
+            }
+
+            return RedirectToAction("Show", new { solutionId = solutionId });
         }
 
     }

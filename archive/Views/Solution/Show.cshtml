@@ -74,5 +74,9 @@
         <p>Ocena: @Model.Rating
         </p>
     </section>
+
+    @Html.ActionLink("Dobre rozwiązanie", "addRating", "Solution", new{rating = 1, solutionId = @Model.Solution.Id})
+    @Html.ActionLink("Złe rozwiązanie", "addRating", "Solution", new{rating = -1, solutionId = @Model.Solution.Id})
+
 </article>
 
