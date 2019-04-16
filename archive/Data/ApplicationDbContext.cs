@@ -8,12 +8,14 @@ using Job = System.Threading.Tasks.Task;
 
 namespace archive.Data
 {
-    public class ApplicationDbContext : IdentityDbContext, IRepository
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IRepository
     {
         public DbSet<Course> Courses { get; set; }
         public DbSet<Taskset> Tasksets { get; set; }
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Solution> Solutions { get; set; }
+
+        public DbSet<Comment> Comments { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -46,6 +48,21 @@ namespace archive.Data
                     entity.HasOne(e => e.Course)
                         .WithMany(e => e.Tasksets)
                         .HasForeignKey(e => e.CourseId);
+                });
+
+            builder.Entity<Comment>(
+                entity =>
+                {
+                    entity.HasKey(e => e.Id);
+
+                    entity.Property(e => e.ApplicationUserId).IsRequired();
+                    entity.Property(e => e.content).IsRequired();
+                    entity.Property(e => e.CommentDate).IsRequired();
+
+                    entity.HasOne(e => e.Solution)
+                        .WithMany(e => e.Comments);
+                    entity.HasOne(e => e.ApplicationUser).WithMany(u => u.Comments);
+
                 });
 
             builder.Entity<Task>(

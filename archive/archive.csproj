@@ -7,8 +7,21 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Migrations\20190414200900_Comments.cs" />
+      <Compile Remove="Migrations\20190414200900_Comments.Designer.cs" />
+      <Compile Remove="Migrations\20190415152111_Comment2.cs" />
+      <Compile Remove="Migrations\20190415152111_Comment2.Designer.cs" />
+      <Compile Remove="Migrations\20190416102133_Comment3.cs" />
+      <Compile Remove="Migrations\20190416102133_Comment3.Designer.cs" />
+      <Compile Remove="Migrations\20190416103815_Comment3.cs" />
+      <Compile Remove="Migrations\20190416103815_Comment3.Designer.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.0.2105168" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />

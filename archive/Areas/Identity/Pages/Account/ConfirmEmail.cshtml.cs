@@ -12,9 +12,9 @@ namespace archive.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ConfirmEmailModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<archive.Data.Entities.ApplicationUser> _userManager;
 
-        public ConfirmEmailModel(UserManager<IdentityUser> userManager)
+        public ConfirmEmailModel(UserManager<archive.Data.Entities.ApplicationUser> userManager)
         {
             _userManager = userManager;
         }
