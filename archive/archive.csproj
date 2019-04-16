@@ -7,8 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Migrations\20190414200900_Comments.cs" />
+      <Compile Remove="Migrations\20190414200900_Comments.Designer.cs" />
+      <Compile Remove="Migrations\20190415152111_Comment2.cs" />
+      <Compile Remove="Migrations\20190415152111_Comment2.Designer.cs" />
       <Compile Remove="Migrations\20190416102133_Comment3.cs" />
       <Compile Remove="Migrations\20190416102133_Comment3.Designer.cs" />
+      <Compile Remove="Migrations\20190416103815_Comment3.cs" />
+      <Compile Remove="Migrations\20190416103815_Comment3.Designer.cs" />
     </ItemGroup>
 
     <ItemGroup>

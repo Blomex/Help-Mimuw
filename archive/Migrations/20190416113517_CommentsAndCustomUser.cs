@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace archive.Migrations
 {
-    public partial class Comments : Migration
+    public partial class CommentsAndCustomUser : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,14 +14,20 @@ namespace archive.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    author = table.Column<string>(nullable: false),
+                    ApplicationUserId = table.Column<string>(nullable: false),
                     content = table.Column<string>(nullable: false),
                     SolutionId = table.Column<int>(nullable: false),
-                    CommentDate = table.Column<DateTime>(type: "Date", nullable: false)
+                    CommentDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_Solutions_SolutionId",
                         column: x => x.SolutionId,

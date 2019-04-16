@@ -10,8 +10,8 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190416103815_Comment3")]
-    partial class Comment3
+    [Migration("20190416113517_CommentsAndCustomUser")]
+    partial class CommentsAndCustomUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
