@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using archive.Data;
 using archive.Data.Entities;
+using archive.Data.Enums;
 using EntityFrameworkCoreMock;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
@@ -46,11 +48,6 @@ namespace archive.Tests
             repo.Setup(t => t.Solutions).Returns(solutionsDbSet.Object);
 
             return repo;
-        }
-
-        public static void InitializeDbForTests(ApplicationDbContext db)
-        {
-            // Tutaj wstawić dane
         }
     }
 }

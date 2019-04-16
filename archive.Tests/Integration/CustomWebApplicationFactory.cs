@@ -47,7 +47,7 @@ namespace archive.Tests.Integration
                     try
                     {
                         // Seed the database with test data.
-                        TestUtils.InitializeDbForTests(db);
+                        DatabaseDataProvider.InitializeForTests(db);
                     }
                     catch (Exception ex)
                     {
