@@ -9,7 +9,7 @@ namespace archive.Data.Entities
         public int Id { get; set; }
         public int IdSolution { get; set; }
         public string NameUser { get; set; }
-        public int Value {get; set; }
+        public bool Value {get; set; }
 
     }
 }

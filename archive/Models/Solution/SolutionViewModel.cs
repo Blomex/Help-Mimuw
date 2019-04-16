@@ -8,15 +8,15 @@ namespace archive.Models.Solution
         public Data.Entities.Task Task { get; }
         public Data.Entities.Solution Solution { get; }
 
-        public int Rating {get;}
+        public double Average {get;}
 
         public List<Data.Entities.Comment> Comments { get; }
 
-        public SolutionViewModel(Data.Entities.Task task, Data.Entities.Solution solution, List<Data.Entities.Comment> comments, int rating)
+        public SolutionViewModel(Data.Entities.Task task, Data.Entities.Solution solution, List<Data.Entities.Comment> comments, double average)
         {
             Task = task;
             Solution = solution;
-            Rating=rating;
+            Average=average;
             Comments = comments;
         }
     }

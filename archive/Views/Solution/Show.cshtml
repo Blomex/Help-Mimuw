@@ -71,12 +71,12 @@
         </section>
     </section>
     <section>
-        <p>Ocena: @Model.Rating
+        <p>Średnia ocen w skali (-1 do 1): @Model.Average
         </p>
     </section>
     <form asp-action="AddRating">
-        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="1">Dobre rozwiązanie</button>
-        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="-1">Złe rozwiązanie</button>
+        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="true">Dobre rozwiązanie</button>
+        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="false">Złe rozwiązanie</button>
     </form>
 
 </article>
