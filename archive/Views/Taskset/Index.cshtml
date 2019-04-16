@@ -1,4 +1,5 @@
 @model archive.Models.Taskset.IndexViewModel
+@using System.Web
 
 <h1>@Model.Course.Name</h1>
 <a asp-controller="Taskset" asp-action="Create"
@@ -8,6 +9,8 @@
 <h2>Lista egzaminów:</h2>
 @{
     int lastYear = 0;
+    string courseShortcutEncoded = 
+        Model.Course.ShortcutCode != null ? HttpUtility.UrlEncode(Model.Course.ShortcutCode) : null;
 }
 @foreach (var taskset in Model.Tasksets)
 {
@@ -22,11 +25,18 @@
         @:<ul>
         lastYear = taskset.Year;
     }
-    
-    <li><a asp-controller="Taskset" asp-action="ShowTaskset"
-       asp-route-id="@taskset.Id">
-       @taskset.Name
-    </a>
+
+    <li>
+        @if (courseShortcutEncoded == null || taskset.ShortcutCode == null)
+        {
+            <a asp-controller="Taskset" asp-action="ShowTaskset" asp-route-id="@taskset.Id">
+                @taskset.Name
+            </a>
+        }
+        else
+        {
+            <a href="/s/@courseShortcutEncoded/@HttpUtility.UrlEncode(taskset.ShortcutCode)">@taskset.Name</a>
+        }
     </li>
 
 }

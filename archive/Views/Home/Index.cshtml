@@ -1,12 +1,18 @@
-﻿@model IEnumerable<archive.Models.Course.CourseViewModel>
+﻿@model IEnumerable<archive.Data.Entities.Course>
 <h1>Archwium zadań</h1>
 
 <h2>Przedmioty:</h2>
 @foreach (var course in Model)
 {
-    <a asp-controller="Taskset" asp-action="Index"
-       asp-route-id="@course.Id">
-        @course.Name
-    </a>
+    @if (course.ShortcutCode == null)
+    {
+        <a asp-controller="Taskset" asp-action="Index" asp-route-id="@course.Id">
+            @course.Name
+        </a>
+    }
+    else
+    {
+        <a href="/s/@System.Web.HttpUtility.UrlEncode(course.ShortcutCode)">@course.Name</a>
+    }
     <br/>
 }
