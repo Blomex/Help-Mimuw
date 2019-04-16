@@ -8,7 +8,7 @@ using Job = System.Threading.Tasks.Task;
 
 namespace archive.Data
 {
-    public class ApplicationDbContext : IdentityDbContext, IRepository
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IRepository
     {
         public DbSet<Course> Courses { get; set; }
         public DbSet<Taskset> Tasksets { get; set; }
@@ -55,12 +55,13 @@ namespace archive.Data
                 {
                     entity.HasKey(e => e.Id);
 
-                    entity.Property(e => e.author).IsRequired();
+                    entity.Property(e => e.ApplicationUserId).IsRequired();
                     entity.Property(e => e.content).IsRequired();
                     entity.Property(e => e.CommentDate).IsRequired();
 
                     entity.HasOne(e => e.Solution)
                         .WithMany(e => e.Comments);
+                    entity.HasOne(e => e.ApplicationUser).WithMany(u => u.Comments);
 
                 });
 

@@ -54,6 +54,7 @@ namespace archive.Controllers
             var comments = await _repository.Comments
                 .Where(e => e.SolutionId == solutionId)
                 .OrderByDescending(e => e.CommentDate)
+                .Include(e => e.ApplicationUser)
                 .ToListAsync();
             if (comments == null || comments?.Count == 0)
             {
@@ -132,8 +133,6 @@ namespace archive.Controllers
             
             var comment = new Comment
             {
-                CommentDate = DateTime.Now,
-                author = User.Identity.GetUserName(),
                 content = "",
                 Solution = solution,
                 SolutionId = forSolutionId
@@ -144,7 +143,7 @@ namespace archive.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateComment([Bind("Id,author,content, SolutionId, CommentDate")] Comment comment)
+        public async Task<IActionResult> CreateComment([Bind("Id,content, SolutionId, CommentDate")] Comment comment)
         {
             if (await _repository.Solutions.FindAsync(comment.SolutionId) == null)
             {
@@ -159,6 +158,8 @@ namespace archive.Controllers
                 return new StatusCodeResult(400);
             }
             // Update
+            comment.CommentDate = DateTime.Now;
+            comment.ApplicationUserId = User.Identity.GetUserId();
             _repository.Comments.Add(comment);
             await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
             return RedirectToAction("Show", new { solutionId = comment.SolutionId });

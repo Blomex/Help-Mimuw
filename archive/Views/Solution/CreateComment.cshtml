@@ -8,8 +8,6 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Comment.Id" />
             <input type="hidden" asp-for="Comment.SolutionId" />
-            <input type="hidden" asp-for="Comment.CommentDate">
-            <input type="hidden" asp-for="Comment.author" />
             <div class="form-group">
                 <label asp-for="Comment.content" class="control-label">Treść komentarza</label>
                 <textarea asp-for="Comment.content" class="form-control" cols="120" rows="4" autofocus></textarea>

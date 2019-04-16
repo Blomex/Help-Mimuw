@@ -11,12 +11,12 @@ namespace archive.Areas.Identity.Pages.Account.Manage
 {
     public class SetPasswordModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<archive.Data.Entities.ApplicationUser> _userManager;
+        private readonly SignInManager<archive.Data.Entities.ApplicationUser> _signInManager;
 
         public SetPasswordModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<archive.Data.Entities.ApplicationUser> userManager,
+            SignInManager<archive.Data.Entities.ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;

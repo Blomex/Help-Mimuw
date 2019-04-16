@@ -7,6 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Migrations\20190416102133_Comment3.cs" />
+      <Compile Remove="Migrations\20190416102133_Comment3.Designer.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.1" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
