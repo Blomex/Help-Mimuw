@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using archive.Data;
@@ -14,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Task = System.Threading.Tasks.Task;
-using Microsoft.AspNet.Identity;
 
 namespace archive.Controllers
 {
@@ -159,7 +159,7 @@ namespace archive.Controllers
             }
             // Update
             comment.CommentDate = DateTime.Now;
-            comment.ApplicationUserId = User.Identity.GetUserId();
+            comment.ApplicationUserId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             _repository.Comments.Add(comment);
             await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
             return RedirectToAction("Show", new { solutionId = comment.SolutionId });
