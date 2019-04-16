@@ -85,7 +85,7 @@ namespace archive
                             defaults: new {controller = "Solution", action = "Show"})
                         .MapRoute("Solution", "solution/create/{forTaskId}",
                             defaults: new {controller = "Solution", action = "Create"})
-                        .MapRoute("Rating", "solution/addrating/{rating}/{solutionId}",
+                        .MapRoute("Rating", "solution/addrating/{solutionId}",
                             new{ controller = "Solution", action = "AddRating"})
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });

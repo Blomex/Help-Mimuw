@@ -170,16 +170,16 @@ namespace archive.Controllers
             return RedirectToAction("Show", new { solutionId = comment.SolutionId });
 
         }
+
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddRating(int rating, int solutionId)
         {
-            /* Czemu Bind działa bez `Solution.`? */
             _logger.LogDebug($"Requested to add rating for {solutionId}; ");
 
             //sprawdzamy czy istnieje rozwiazanie do którego chcemy dodać ocenę
-            if (await _repository.Solutions.FindAsync(_repository.Ratings) == null)
+            if (await _repository.Solutions.FindAsync(solutionId) == null)
             {
                 _logger.LogDebug($"Solution not found {solutionId}, no rating can be added");
                 return new StatusCodeResult(400);
