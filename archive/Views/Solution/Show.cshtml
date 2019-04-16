@@ -19,22 +19,46 @@
         <p><em>Rozwiązanie:</em></p>
         <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;">@Model.Solution.Content</pre>
         <section>
+            <style scoped>
+                .Comment {
+                    display: grid;
+                    grid-template-areas: "Date Author" "Content Content";
+                    margin-bottom: 16px;
+                }
+
+                .Comment .AuthorHere::before {
+                    color: dimgray;
+                    margin-right: 1mm;
+                    content: "Autor:";
+                }
+                .Comment .AuthorHere { 
+                    font-size: 80%; 
+                    grid-area: Author
+                }
+
+                .Comment .DateHere::before {
+                    color: dimgray;
+                    margin-right: 3px;
+                    content: "Data:";
+                }
+                .Comment .DateHere { 
+                    font-size: 80%; 
+                    grid-area: Date 
+                }
+
+                .Comment .ContentHere { grid-area: Content }
+            </style>
             <p><em>Komentarze:</em></p>
             @if (Model.Solution.Comments != null)
             {
                 foreach (var a in Model.Solution.Comments)
                  {
-            <div style="border: solid 1px black; margin: 1px;">
-                <p style="font-family: Tahoma";>
-                    Autor: @a.ApplicationUser.UserName
-                </p>
-                <p>
-                    Data:
-                    @a.CommentDate
-                </p>
-                <p>Treść:</p>
-                <div>@a.content</div>
-
+            <div class="Comment">
+                <div class="AuthorHere">@a.ApplicationUser.UserName</div>
+                <div class="DateHere">@a.CommentDate</div>
+                <div class="ContentHere">
+                    @a.content
+                </div>
             </div>
                  }
             }
