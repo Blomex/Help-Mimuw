@@ -7,6 +7,8 @@ namespace archive.Data.Entities
     {
         [Key]
         public int Id { get; set; }
+        [Required]
+        [MinLength(1)]
         public string Content { get; set; }
         
         public int TaskId { get; set; }

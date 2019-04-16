@@ -77,7 +77,7 @@ namespace archive.Controllers
         {
             /* Czemu Bind działa bez `Solution.`? */
             _logger.LogDebug($"Requested to add solution for {solution.TaskId}; " +
-                $"content: length={solution.Content.Length}, hash={solution.Content.GetHashCode()}");
+                $"content: length={solution.Content?.Length}, hash={solution.Content?.GetHashCode()}");
             
             // Check if such task exists
             if (await _repository.Tasks.FindAsync(solution.TaskId) == null)
