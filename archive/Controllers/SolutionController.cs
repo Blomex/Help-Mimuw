@@ -81,7 +81,7 @@ namespace archive.Controllers
 
             var solution = new Solution
             {
-                Content = "Tu wpisz tresć rowziązania...",
+                Content = "Tu wpisz tresć rozwiązania...",
                 TaskId = forTaskId
             };
 
@@ -94,7 +94,6 @@ namespace archive.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TaskId,Content")] Solution solution)
         {
-            /* Czemu Bind działa bez `Solution.`? */
             _logger.LogDebug($"Requested to add solution for {solution.TaskId}; " +
                 $"content: length={solution.Content?.Length}, hash={solution.Content?.GetHashCode()}");
             
@@ -106,7 +105,7 @@ namespace archive.Controllers
             }
 
             // Validate
-            if (!ModelState.IsValid) /* huh? */
+            if (!ModelState.IsValid)
             {
                 _logger.LogDebug($"Model state is not valid");
                 return new StatusCodeResult(400);
@@ -114,7 +113,7 @@ namespace archive.Controllers
 
             // Update
             _repository.Solutions.Add(solution);
-            await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
+            await _repository.SaveChangesAsync();
             return RedirectToAction("Show", new { solutionId = solution.Id });
         }
 
@@ -126,7 +125,6 @@ namespace archive.Controllers
                 .FirstOrDefaultAsync(t => t.Id == forSolutionId);
             if (solution == null)
             {
-                solution = _repository.Solutions.Find(forSolutionId);
                 _logger.LogDebug($"Solution {forSolutionId} not found, you cannot add comment");
                 return new StatusCodeResult(400);
             }
@@ -150,16 +148,15 @@ namespace archive.Controllers
                 _logger.LogDebug($"Solution not found {comment.SolutionId}, no comment can be added");
                 return new StatusCodeResult(400);
             }
-            //Solution exists, so we can add new comment
-            // Validate
-            if (!ModelState.IsValid) /* huh? */
+            // Validate (is content non-empty)
+            if (!ModelState.IsValid) 
             {
                 _logger.LogDebug($"Model state is not valid");
                 return new StatusCodeResult(400);
             }
             // Update
             comment.CommentDate = DateTime.Now;
-            comment.ApplicationUserId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            comment.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             _repository.Comments.Add(comment);
             await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
             return RedirectToAction("Show", new { solutionId = comment.SolutionId });

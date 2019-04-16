@@ -11,6 +11,8 @@ namespace archive.Data.Entities
         [Key]
         public int Id { get; set; }
         public string ApplicationUserId { get; set; }
+        [Required]
+        [MinLength(1)]
         public string content { get; set; }
         public int SolutionId { get; set; }
 
