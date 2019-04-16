@@ -26,10 +26,6 @@ namespace archive.Migrations
                 name: "FK_Comments_AspNetUsers_ApplicationUserId",
                 table: "Comments");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Comments_ApplicationUserId",
-                table: "Comments");
-
             migrationBuilder.RenameColumn(
                 name: "ApplicationUserId",
                 table: "Comments",
