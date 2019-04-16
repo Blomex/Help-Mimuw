@@ -61,16 +61,21 @@ namespace archive.Controllers
                 _logger.LogDebug($"There are no comments for solution with id={solutionId}");
             }
             
-            // var rating_list = _repository.Ratings.Where(r => r.IdSolution = solutionId).ToListAsync();
+            var rating_list = await _repository.Ratings.Where(r => r.IdSolution == solutionId).ToListAsync();
             int rating = 0;
+            int counter = 0;
             //sumujemy oceny
             foreach (var r in rating_list)
             {
-                rating += r.Value;
+                if(r.Value){rating++;}
+                else{rating--;}
+                counter++;
             }
 
+            double average = rating / counter;
+
             //just to check if they are seen correctly
-            return View("Show", new SolutionViewModel(task, solution, comments, rating));
+            return View("Show", new SolutionViewModel(task, solution, comments, average));
         }
 
         [Authorize]
@@ -171,15 +176,14 @@ namespace archive.Controllers
 
         }
 
-        [HttpPost]
         [Authorize]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddRating(int rating, int solutionId)
+        public async Task<IActionResult> AddRating(bool rating, int solutionId)
         {
             _logger.LogDebug($"Requested to add rating for {solutionId}; ");
 
             //sprawdzamy czy istnieje rozwiazanie do którego chcemy dodać ocenę
-            if (await _repository.Solutions.FindAsync(solutionId) == null)
+            var solution = await _repository.Solutions.FindAsync(solutionId);
+            if (solution == null)
             {
                 _logger.LogDebug($"Solution not found {solutionId}, no rating can be added");
                 return new StatusCodeResult(400);
@@ -191,18 +195,18 @@ namespace archive.Controllers
 
             if(old_rating.Count == 0){
                 _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
-                await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
+                await _repository.SaveChangesAsync();
             }
             else{
                 //usuwamy najpierw starszą ocenę
                 _repository.Ratings.Remove(old_rating[0]);
 
                 _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
-                await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
+                await _repository.SaveChangesAsync();
 
             }
             // Validate
-            if (!ModelState.IsValid) /* huh? */
+            if (!ModelState.IsValid)
             {
                 _logger.LogDebug($"Model state is not valid");
                 return new StatusCodeResult(400);
