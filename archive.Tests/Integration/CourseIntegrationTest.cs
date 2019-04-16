@@ -1,19 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using archive.Data;
-using AngleSharp;
-using AngleSharp.Common;
 using AngleSharp.Dom;
 using Microsoft.AspNetCore.Mvc.Testing;
 using NUnit.Framework;
-using AngleSharp.Html.Dom;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace archive.Tests.Integration
 {
