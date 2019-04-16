@@ -74,9 +74,10 @@
         <p>Ocena: @Model.Rating
         </p>
     </section>
-
-    @Html.ActionLink("Dobre rozwiązanie", "addRating", "Solution", new{rating = 1, solutionId = @Model.Solution.Id})
-    @Html.ActionLink("Złe rozwiązanie", "addRating", "Solution", new{rating = -1, solutionId = @Model.Solution.Id})
+    <form asp-action="AddRating">
+        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="1">Dobre rozwiązanie</button>
+        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="-1">Złe rozwiązanie</button>
+    </form>
 
 </article>
 
