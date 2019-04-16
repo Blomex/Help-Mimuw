@@ -204,8 +204,6 @@ namespace archive.Controllers
                 //i dodawanie nowego
                 old_rating[0].Value = rating;
                 await _repository.SaveChangesAsync();
-               // _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
-               // await _repository.SaveChangesAsync();
 
             }
             // Validate
