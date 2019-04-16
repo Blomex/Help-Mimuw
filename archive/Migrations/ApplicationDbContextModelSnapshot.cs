@@ -227,11 +227,14 @@ namespace archive.Migrations
 
                     b.Property<int>("IdSolution");
 
-                    b.Property<string>("NameUser");
+                    b.Property<string>("NameUser")
+                        .IsRequired();
 
-                    b.Property<int>("Value");
+                    b.Property<bool>("Value");
 
                     b.HasKey("Id");
+
+                    b.HasAlternateKey("IdSolution", "NameUser");
 
                     b.ToTable("Ratings");
                 });
