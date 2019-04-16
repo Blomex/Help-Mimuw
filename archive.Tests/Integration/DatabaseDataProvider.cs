@@ -1496,6 +1496,8 @@ namespace archive.Tests.Integration
                 Id = 1, ApplicationUserId = "5c633625-db0e-45f1-b0e8-2f49ae232070", content = "Trudne",
                 CommentDate = new DateTime(2010, 10, 12)
             });
+
+            db.SaveChanges();
         }
     }
 }

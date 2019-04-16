@@ -11,6 +11,13 @@ namespace archive.Tests.Integration
     {
         private WebApplicationFactory<Startup> _factory;
         private HttpClient _client;
+        
+        [OneTimeSetUp]
+        public void GivenARequestToTheController()
+        {
+            _factory = new WebApplicationFactory<Startup>();
+            _client = _factory.CreateClient();
+        }
 
         [Test]
         [TestCase("/")]
@@ -33,19 +40,12 @@ namespace archive.Tests.Integration
         public async Task EnterMappedPath(string path)
         {
             // Act
-            var response = await _client.GetAsync("/");
+            var response = await _client.GetAsync(path);
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual("text/html; charset=utf-8",
                 response.Content.Headers.ContentType.ToString());
-        }
-
-        [OneTimeSetUp]
-        public void GivenARequestToTheController()
-        {
-            _factory = new WebApplicationFactory<Startup>();
-            _client = _factory.CreateClient();
         }
 
         // FIXME unifikacja sciezek (jest na to ticket)
