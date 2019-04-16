@@ -67,12 +67,14 @@ namespace archive.Controllers
             //sumujemy oceny
             foreach (var r in rating_list)
             {
+                //może jednak zła ocena to 0 zamiast 1?
+                // i podawanie rzeczy w stylu '85% osób uważa to rozwiązanie za dobre'
                 if(r.Value){rating++;}
                 else{rating--;}
                 counter++;
             }
 
-            double average = rating / counter;
+            double average = counter == 0 ? 0 : rating / counter;
 
             //just to check if they are seen correctly
             return View("Show", new SolutionViewModel(task, solution, comments, average));
@@ -198,11 +200,12 @@ namespace archive.Controllers
                 await _repository.SaveChangesAsync();
             }
             else{
-                //usuwamy najpierw starszą ocenę
-                _repository.Ratings.Remove(old_rating[0]);
-
-                _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
+                //wystarczy zrobić tak, nie trzeba robić żadnej magii w stylu usuwanie poprzedniego rekordu
+                //i dodawanie nowego
+                old_rating[0].Value = rating;
                 await _repository.SaveChangesAsync();
+               // _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
+               // await _repository.SaveChangesAsync();
 
             }
             // Validate
