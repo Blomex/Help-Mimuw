@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using archive.Data;
 using Microsoft.AspNetCore.Mvc;
 using archive.Models;
-using archive.Models.Course;
 using archive.Models.Taskset;
 using archive.Services;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +29,7 @@ namespace archive.Controllers
         public async Task<IActionResult> Index()
         {
             var courses = await _repository.Courses.OrderBy(c => c.Name).ToListAsync();
-            return View(courses.Select(x => new CourseViewModel(x.Name, x.Id)));
+            return View(courses);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
