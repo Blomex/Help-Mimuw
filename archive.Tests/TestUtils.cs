@@ -47,5 +47,10 @@ namespace archive.Tests
 
             return repo;
         }
+
+        public static void InitializeDbForTests(ApplicationDbContext db)
+        {
+            // Tutaj wstawić dane
+        }
     }
 }
