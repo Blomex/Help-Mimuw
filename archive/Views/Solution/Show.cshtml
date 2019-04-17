@@ -53,7 +53,7 @@
                 @{
                     var counter = Model.Counter;
                     int rating = Model.GoodVotes;
-                    var average = counter == 0 ? 0 : rating / counter;
+                    double average = counter == 0 ? 0 : rating / counter;
                     var percent = average * 100;
                 }
                 <p> Ocena: @percent % (@rating / @Model.Counter)
