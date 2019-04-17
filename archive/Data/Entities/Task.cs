@@ -11,7 +11,6 @@ namespace archive.Data.Entities
         public string Name { get; set; }
         /* Tu gienieczko ma listę wersji zamiast pojedyńczej zawartości. */
         public string Content { get; set; }
-        public short? InTasksetNumber { get; set; }
    
         public int TasksetId { get; set; }
         public virtual Taskset Taskset { get; set; }

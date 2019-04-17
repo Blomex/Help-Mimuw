@@ -267,17 +267,13 @@ namespace archive.Migrations
 
                     b.Property<string>("Content");
 
-                    b.Property<short?>("InTasksetNumber");
-
                     b.Property<string>("Name");
 
                     b.Property<int>("TasksetId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TasksetId", "InTasksetNumber")
-                        .IsUnique()
-                        .HasAnnotation("Npgsql:IndexMethod", "btree");
+                    b.HasIndex("TasksetId");
 
                     b.ToTable("Tasks");
                 });

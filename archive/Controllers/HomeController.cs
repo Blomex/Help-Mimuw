@@ -71,14 +71,6 @@ namespace archive.Controllers
                 return await _tasksetController.ShowTaskset(taskset.Id);
             }
 
-            // Find the task by number
-            var task = await _repository.Tasks
-                .Where(e => e.TasksetId == taskset.Id && e.InTasksetNumber == shcTask).FirstAsync();
-            if (task == null)
-            {
-                return new StatusCodeResult(404);
-            }
-
             return new StatusCodeResult(404);
         }
     }
