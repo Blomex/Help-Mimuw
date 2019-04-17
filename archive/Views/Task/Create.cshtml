@@ -22,12 +22,12 @@
             <div class="form-group">
                 <label asp-for="Courses"></label>
                 <select id="course-select" asp-items="Model.Courses" class="form-control"
-                        onchange="showTasksetsForCourse(this.value)">
+                        onchange="showTasksetsForCourse(this.value)" required>
                 </select>
             </div>
             <div class="form-group">
                 <label asp-for="TasksetId"></label>
-                <select id="taskset-select" asp-for="TasksetId" asp-items="Model.Tasksets" class="form-control">
+                <select id="taskset-select" asp-for="TasksetId" asp-items="Model.Tasksets" class="form-control" required>
                     <option value="">--- Wybierz zbiór zadań ---</option>
                 </select>
                 <span asp-validation-for="TasksetId" class="text-danger"></span>
@@ -39,12 +39,12 @@
         }
         <div class="form-group">
             <label asp-for="Name"></label>
-            <input asp-for="Name" class="form-control"/>
+            <input asp-for="Name" class="form-control" required/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="Content"></label>
-            <textarea asp-for="Content" class="form-control" cols="120" rows="20" autofocus></textarea>
+            <textarea asp-for="Content" class="form-control" cols="120" rows="20" autofocus required></textarea>
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
 

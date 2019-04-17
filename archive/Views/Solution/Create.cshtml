@@ -19,7 +19,7 @@
             <input type="hidden" asp-for="Solution.TaskId" />
             <div class="form-group">
                 <label asp-for="Solution.Content" class="control-label">Treść rozwiązania</label>
-                <textarea asp-for="Solution.Content" class="form-control" cols="120" rows="20" autofocus></textarea>
+                <textarea asp-for="Solution.Content" class="form-control" cols="120" rows="20" autofocus required></textarea>
                 <span asp-validation-for="Solution.Content" class="text-danger"></span>
             </div>
             <div class="form-group">
