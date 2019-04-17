@@ -192,7 +192,7 @@ namespace archive.Controllers
             }
 
             //sprawdzamy czy już oceniał wcześniej
-            var userID = this.User.Identity.Name;
+            var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var old_rating = await _repository.Ratings.Where(r => r.IdSolution == solutionId && r.NameUser == userID).ToListAsync();
 
             if(old_rating.Count == 0){
