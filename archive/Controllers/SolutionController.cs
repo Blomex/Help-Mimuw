@@ -70,7 +70,6 @@ namespace archive.Controllers
                 //może jednak zła ocena to 0 zamiast 1?
                 // i podawanie rzeczy w stylu '85% osób uważa to rozwiązanie za dobre'
                 if(r.Value){rating++;}
-                else{rating--;}
                 counter++;
             }
 

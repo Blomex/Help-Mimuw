@@ -12,7 +12,7 @@ namespace archive.Data
         DbSet<Solution> Solutions { get; }
 
         DbSet<Rating> Ratings {get;}
-        
+
         DbSet<Comment> Comments { get; }
         Job SaveChangesAsync();
     }

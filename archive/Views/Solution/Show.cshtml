@@ -48,6 +48,18 @@
 
                 .Comment .ContentHere { grid-area: Content }
             </style>
+            <section>
+
+                @{
+                    var percent = Model.Average * 100;
+                }
+                <p> @percent % użytkowników uważa to rozwiązanie za dobre
+                </p>
+            </section>
+            <form asp-action="AddRating">
+                <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="true">Dobre rozwiązanie</button>
+                <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="false">Złe rozwiązanie</button>
+            </form>
             <p><em>Komentarze:</em></p>
             @if (Model.Solution.Comments != null)
             {
@@ -70,14 +82,6 @@
                asp-route-forSolutionId="@Model.Solution.Id">Dodaj komentarz</a>
         </section>
     </section>
-    <section>
-        <p>Średnia ocen w skali (-1 do 1): @Model.Average
-        </p>
-    </section>
-    <form asp-action="AddRating">
-        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="true">Dobre rozwiązanie</button>
-        <button asp-action="AddRating" asp-route-solutionId="@Model.Solution.Id" asp-route-rating="false">Złe rozwiązanie</button>
-    </form>
 
 </article>
 
