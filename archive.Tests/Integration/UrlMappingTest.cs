@@ -31,7 +31,8 @@ namespace archive.Tests.Integration
         
         [TestCase("/solution/1")]
         [TestCase("/solution/create/1")]
-        
+        [TestCase("/solution/addrating/1?rating=true")]
+        [TestCase("/solution/addrating/1?rating=false")]
         [TestCase("/Solution/CreateComment?forSolutionId=1")]
         
         [TestCase("/Identity/Account/Login")]
@@ -56,6 +57,8 @@ namespace archive.Tests.Integration
         [TestCase("/Task/Create?forTasksetId=1")]
         
         [TestCase("/solution/create/1")]
+        [TestCase("/solution/addrating/1?rating=true")]
+        [TestCase("/solution/addrating/1?rating=false")]
         [TestCase("/Solution/CreateComment?forSolutionId=1")]
         public async Task RedirectToLoginPage(string path)
         {
