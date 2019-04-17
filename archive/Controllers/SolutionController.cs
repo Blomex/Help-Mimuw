@@ -153,7 +153,7 @@ namespace archive.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateComment([Bind("Id,content, SolutionId, CommentDate")] Comment comment)
+        public async Task<IActionResult> CreateComment([Bind("Id,Content, SolutionId, CommentDate")] Comment comment)
         {
             if (await _repository.Solutions.FindAsync(comment.SolutionId) == null)
             {
