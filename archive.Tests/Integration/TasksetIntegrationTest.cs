@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using Task = System.Threading.Tasks.Task;
 
 namespace archive.Tests.Integration
@@ -73,6 +74,49 @@ namespace archive.Tests.Integration
                 for (int i = 0; i < obtainedTasksets.Count; ++i)
                 {
                     Assert.AreEqual(expectedTasksets[i], obtainedTasksets[i].Trim());
+                }
+            }
+        }
+
+        [Test]
+        public async Task ShowTasks()
+        {
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                // Arrange
+                var repository = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var tasksetName1 = Guid.NewGuid().ToString();
+                var taskset1 = new Taskset {Name = tasksetName1, Type = TasksetType.Exam, Year = 2000, CourseId = 1};
+                repository.Tasksets.Add(taskset1);
+                repository.SaveChanges();
+
+                var taskName1 = Guid.NewGuid().ToString();
+                var taskName2 = Guid.NewGuid().ToString();
+                var content = "Testowe zadanie";
+                var task1 = new Data.Entities.Task {Name = taskName1, Content = content, TasksetId = taskset1.Id};
+                var task2 = new Data.Entities.Task {Name = taskName2, Content = content, TasksetId = taskset1.Id};
+                repository.Tasks.Add(task1);
+                repository.Tasks.Add(task2);
+                repository.SaveChanges();
+
+                // Act
+                var tasksResponse = await _client.GetAsync("/Taskset/ShowTaskset/" + taskset1.Id);
+                var tasksHtmlDocument = await HtmlHelpers.GetDocumentAsync(tasksResponse);
+                Assert.AreEqual(HttpStatusCode.OK, tasksResponse.StatusCode);
+
+                // Assert
+                var main = tasksHtmlDocument.GetElementsByTagName("main");
+                Assert.AreEqual(1, main.Length);
+
+                repository.Remove(taskset1);
+                repository.Remove(task1);
+                repository.Remove(task2);
+                repository.SaveChanges();
+
+                var obtainedTasksets = new List<string>();
+                foreach (var a in main.Children("pre"))
+                {
+                    Assert.AreEqual(content, a.TextContent);
                 }
             }
         }
