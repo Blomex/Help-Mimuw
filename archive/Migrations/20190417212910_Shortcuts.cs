@@ -10,10 +10,6 @@ namespace archive.Migrations
                 name: "AK_Tasksets_CourseId_Name_Year",
                 table: "Tasksets");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Tasks_TasksetId",
-                table: "Tasks");
-
             migrationBuilder.DropUniqueConstraint(
                 name: "AK_Courses_Name",
                 table: "Courses");
@@ -30,11 +26,6 @@ namespace archive.Migrations
                 nullable: true,
                 oldClrType: typeof(string));
 
-            migrationBuilder.AddColumn<short>(
-                name: "InTasksetNumber",
-                table: "Tasks",
-                nullable: true);
-
             migrationBuilder.AddColumn<string>(
                 name: "ShortcutCode",
                 table: "Courses",
@@ -45,13 +36,6 @@ namespace archive.Migrations
                 name: "IX_Tasksets_CourseId_ShortcutCode",
                 table: "Tasksets",
                 columns: new[] { "CourseId", "ShortcutCode" },
-                unique: true)
-                .Annotation("Npgsql:IndexMethod", "btree");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tasks_TasksetId_InTasksetNumber",
-                table: "Tasks",
-                columns: new[] { "TasksetId", "InTasksetNumber" },
                 unique: true)
                 .Annotation("Npgsql:IndexMethod", "btree");
 
@@ -69,20 +53,12 @@ namespace archive.Migrations
                 table: "Tasksets");
 
             migrationBuilder.DropIndex(
-                name: "IX_Tasks_TasksetId_InTasksetNumber",
-                table: "Tasks");
-
-            migrationBuilder.DropIndex(
                 name: "IX_Courses_ShortcutCode",
                 table: "Courses");
 
             migrationBuilder.DropColumn(
                 name: "ShortcutCode",
                 table: "Tasksets");
-
-            migrationBuilder.DropColumn(
-                name: "InTasksetNumber",
-                table: "Tasks");
 
             migrationBuilder.DropColumn(
                 name: "ShortcutCode",
@@ -104,11 +80,6 @@ namespace archive.Migrations
                 name: "AK_Courses_Name",
                 table: "Courses",
                 column: "Name");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tasks_TasksetId",
-                table: "Tasks",
-                column: "TasksetId");
         }
     }
 }

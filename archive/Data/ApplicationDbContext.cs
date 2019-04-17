@@ -81,8 +81,7 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
-                    // entity.HasIndex(e => e.TasksetId);  //< according to EXPLAIN this did not a difference
-                    entity.HasIndex(e => new { e.TasksetId, e.InTasksetNumber }).IsUnique().ForNpgsqlHasMethod("btree");
+                    entity.HasIndex(e => e.TasksetId);
 
                     entity.Property(e => e.Name);
                     entity.Property(e => e.Content);

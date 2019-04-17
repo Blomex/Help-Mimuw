@@ -10,7 +10,7 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190415224930_Shortcuts")]
+    [Migration("20190417212910_Shortcuts")]
     partial class Shortcuts
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,17 +225,13 @@ namespace archive.Migrations
 
                     b.Property<string>("Content");
 
-                    b.Property<short?>("InTasksetNumber");
-
                     b.Property<string>("Name");
 
                     b.Property<int>("TasksetId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TasksetId", "InTasksetNumber")
-                        .IsUnique()
-                        .HasAnnotation("Npgsql:IndexMethod", "btree");
+                    b.HasIndex("TasksetId");
 
                     b.ToTable("Tasks");
                 });
