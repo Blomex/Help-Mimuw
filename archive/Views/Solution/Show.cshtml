@@ -17,7 +17,7 @@
     </section>
     <section>
         <p><em>Rozwiązanie:</em></p>
-        <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;">@Model.Solution.Content</pre>
+        <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;" class="Solution">@Model.Solution.Content</pre>
         <section>
             <style scoped>
                 .Comment {
@@ -69,7 +69,7 @@
                 <div class="AuthorHere">@a.ApplicationUser.UserName</div>
                 <div class="DateHere">@a.CommentDate</div>
                 <div class="ContentHere">
-                    @a.content
+                    @a.Content
                 </div>
             </div>
                  }

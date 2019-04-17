@@ -66,7 +66,7 @@ namespace archive.Data
                     entity.HasKey(e => e.Id);
 
                     entity.Property(e => e.ApplicationUserId).IsRequired();
-                    entity.Property(e => e.content).IsRequired();
+                    entity.Property(e => e.Content).IsRequired();
                     entity.Property(e => e.CommentDate).IsRequired();
 
                     entity.HasOne(e => e.Solution)

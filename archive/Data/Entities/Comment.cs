@@ -13,7 +13,7 @@ namespace archive.Data.Entities
         public string ApplicationUserId { get; set; }
         [Required]
         [MinLength(1)]
-        public string content { get; set; }
+        public string Content { get; set; }
         public int SolutionId { get; set; }
 
         [Column(TypeName = "timestamp")]

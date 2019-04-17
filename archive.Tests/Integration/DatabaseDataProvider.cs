@@ -7,6 +7,7 @@ namespace archive.Tests.Integration
 {
     public class DatabaseDataProvider
     {
+        // FIXME? Narazie nie używany, testy idą na żywej bazie
         public static void InitializeForTests(ApplicationDbContext db)
         {
             // Courses
@@ -1483,17 +1484,17 @@ namespace archive.Tests.Integration
             // Comments
             db.Comments.Add(new Comment
             {
-                Id = 1, ApplicationUserId = "5c633625-db0e-45f1-b0e8-2f49ae232070", content = "Fajne",
+                Id = 1, ApplicationUserId = "5c633625-db0e-45f1-b0e8-2f49ae232070", Content = "Fajne",
                 CommentDate = new DateTime(2010, 10, 10)
             });
             db.Comments.Add(new Comment
             {
-                Id = 1, ApplicationUserId = "5c633625-db0e-45f1-b0e8-2f49ae232070", content = "Łatwe",
+                Id = 1, ApplicationUserId = "5c633625-db0e-45f1-b0e8-2f49ae232070", Content = "Łatwe",
                 CommentDate = new DateTime(2010, 10, 11)
             });
             db.Comments.Add(new Comment
             {
-                Id = 1, ApplicationUserId = "5c633625-db0e-45f1-b0e8-2f49ae232070", content = "Trudne",
+                Id = 1, ApplicationUserId = "5c633625-db0e-45f1-b0e8-2f49ae232070", Content = "Trudne",
                 CommentDate = new DateTime(2010, 10, 12)
             });
 

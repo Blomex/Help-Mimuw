@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace archive.Tests.Integration
 {
     // Source: https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2
+    // FIXME? Narazie nie używany, z jakiegoś powodu w testach nie widać danych, ktore wstawiamy poniżej
     public class CustomWebApplicationFactory<TStartup>
         : WebApplicationFactory<TStartup> where TStartup : class
     {

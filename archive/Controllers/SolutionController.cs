@@ -145,7 +145,7 @@ namespace archive.Controllers
             
             var comment = new Comment
             {
-                content = "",
+                Content = "",
                 Solution = solution,
                 SolutionId = forSolutionId
             };

@@ -18,7 +18,7 @@ namespace archive.Tests.Integration
         private HttpClient _client;
 
         [OneTimeSetUp]
-        public void GivenARequestToTheController()
+        public void InitApplication()
         {
             _factory = new WebApplicationFactory<Startup>();
             _client = _factory.CreateClient();
