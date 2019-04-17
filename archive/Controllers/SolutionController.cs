@@ -73,10 +73,8 @@ namespace archive.Controllers
                 counter++;
             }
 
-            double average = counter == 0 ? 0 : rating / counter;
-
             //just to check if they are seen correctly
-            return View("Show", new SolutionViewModel(task, solution, comments, average));
+            return View("Show", new SolutionViewModel(task, solution, comments, rating, counter));
         }
 
         [Authorize]
@@ -100,7 +98,7 @@ namespace archive.Controllers
                 TaskId = forTaskId
             };
 
-            return View("Create", new SolutionViewModel(task, solution, new List<Comment>(), 0));
+            return View("Create", new SolutionViewModel(task, solution, new List<Comment>(), 0, 0));
         }
 
         [HttpPost]
@@ -193,7 +191,6 @@ namespace archive.Controllers
             //sprawdzamy czy już oceniał wcześniej
             var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var old_rating = await _repository.Ratings.Where(r => r.IdSolution == solutionId && r.NameUser == userID).ToListAsync();
-
             if(old_rating.Count == 0){
                 _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
                 await _repository.SaveChangesAsync();

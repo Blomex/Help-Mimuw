@@ -51,9 +51,12 @@
             <section>
 
                 @{
-                    var percent = Model.Average * 100;
+                    var counter = Model.Counter;
+                    int rating = Model.GoodVotes;
+                    var average = counter == 0 ? 0 : rating / counter;
+                    var percent = average * 100;
                 }
-                <p> @percent % użytkowników uważa to rozwiązanie za dobre
+                <p> Ocena: @percent % (@rating / @Model.Counter)
                 </p>
             </section>
             <form asp-action="AddRating">
