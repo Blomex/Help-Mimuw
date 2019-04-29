@@ -36,6 +36,7 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.1" />
         <PackageReference Include="NUnit" Version="3.11.0" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+        <PackageReference Include="SendGrid" Version="9.11.0" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     </ItemGroup>
 

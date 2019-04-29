@@ -78,10 +78,10 @@ namespace archive.Areas.Identity.Pages.Account
                         values: new { userId = user.Id, code = code },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Pttwierdzenie adresu email",
+                    await _emailSender.SendEmailAsync(Input.Email, "Potwierdzenie adresu email",
                         $"Potwierdź swój adres email <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>klikając tutaj</a>.");
-
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    //jeśli usuniemy tą linijkę niżej, to nie pozwolimy się automatycznie zalogować nowo utworzonym użytkownikom
+                   // await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)
