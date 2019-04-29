@@ -7,10 +7,21 @@ namespace archive.Data.Enums
 {
     public class UserRoles
     {
-        public const string NEW_USRER = "NEW_USER";
-        public const string REGULAR_USER = "REGULAR_USER";
-        public const string ARCHUSER = "ARCHUSER";
+        /// <summary>
+        /// Zweryfikowany użytkownik, który może dodawać zadania i rozwiązania
+        /// </summary>
+        public const string TRUSTED_USER = "TRUSTED_USER";
 
-        public static readonly string[] AllRoles = { NEW_USRER, REGULAR_USER, ARCHUSER };
+        /// <summary>
+        /// Moderator, który może dodawać przedmioty, egzaminy i edytować nieswoje rozwiązania
+        /// </summary>
+        public const string MODERATOR = "MODERATOR";
+
+        /// <summary>
+        /// Imperator, który dodatkowo może mianować moderatorów
+        /// </summary>
+        public const string IMPERATOR = "IMPERATOR";
+
+        public static readonly string[] AllRoles = { TRUSTED_USER, MODERATOR, IMPERATOR };
     }
 }

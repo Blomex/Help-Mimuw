@@ -45,6 +45,7 @@ namespace archive.Controllers
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
+        [Authorize]
         public async Task<IActionResult> Shortcut(string shcCourse, string shcTaskset=null, short? shcTask=null)
         {
             if (string.IsNullOrEmpty(shcCourse))
@@ -79,21 +80,6 @@ namespace archive.Controllers
             }
 
             return new StatusCodeResult(404);
-        }
-
-        [Authorize]
-        public async Task<IActionResult> BloodyAuthorization()
-        {
-            var user = await _userManager.FindByIdAsync(_userManager.GetUserId(HttpContext.User));
-            await _userManager.AddToRoleAsync(user, UserRoles.ARCHUSER);
-            return new StatusCodeResult(200);
-        }
-
-
-        [Authorize(Roles = UserRoles.ARCHUSER)]
-        public IActionResult TestBloodyAuthorization()
-        {
-            return new StatusCodeResult(200);
         }
     }
 }

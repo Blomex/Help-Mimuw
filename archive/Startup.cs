@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
+using archive.Data.Enums;
 
 namespace archive
 {
@@ -124,7 +125,7 @@ namespace archive
             var logger = serviceProvider.GetService<ILogger<Startup>>();
             logger.LogInformation("Create missing roles");
 
-            foreach (var roleName in Data.Enums.UserRoles.AllRoles)
+            foreach (var roleName in UserRoles.AllRoles)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {
