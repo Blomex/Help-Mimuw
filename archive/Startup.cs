@@ -65,6 +65,11 @@ namespace archive
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ConfirmedUser", policy => policy.RequireClaim("ConfirmedEmail"));
+                options.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
+            });
 
             services.Configure<IdentityOptions>(ConfigureIdentityOptions);
 

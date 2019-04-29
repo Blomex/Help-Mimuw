@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using archive.Models;
 using archive.Models.Taskset;
 using archive.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
@@ -32,7 +33,7 @@ namespace archive.Controllers
             _tasksetController = tasksetController;
             _userManager = userManager;
         }
-
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var courses = await _repository.Courses.OrderBy(c => c.Name).ToListAsync();
