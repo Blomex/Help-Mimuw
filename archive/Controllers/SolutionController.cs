@@ -12,6 +12,7 @@ using archive.Models.Comment;
 using archive.Models.Solution;
 using archive.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -131,7 +132,7 @@ namespace archive.Controllers
             return RedirectToAction("Show", new { solutionId = solution.Id });
         }
 
-        [Authorize]
+        [Authorize(Policy = "ConfirmedUser")]
         public async Task<IActionResult> CreateComment(int forSolutionId)
         {
             var solution = await _repository.Solutions
@@ -153,7 +154,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "ConfirmedUser")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateComment([Bind("Id,Content, SolutionId, CommentDate")] Comment comment)
         {
