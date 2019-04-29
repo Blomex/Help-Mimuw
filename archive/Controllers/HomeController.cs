@@ -28,7 +28,8 @@ namespace archive.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var courses = await _repository.Courses.OrderBy(c => c.Name).ToListAsync();
+            //check how deal with null
+            var courses = await _repository.Courses.Where(c => c.Archive == false).OrderBy(c => c.Name).ToListAsync();
             return View(courses);
         }
 
@@ -54,7 +55,9 @@ namespace archive.Controllers
                 .Add(new Data.Entities.Course
                 {
                     Name = model.Name,
-                    ShortcutCode = model.ShortcutCode
+                    ShortcutCode = model.ShortcutCode,
+                    Archive = false
+                
                 });
             
             await _repository.SaveChangesAsync();
@@ -84,6 +87,60 @@ namespace archive.Controllers
             }
             
             course.Name = model.Name;
+            
+            await _repository.SaveChangesAsync();
+            return RedirectToAction("Index");;
+        }
+
+        public async Task<IActionResult> ArchiveCourse()
+        {
+            var courses = await _repository.Courses.Where(c => c.Archive == false).ToListAsync();
+            return View(new ArchiveCourseModel(courses));
+        } 
+
+         [HttpPost]
+        public async Task<IActionResult> ArchiveCourse(ArchiveCourseModel model)
+        {
+            _logger.LogDebug($"Archive to course id :" + model.CourseId);
+
+            var course = await _repository.Courses
+                .Where(c => c.Id == model.CourseId)
+                .FirstOrDefaultAsync();
+
+            if (course == null || !ModelState.IsValid)
+            {
+                _logger.LogDebug($"Cannot archive:" + model.CourseId);
+                return new StatusCodeResult(400);
+            }
+            
+            course.Archive = true;
+            
+            await _repository.SaveChangesAsync();
+            return RedirectToAction("Index");;
+        }
+
+        public async Task<IActionResult> UnarchiveCourse()
+        {
+            var courses = await _repository.Courses.Where(c => c.Archive == true).ToListAsync();
+            return View(new ArchiveCourseModel(courses));
+        } 
+
+         [HttpPost]
+        public async Task<IActionResult> UnarchiveCourse(ArchiveCourseModel model)
+        {
+            _logger.LogDebug($"Archive to course id :" + model.CourseId);
+
+            var course = await _repository.Courses
+                .Where(c => c.Id == model.CourseId)
+                .FirstOrDefaultAsync();
+
+            if (course == null || !ModelState.IsValid)
+            {
+                _logger.LogDebug($"Cannot archive:" + model.CourseId);
+                return new StatusCodeResult(400);
+            }
+            
+            course.Archive = false;
             
             await _repository.SaveChangesAsync();
             return RedirectToAction("Index");;
