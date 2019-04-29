@@ -1,0 +1,29 @@
+@model archive.Models.ArchiveCourseModel
+@{
+    ViewData["Title"] = "Archwizacja przedmiotu";
+}
+
+@if(Model.Courses.Any()){
+<h2>@Html.DisplayNameFor(model => model)</h2>
+<hr/>
+<div class="row">
+    <form asp-controller="Home" asp-action="ArchiveCourse">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+       
+        <div class="form-group">
+          <label asp-for="CourseId"></label>
+            <select asp-for="CourseId" asp-items="Model.Courses" class="form-control"></select>
+            <span asp-validation-for="CourseId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Archiwizuj" class="btn btn-primary"/>
+        </div>
+    </form>
+</div>
+}
+else{
+    <h4>Nie ma przedmiotów do Odarchwizowania.</h4>
+}
+

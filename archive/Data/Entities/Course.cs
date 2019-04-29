@@ -11,6 +11,8 @@ namespace archive.Data.Entities
         [Column(TypeName = "VARCHAR(8)")]
         public string ShortcutCode { get; set; }
         public string Name { get; set; }
+
+        public bool Archive {get; set;} 
         
         public virtual ICollection<Taskset> Tasksets { get; set; } = new HashSet<Taskset>();
     }
