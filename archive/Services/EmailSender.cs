@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
-
+using System;
 namespace archive.Services
 {
     public class EmailSender : IEmailSender
@@ -22,6 +22,10 @@ namespace archive.Services
 
         public Task Execute(string apiKey, string subject, string message, string email)
         {
+            if (apiKey == null)
+            {
+                apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            }
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
