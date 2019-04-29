@@ -62,6 +62,33 @@ namespace archive.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> EditCourse()
+        {
+            var courses = await _repository.Courses.ToListAsync();
+            return View(new EditCourseModel(courses));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCourse(EditCourseModel model)
+        {
+            _logger.LogDebug($"Requested to edit name:" + model.Name);
+
+            var course = await _repository.Courses
+                .Where(c => c.Id == model.CourseId)
+                .FirstOrDefaultAsync();
+
+            if (course == null || !ModelState.IsValid)
+            {
+                _logger.LogDebug($"Cannot edit:" + model.Name);
+                return new StatusCodeResult(400);
+            }
+            
+            course.Name = model.Name;
+            
+            await _repository.SaveChangesAsync();
+            return RedirectToAction("Index");;
+        }
+
 
         public async Task<IActionResult> Shortcut(string shcCourse, string shcTaskset=null, short? shcTask=null)
         {
