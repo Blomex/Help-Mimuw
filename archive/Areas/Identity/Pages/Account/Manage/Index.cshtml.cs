@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +37,9 @@ namespace archive.Areas.Identity.Pages.Account.Manage
 
         [TempData]
         public string StatusMessage { get; set; }
+        
+        [Display(Name = "Awatar")]
+        public byte[] AvatarImage { get; set; }
 
         [BindProperty]
         public InputModel Input { get; set; }
@@ -48,6 +54,12 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Numer telefonu")]
             public string PhoneNumber { get; set; }
+            
+            [Display(Name = "Strona domowa")]
+            public string HomePage { get; set; }
+            
+            [Display(Name = "Ustaw nowy awatar")]
+            public IFormFile AvatarImage { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -63,11 +75,13 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
-
+            AvatarImage = user.Avatar;
+            
             Input = new InputModel
             {
                 Email = email,
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                HomePage = user.HomePage,
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -107,6 +121,26 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 {
                     var userId = await _userManager.GetUserIdAsync(user);
                     throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
+                }
+            }
+
+            user.HomePage = Input.HomePage;
+            if (!(await _userManager.UpdateAsync(user)).Succeeded)
+            {
+                var userId = await _userManager.GetUserIdAsync(user);
+                throw new InvalidOperationException($"Unexpected error occurred setting homepage for user with ID '{userId}'.");
+            }
+
+            if (Input.AvatarImage != null)
+            {
+                var stream = Input.AvatarImage.OpenReadStream();
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                user.Avatar = memoryStream.ToArray();
+                if (!(await _userManager.UpdateAsync(user)).Succeeded)
+                {
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    throw new InvalidOperationException($"Unexpected error occurred setting avatar for user with ID '{userId}'.");
                 }
             }
 

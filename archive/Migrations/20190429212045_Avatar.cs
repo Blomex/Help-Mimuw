@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace archive.Migrations
 {
-    public partial class RebuiltDatabase : Migration
+    public partial class Avatar : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,7 +40,10 @@ namespace archive.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    Avatar = table.Column<byte[]>(maxLength: 50331648, nullable: true),
+                    HomePage = table.Column<string>(maxLength: 256, nullable: true),
+                    LastLogout = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -53,12 +56,28 @@ namespace archive.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    ShortcutCode = table.Column<string>(type: "VARCHAR(8)", nullable: true),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Courses", x => x.Id);
-                    table.UniqueConstraint("AK_Courses_Name", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ratings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    IdSolution = table.Column<int>(nullable: false),
+                    NameUser = table.Column<string>(nullable: false),
+                    Value = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ratings", x => x.Id);
+                    table.UniqueConstraint("AK_Ratings_IdSolution_NameUser", x => new { x.IdSolution, x.NameUser });
                 });
 
             migrationBuilder.CreateTable(
@@ -173,6 +192,7 @@ namespace archive.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    ShortcutCode = table.Column<string>(type: "VARCHAR(8)", nullable: true),
                     Type = table.Column<int>(nullable: false),
                     Year = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: false),
@@ -181,7 +201,6 @@ namespace archive.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tasksets", x => x.Id);
-                    table.UniqueConstraint("AK_Tasksets_CourseId_Name_Year", x => new { x.CourseId, x.Name, x.Year });
                     table.ForeignKey(
                         name: "FK_Tasksets_Courses_CourseId",
                         column: x => x.CourseId,
@@ -196,7 +215,7 @@ namespace archive.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    Name = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
                     Content = table.Column<string>(nullable: true),
                     TasksetId = table.Column<int>(nullable: false)
                 },
@@ -227,6 +246,34 @@ namespace archive.Migrations
                         name: "FK_Solutions_Tasks_TaskId",
                         column: x => x.TaskId,
                         principalTable: "Tasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    ApplicationUserId = table.Column<string>(nullable: false),
+                    Content = table.Column<string>(nullable: false),
+                    SolutionId = table.Column<int>(nullable: false),
+                    CommentDate = table.Column<DateTime>(type: "timestamp", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comments_Solutions_SolutionId",
+                        column: x => x.SolutionId,
+                        principalTable: "Solutions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -269,6 +316,22 @@ namespace archive.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_ApplicationUserId",
+                table: "Comments",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_SolutionId",
+                table: "Comments",
+                column: "SolutionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_ShortcutCode",
+                table: "Courses",
+                column: "ShortcutCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Solutions_TaskId",
                 table: "Solutions",
                 column: "TaskId");
@@ -277,6 +340,13 @@ namespace archive.Migrations
                 name: "IX_Tasks_TasksetId",
                 table: "Tasks",
                 column: "TasksetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tasksets_CourseId_ShortcutCode",
+                table: "Tasksets",
+                columns: new[] { "CourseId", "ShortcutCode" },
+                unique: true)
+                .Annotation("Npgsql:IndexMethod", "btree");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -297,13 +367,19 @@ namespace archive.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Solutions");
+                name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "Ratings");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Solutions");
 
             migrationBuilder.DropTable(
                 name: "Tasks");

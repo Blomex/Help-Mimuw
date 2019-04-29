@@ -137,6 +137,9 @@ namespace archive.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<byte[]>("Avatar")
+                        .HasMaxLength(50331648);
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
@@ -144,6 +147,12 @@ namespace archive.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("HomePage")
+                        .HasMaxLength(256);
+
+                    b.Property<DateTime>("LastLogout")
+                        .HasColumnType("timestamp");
 
                     b.Property<bool>("LockoutEnabled");
 
