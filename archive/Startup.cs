@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
 using archive.Data.Enums;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace archive
 {
@@ -44,10 +45,27 @@ namespace archive
                 options.UseNpgsql(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>()
+            
+            // Wymaga potwierdzenia maila przed zrobieniem czegokolwiek na stronce
+            services.AddDefaultIdentity<ApplicationUser>(/*
+                    config =>
+                    {
+                        config.SignIn.RequireConfirmedEmail = true;
+                    }*/)
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+            // requires
+            // using Microsoft.AspNetCore.Identity.UI.Services;
+            // using archive.Services;
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+
             services.Configure<IdentityOptions>(ConfigureIdentityOptions);
 
             services.AddScoped<IRepository, ApplicationDbContext>();

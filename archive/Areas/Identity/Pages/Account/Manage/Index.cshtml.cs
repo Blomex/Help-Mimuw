@@ -137,12 +137,10 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 pageHandler: null,
                 values: new { userId = userId, code = code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            await _emailSender.SendEmailAsync(email, "Potwierdzenie adresu email",
+                $"Potwierdź swój adres email <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>klikając tutaj</a>.");
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            StatusMessage = "Email weryfikacyjny został wysłany. Proszę o sprawdzenie skrzynki mailowej.";
             return RedirectToPage();
         }
     }
