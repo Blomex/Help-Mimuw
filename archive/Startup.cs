@@ -19,6 +19,7 @@ using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
 using archive.Data.Enums;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 
 namespace archive
 {
@@ -67,11 +68,14 @@ namespace archive
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ConfirmedUser", policy => policy.RequireClaim("ConfirmedEmail"));
+
+                options.AddPolicy("ConfirmedUser", policy => policy.RequireRole("ConfirmedUser"));
+                //moderator nie do końca jest potrzebny chyba. 
                 options.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
             });
 
             services.Configure<IdentityOptions>(ConfigureIdentityOptions);
+            
 
             services.AddScoped<IRepository, ApplicationDbContext>();
             services.AddScoped<ICourseService, CourseService>();
