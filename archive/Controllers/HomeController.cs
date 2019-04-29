@@ -10,6 +10,10 @@ using archive.Models.Taskset;
 using archive.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using archive.Data.Entities;
+using archive.Data.Enums;
 
 namespace archive.Controllers
 {
@@ -18,12 +22,15 @@ namespace archive.Controllers
         private readonly TasksetController _tasksetController;
         private readonly ILogger _logger;
         private readonly IRepository _repository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<SolutionController> logger, IRepository repository, TasksetController tasksetController)
+        public HomeController(ILogger<SolutionController> logger, IRepository repository, TasksetController tasksetController,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _repository = repository;
             _tasksetController = tasksetController;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
@@ -72,6 +79,21 @@ namespace archive.Controllers
             }
 
             return new StatusCodeResult(404);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> BloodyAuthorization()
+        {
+            var user = await _userManager.FindByIdAsync(_userManager.GetUserId(HttpContext.User));
+            await _userManager.AddToRoleAsync(user, UserRoles.ARCHUSER);
+            return new StatusCodeResult(200);
+        }
+
+
+        [Authorize(Roles = UserRoles.ARCHUSER)]
+        public IActionResult TestBloodyAuthorization()
+        {
+            return new StatusCodeResult(200);
         }
     }
 }

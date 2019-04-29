@@ -16,6 +16,7 @@ using archive.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using archive.Data.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace archive
 {
@@ -43,6 +44,7 @@ namespace archive
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.Configure<IdentityOptions>(ConfigureIdentityOptions);
@@ -59,7 +61,7 @@ namespace archive
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -91,6 +93,9 @@ namespace archive
                     // .MapRoute("shortcut", "s/{shcCourse}/{shcTaskset}/{shcTask?}", new { controller = "Home", action = "Shortcut" })
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
+
+            System.Threading.Tasks.Task rolesCreationTask = CreateUserRoles(serviceProvider);
+            rolesCreationTask.Wait();
         }
 
         protected void ConfigureIdentityOptions(IdentityOptions options)
@@ -111,6 +116,28 @@ namespace archive
             options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             options.User.RequireUniqueEmail = false;
+        }
+
+        protected async System.Threading.Tasks.Task CreateUserRoles(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var logger = serviceProvider.GetService<ILogger<Startup>>();
+            logger.LogInformation("Create missing roles");
+
+            foreach (var roleName in Data.Enums.UserRoles.AllRoles)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    if ((await roleManager.CreateAsync(new IdentityRole(roleName))).Succeeded)
+                    {
+                        logger.LogInformation($"Created missing role `{roleName}`");
+                    }
+                    else
+                    {
+                        logger.LogError($"Failed to create missing role `{roleName}`");
+                    }
+                }
+            }
         }
     }
 }
