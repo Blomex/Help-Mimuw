@@ -46,6 +46,31 @@ namespace archive.Controllers
         }
 
         [Authorize]
+        public IActionResult CreateCourse()
+        {
+
+            return View(new CreateCourseModel{});
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCourse(CreateCourseModel model)
+        {
+            _logger.LogDebug($"Requested to add course: " + model.Name);
+            
+            
+            _repository.Courses
+                .Add(new Data.Entities.Course
+                {
+                    Name = model.Name,
+                    ShortcutCode = model.ShortcutCode
+                });
+            
+            await _repository.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+
+
         public async Task<IActionResult> Shortcut(string shcCourse, string shcTaskset=null, short? shcTask=null)
         {
             if (string.IsNullOrEmpty(shcCourse))
