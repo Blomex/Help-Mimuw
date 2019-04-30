@@ -21,6 +21,18 @@
       <Compile Remove="Migrations\20190416103815_Comment3.Designer.cs" />
       <Compile Remove="Migrations\20190415184340_ratings.cs" />
       <Compile Remove="Migrations\20190415184340_ratings.Designer.cs" />
+      <Compile Remove="Migrations\20190430154145_SolutionVersions.cs" />
+      <Compile Remove="Migrations\20190430154145_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190430154254_SolutionVersions.cs" />
+      <Compile Remove="Migrations\20190430154254_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190430154346_SolutionVersions.cs" />
+      <Compile Remove="Migrations\20190430154346_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190430154605_SolutionVersions.cs" />
+      <Compile Remove="Migrations\20190430154605_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190430165904_SolutionVersions.cs" />
+      <Compile Remove="Migrations\20190430165904_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190430170229_SolutionVersions.cs" />
+      <Compile Remove="Migrations\20190430170229_SolutionVersions.Designer.cs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -98,7 +98,7 @@ namespace archive.Controllers
 
             var solution = new Solution
             {
-                Content = "Tu wpisz tresć rozwiązania...",
+                CachedContent = "Tu wpisz tresć rozwiązania...",
                 TaskId = forTaskId
             };
 
@@ -111,7 +111,7 @@ namespace archive.Controllers
         public async Task<IActionResult> Create([Bind("Id,TaskId,Content")] Solution solution)
         {
             _logger.LogDebug($"Requested to add solution for {solution.TaskId}; " +
-                $"content: length={solution.Content?.Length}, hash={solution.Content?.GetHashCode()}");
+                $"content: length={solution.CachedContent?.Length}, hash={solution.CachedContent?.GetHashCode()}");
             
             // Check if such task exists
             if (await _repository.Tasks.FindAsync(solution.TaskId) == null)

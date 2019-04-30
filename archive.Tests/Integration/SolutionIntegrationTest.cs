@@ -31,7 +31,7 @@ namespace archive.Tests.Integration
                 // Arrange
                 var repository = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 var user = await repository.Users.FirstOrDefaultAsync();
-                var solution = new Solution {Content = "Indukcja po $n$.", TaskId = 1};
+                var solution = new Solution {CachedContent = "Indukcja po $n$.", TaskId = 1};
                 repository.Solutions.Add(solution);
                 await repository.SaveChangesAsync();
                 var comment1 = new Comment {Content = "Fajne", SolutionId = solution.Id, ApplicationUserId = user.Id};

@@ -95,12 +95,19 @@ namespace archive.Data
                 {
                     entity.HasKey(e => e.Id);
 
-                    entity.Property(e => e.Content).IsRequired();
-
                     entity.HasOne(e => e.Task)
                         .WithMany(e => e.Solutions)
                         .HasForeignKey(e => e.TaskId);
+
+                    entity.HasOne(s => s.Author).WithMany(a => a.Solutions);
                 });
+
+            builder.Entity<SolutionVersion>(solutionVersion => 
+            {
+                solutionVersion.HasKey(v => v.Id);
+
+                solutionVersion.HasOne(v => v.Solution).WithMany(s => s.Versions).IsRequired();
+            });
             
             builder.Entity<UserAvatar>(
                 entity =>
