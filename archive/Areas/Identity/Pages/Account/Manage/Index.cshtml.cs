@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using archive.Data;
 using archive.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace archive.Areas.Identity.Pages.Account.Manage
 {
@@ -19,16 +21,18 @@ namespace archive.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<archive.Data.Entities.ApplicationUser> _userManager;
         private readonly SignInManager<archive.Data.Entities.ApplicationUser> _signInManager;
+        private readonly IRepository _repository;
         private readonly IEmailSender _emailSender;
 
         public IndexModel(
             UserManager<archive.Data.Entities.ApplicationUser> userManager,
             SignInManager<archive.Data.Entities.ApplicationUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender, IRepository repository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _repository = repository;
         }
 
         [Display(Name = "Nazwa użytkownika")]
@@ -74,9 +78,12 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             var userName = await _userManager.GetUserNameAsync(user);
             var email = await _userManager.GetEmailAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var id = await _userManager.GetUserIdAsync(user);
 
             Username = userName;
-            AvatarImage = user.Avatar;
+            AvatarImage = (await _repository.Avatars
+                .FirstOrDefaultAsync(a => a.ApplicationUserId == id))?
+                .Image;
             
             Input = new InputModel
             {

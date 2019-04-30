@@ -10,7 +10,7 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190429215607_Avatar")]
+    [Migration("20190430181825_Avatar")]
     partial class Avatar
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -138,9 +138,6 @@ namespace archive.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
-
-                    b.Property<byte[]>("Avatar")
-                        .HasMaxLength(50331648);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
@@ -315,6 +312,26 @@ namespace archive.Migrations
                     b.ToTable("Tasksets");
                 });
 
+            modelBuilder.Entity("archive.Data.Entities.UserAvatar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired();
+
+                    b.Property<byte[]>("Image")
+                        .IsRequired()
+                        .HasMaxLength(50331648);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique();
+
+                    b.ToTable("Avatars");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -394,6 +411,14 @@ namespace archive.Migrations
                     b.HasOne("archive.Data.Entities.Course", "Course")
                         .WithMany("Tasksets")
                         .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.UserAvatar", b =>
+                {
+                    b.HasOne("archive.Data.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne("Avatar")
+                        .HasForeignKey("archive.Data.Entities.UserAvatar", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
