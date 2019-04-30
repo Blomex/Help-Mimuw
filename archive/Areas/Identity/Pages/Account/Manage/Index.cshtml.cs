@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using archive.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Identity;
@@ -97,6 +98,8 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             }
 
             var user = await _userManager.GetUserAsync(User);
+            var userId = await _userManager.GetUserIdAsync(user);
+            
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -108,7 +111,6 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
                 if (!setEmailResult.Succeeded)
                 {
-                    var userId = await _userManager.GetUserIdAsync(user);
                     throw new InvalidOperationException($"Unexpected error occurred setting email for user with ID '{userId}'.");
                 }
             }
@@ -119,7 +121,6 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    var userId = await _userManager.GetUserIdAsync(user);
                     throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
                 }
             }
@@ -127,7 +128,6 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             user.HomePage = Input.HomePage;
             if (!(await _userManager.UpdateAsync(user)).Succeeded)
             {
-                var userId = await _userManager.GetUserIdAsync(user);
                 throw new InvalidOperationException($"Unexpected error occurred setting homepage for user with ID '{userId}'.");
             }
 
@@ -136,10 +136,9 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 var stream = Input.AvatarImage.OpenReadStream();
                 var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream);
-                user.Avatar = memoryStream.ToArray();
+                user.Avatar = new UserAvatar {Image = memoryStream.ToArray(), ApplicationUserId = user.Id};
                 if (!(await _userManager.UpdateAsync(user)).Succeeded)
                 {
-                    var userId = await _userManager.GetUserIdAsync(user);
                     throw new InvalidOperationException($"Unexpected error occurred setting avatar for user with ID '{userId}'.");
                 }
             }
