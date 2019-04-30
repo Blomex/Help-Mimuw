@@ -15,9 +15,7 @@ namespace archive.Data.Entities
         [Required]
         public string CachedContent { get; set; }
 
-        [Required]
         public virtual IEnumerable<SolutionVersion> Versions { get; set; }
-        [Required]
         public virtual SolutionVersion CurrentVersion { get; set; }
 
         public int TaskId { get; set; }

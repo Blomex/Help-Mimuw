@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using archive.Data;
@@ -9,9 +10,10 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190430192906_SomethingChanged")]
+    partial class SomethingChanged
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,12 +147,6 @@ namespace archive.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<string>("HomePage")
-                        .HasMaxLength(256);
-
-                    b.Property<DateTime>("LastActive")
-                        .HasColumnType("timestamp");
-
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
@@ -216,8 +212,6 @@ namespace archive.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("Archive");
-
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -261,7 +255,7 @@ namespace archive.Migrations
                     b.Property<string>("CachedContent")
                         .IsRequired();
 
-                    b.Property<long?>("CurrentVersionId");
+                    b.Property<long>("CurrentVersionId");
 
                     b.Property<int>("TaskId");
 
@@ -339,19 +333,6 @@ namespace archive.Migrations
                     b.ToTable("Tasksets");
                 });
 
-            modelBuilder.Entity("archive.Data.Entities.UserAvatar", b =>
-                {
-                    b.Property<string>("ApplicationUserId");
-
-                    b.Property<byte[]>("Image")
-                        .IsRequired()
-                        .HasMaxLength(3145728);
-
-                    b.HasKey("ApplicationUserId");
-
-                    b.ToTable("Avatars");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -418,7 +399,8 @@ namespace archive.Migrations
 
                     b.HasOne("archive.Data.Entities.SolutionVersion", "CurrentVersion")
                         .WithMany()
-                        .HasForeignKey("CurrentVersionId");
+                        .HasForeignKey("CurrentVersionId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("archive.Data.Entities.Task", "Task")
                         .WithMany("Solutions")
@@ -447,14 +429,6 @@ namespace archive.Migrations
                     b.HasOne("archive.Data.Entities.Course", "Course")
                         .WithMany("Tasksets")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("archive.Data.Entities.UserAvatar", b =>
-                {
-                    b.HasOne("archive.Data.Entities.ApplicationUser", "ApplicationUser")
-                        .WithOne("Avatar")
-                        .HasForeignKey("archive.Data.Entities.UserAvatar", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

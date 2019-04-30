@@ -8,7 +8,6 @@ namespace archive.Models.Solution
     public class SolutionCreateModel
     {
         public Data.Entities.Task Task;
-        public Data.Entities.Solution Solution;
         public string NewContent;
     }
 }

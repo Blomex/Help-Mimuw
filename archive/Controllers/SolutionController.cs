@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Transactions;
 using archive.Data;
 using archive.Data.Entities;
 using archive.Data.Enums;
@@ -12,6 +13,7 @@ using archive.Models.Comment;
 using archive.Models.Solution;
 using archive.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +25,15 @@ namespace archive.Controllers
     public class SolutionController : ArchiveController
     {
         private readonly ILogger _logger;
-        private readonly IRepository _repository;
+        private readonly ApplicationDbContext _repository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public SolutionController(ILogger<SolutionController> logger, IRepository repository,
-            IUserActivityService activityService) : base(activityService)
+        public SolutionController(ILogger<SolutionController> logger, ApplicationDbContext repository, 
+            UserManager<ApplicationUser> userManager, IUserActivityService activityService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
+            _userManager = userManager;
         }
 
         [Authorize]
@@ -96,27 +100,23 @@ namespace archive.Controllers
                 return new StatusCodeResult(400);
             }
 
-            var solution = new Solution
-            {
-                CachedContent = "Tu wpisz tresć rozwiązania...",
-                TaskId = forTaskId
-            };
-
-            return View("Create", new SolutionViewModel(task, solution, new List<Comment>(), 0, 0));
+            
+            return View("Create", new SolutionCreateModel { Task = task, NewContent = "" });
         }
 
         [HttpPost]
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TaskId,Content")] Solution solution)
+        public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task)
         {
-            _logger.LogDebug($"Requested to add solution for {solution.TaskId}; " +
-                $"content: length={solution.CachedContent?.Length}, hash={solution.CachedContent?.GetHashCode()}");
+            SolutionCreateModel edited_solution = new SolutionCreateModel() { NewContent = NewContent, Task = Task };
+            _logger.LogDebug($"Requested to add solution for {edited_solution.Task}; " +
+                $"content: length={edited_solution.NewContent?.Length}, hash={edited_solution.NewContent?.GetHashCode()}");
             
             // Check if such task exists
-            if (await _repository.Tasks.FindAsync(solution.TaskId) == null)
+            if (await _repository.Tasks.FindAsync(edited_solution.Task.Id) == null)
             {
-                _logger.LogDebug($"Task not found {solution.TaskId}, no solution can be added");
+                _logger.LogDebug($"Task not found {edited_solution.Task.Id}, no solution can be added");
                 return new StatusCodeResult(400);
             }
 
@@ -128,8 +128,30 @@ namespace archive.Controllers
             }
 
             // Update
-            _repository.Solutions.Add(solution);
-            await _repository.SaveChangesAsync();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            /*  BTW doing it this^ way we assure that user is still in DB, I suppose. */
+            var solution = new Solution
+            {
+                TaskId = edited_solution.Task.Id,
+                Author = user,
+                CachedContent = NewContent
+            };
+            var version = new SolutionVersion
+            {
+                Solution = solution,
+                Created = DateTime.Now,
+                Content = edited_solution.NewContent
+            };
+            using (var transaction = _repository.Database.BeginTransaction())
+            {
+                // Now save to database in two steps to avoid circular dependency between foreign keys
+                _repository.Solutions.Add(solution);
+                _repository.SolutionsVersions.Add(version);
+                await _repository.SaveChangesAsync();
+                solution.CurrentVersion = version;
+                await _repository.SaveChangesAsync();
+                transaction.Commit();
+            }
             return RedirectToAction("Show", new { solutionId = solution.Id });
         }
 

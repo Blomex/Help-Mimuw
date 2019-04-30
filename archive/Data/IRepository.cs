@@ -10,6 +10,7 @@ namespace archive.Data
         DbSet<Taskset> Tasksets { get; }
         DbSet<Task> Tasks { get; }
         DbSet<Solution> Solutions { get; }
+        DbSet<SolutionVersion> SolutionsVersions { get; }
 
         DbSet<Rating> Ratings {get;}
 
