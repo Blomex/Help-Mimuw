@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using archive.Data.Enums;
 
 namespace archive.Controllers
 {
@@ -28,6 +29,7 @@ namespace archive.Controllers
             _repository = repository;
         }
 
+        [Authorize]
         public async Task<IActionResult> ShowTaskset(int id)
         {
             var taskset = await _repository.Tasksets
@@ -53,6 +55,7 @@ namespace archive.Controllers
             return View("/Views/Taskset/ShowTaskset.cshtml", model);
         }
 
+        [Authorize]
         public async Task<IActionResult> Index(int id)
         {
             _logger.LogDebug($"Requested taskset for course id={id}");
@@ -74,7 +77,7 @@ namespace archive.Controllers
             return View("/Views/Taskset/Index.cshtml", model);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.MODERATOR)]
         public async Task<IActionResult> Create(int? forCourseId)
         {
             var course = await _repository.Courses
@@ -90,7 +93,7 @@ namespace archive.Controllers
             return View(new CreateTasksetViewModel(courses));
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.MODERATOR)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTasksetViewModel taskset)

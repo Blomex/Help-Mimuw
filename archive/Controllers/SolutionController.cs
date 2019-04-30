@@ -6,6 +6,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
+using archive.Data.Enums;
 using archive.Models;
 using archive.Models.Comment;
 using archive.Models.Solution;
@@ -29,6 +30,7 @@ namespace archive.Controllers
             _repository = repository;
         }
 
+        [Authorize]
         public async Task<IActionResult> Show(int solutionId)
         {
             _logger.LogDebug($"Requested solution with id={solutionId}");
@@ -77,7 +79,7 @@ namespace archive.Controllers
             return View("Show", new SolutionViewModel(task, solution, comments, rating, counter));
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int forTaskId)
         {
             _logger.LogDebug($"Requested solution creation form for task {forTaskId}");
@@ -102,7 +104,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TaskId,Content")] Solution solution)
         {
@@ -175,7 +177,7 @@ namespace archive.Controllers
 
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> AddRating(bool rating, int solutionId)
         {
             _logger.LogDebug($"Requested to add rating for {solutionId}; ");

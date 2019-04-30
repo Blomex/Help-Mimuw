@@ -10,6 +10,11 @@ using archive.Models.Taskset;
 using archive.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
+
+using Microsoft.AspNetCore.Identity;
+using archive.Data.Entities;
+using archive.Data.Enums;
 
 namespace archive.Controllers
 {
@@ -18,12 +23,15 @@ namespace archive.Controllers
         private readonly TasksetController _tasksetController;
         private readonly ILogger _logger;
         private readonly IRepository _repository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<SolutionController> logger, IRepository repository, TasksetController tasksetController)
+        public HomeController(ILogger<SolutionController> logger, IRepository repository, TasksetController tasksetController,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _repository = repository;
             _tasksetController = tasksetController;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
@@ -39,6 +47,7 @@ namespace archive.Controllers
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
+        [Authorize(Roles = "MODERATOR")]
         public IActionResult CreateCourse()
         {
 
@@ -46,6 +55,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> CreateCourse(CreateCourseModel model)
         {
             _logger.LogDebug($"Requested to add course: " + model.Name);
@@ -64,7 +74,7 @@ namespace archive.Controllers
 
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> EditCourse()
         {
             var courses = await _repository.Courses.ToListAsync();
@@ -72,6 +82,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> EditCourse(EditCourseModel model)
         {
             _logger.LogDebug($"Requested to edit name:" + model.Name);
@@ -92,13 +103,16 @@ namespace archive.Controllers
             return RedirectToAction("Index");;
         }
 
+        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> ArchiveCourse()
         {
             var courses = await _repository.Courses.Where(c => c.Archive == false).ToListAsync();
             return View(new ArchiveCourseModel(courses));
         } 
 
-         [HttpPost]
+        [HttpPost]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> ArchiveCourse(ArchiveCourseModel model)
         {
             _logger.LogDebug($"Archive to course id :" + model.CourseId);
@@ -119,13 +133,15 @@ namespace archive.Controllers
             return RedirectToAction("Index");;
         }
 
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> UnarchiveCourse()
         {
             var courses = await _repository.Courses.Where(c => c.Archive == true).ToListAsync();
             return View(new ArchiveCourseModel(courses));
         } 
 
-         [HttpPost]
+        [HttpPost]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> UnarchiveCourse(ArchiveCourseModel model)
         {
             _logger.LogDebug($"Archive to course id :" + model.CourseId);

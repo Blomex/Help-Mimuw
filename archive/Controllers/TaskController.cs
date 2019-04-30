@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
+using archive.Data.Enums;
 using archive.Models;
 using archive.Models.Task;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ namespace archive.Controllers
             _logger = logger;
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forTasksetId = null)
         {
             var taskset = await TasksetOrDefaultAsync(forTasksetId);
@@ -37,7 +38,7 @@ namespace archive.Controllers
             return View(new CreateTaskViewModel(tasksets));
         }
         
-        [Authorize]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateTaskViewModel task)
         {
