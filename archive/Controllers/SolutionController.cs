@@ -132,7 +132,7 @@ namespace archive.Controllers
             return RedirectToAction("Show", new { solutionId = solution.Id });
         }
 
-        [Authorize(Policy = "ConfirmedUser")]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> CreateComment(int forSolutionId)
         {
             var solution = await _repository.Solutions
@@ -154,7 +154,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ConfirmedUser")]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateComment([Bind("Id,Content, SolutionId, CommentDate")] Comment comment)
         {
