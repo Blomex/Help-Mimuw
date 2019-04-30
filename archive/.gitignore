@@ -2,5 +2,7 @@ bin/
 obj/
 *.dll
 *.exe
+.vs/
+.vscode/
 appsettings-local.json
 archive.csproj.user
