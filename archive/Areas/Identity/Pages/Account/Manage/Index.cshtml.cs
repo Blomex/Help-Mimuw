@@ -42,7 +42,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
 
         [TempData]
         public string StatusMessage { get; set; }
-        
+
         [Display(Name = "Awatar")]
         public byte[] AvatarImage { get; set; }
 
@@ -59,10 +59,10 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Numer telefonu")]
             public string PhoneNumber { get; set; }
-            
+
             [Display(Name = "Strona domowa")]
             public string HomePage { get; set; }
-            
+
             [Display(Name = "Ustaw nowy awatar")]
             public IFormFile AvatarImage { get; set; }
         }
@@ -81,10 +81,11 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             var id = await _userManager.GetUserIdAsync(user);
 
             Username = userName;
-            AvatarImage = (await _repository.Avatars
-                .FirstOrDefaultAsync(a => a.ApplicationUserId == id))?
-                .Image;
-            
+            AvatarImage = (await _repository.Users
+                    .Include(u => u.Avatar)
+                    .FirstOrDefaultAsync(a => a.Id == id))?
+                .Avatar?.Image;
+
             Input = new InputModel
             {
                 Email = email,
@@ -106,7 +107,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
 
             var user = await _userManager.GetUserAsync(User);
             var userId = await _userManager.GetUserIdAsync(user);
-            
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -118,7 +119,8 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
                 if (!setEmailResult.Succeeded)
                 {
-                    throw new InvalidOperationException($"Unexpected error occurred setting email for user with ID '{userId}'.");
+                    throw new InvalidOperationException(
+                        $"Unexpected error occurred setting email for user with ID '{userId}'.");
                 }
             }
 
@@ -128,14 +130,16 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
+                    throw new InvalidOperationException(
+                        $"Unexpected error occurred setting phone number for user with ID '{userId}'.");
                 }
             }
 
             user.HomePage = Input.HomePage;
             if (!(await _userManager.UpdateAsync(user)).Succeeded)
             {
-                throw new InvalidOperationException($"Unexpected error occurred setting homepage for user with ID '{userId}'.");
+                throw new InvalidOperationException(
+                    $"Unexpected error occurred setting homepage for user with ID '{userId}'.");
             }
 
             if (Input.AvatarImage != null)
@@ -146,7 +150,8 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 user.Avatar = new UserAvatar {Image = memoryStream.ToArray(), ApplicationUserId = user.Id};
                 if (!(await _userManager.UpdateAsync(user)).Succeeded)
                 {
-                    throw new InvalidOperationException($"Unexpected error occurred setting avatar for user with ID '{userId}'.");
+                    throw new InvalidOperationException(
+                        $"Unexpected error occurred setting avatar for user with ID '{userId}'.");
                 }
             }
 
@@ -175,7 +180,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             var callbackUrl = Url.Page(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
-                values: new { userId = userId, code = code },
+                values: new {userId = userId, code = code},
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(email, "Potwierdzenie adresu email",
                 $"Potwierdź swój adres email <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>klikając tutaj</a>.");

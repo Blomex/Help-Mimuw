@@ -11,7 +11,7 @@ namespace archive.Data.Entities
         [MaxLength(256)]
         public string HomePage { get; set; }
         [Column(TypeName = "timestamp")]
-        public DateTime LastLogout { get; set; }
+        public DateTime LastActive { get; set; }
 
         public virtual UserAvatar Avatar { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }

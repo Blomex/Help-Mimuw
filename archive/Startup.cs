@@ -68,6 +68,7 @@ namespace archive
             services.AddScoped<ITaskService, TaskService>();
             services.AddScoped<ISolutionService, SolutionService>();
             services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<IUserActivityService, UserActivityService>();
 
             services.AddMvc().AddControllersAsServices()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
