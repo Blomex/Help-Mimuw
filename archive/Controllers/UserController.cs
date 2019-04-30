@@ -14,13 +14,13 @@ using Microsoft.Extensions.Logging;
 
 namespace archive.Controllers
 {
-    public class UserProfileController : Controller
+    public class UserController : Controller
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
         private readonly IUserActivityService _activityService;
 
-        public UserProfileController(IRepository repository, ILogger<TaskController> logger,
+        public UserController(IRepository repository, ILogger<UserController> logger,
             IUserActivityService activityService)
         {
             _repository = repository;
@@ -34,20 +34,20 @@ namespace archive.Controllers
             _activityService.RegisterAction(User.Identity.Name);
         }
 
-        public async Task<IActionResult> ShowProfile(string uid)
+        public async Task<IActionResult> ShowProfile(string name)
         {
-            _logger.LogDebug($"Zażądano profilu użytkownika o id={uid}");
+            _logger.LogDebug($"Zażądano profilu użytkownika o nazwie={name}");
             var user = await _repository.Users
                 .Include(t => t.Avatar)
-                .FirstOrDefaultAsync(t => t.Id == uid);
+                .FirstOrDefaultAsync(t => t.UserName == name);
 
             if (user == null)
             {
-                _logger.LogDebug($"Nie znaleziono użytkownika o id={uid}");
+                _logger.LogDebug($"Nie znaleziono użytkownika o nazwie={name}");
                 return new StatusCodeResult(404);
             }
 
-            var lastActive = await _activityService.GetLastActionTimeAsync(uid);
+            var lastActive = await _activityService.GetLastActionTimeAsync(name);
             
             return View("/Views/User/ShowProfile.cshtml", new ProfileViewModel
             {
