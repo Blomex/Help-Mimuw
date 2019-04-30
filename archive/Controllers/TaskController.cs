@@ -23,7 +23,7 @@ namespace archive.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "TRUSTED_USER, MODERATOR")]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forTasksetId = null)
         {
             var taskset = await TasksetOrDefaultAsync(forTasksetId);

@@ -79,7 +79,7 @@ namespace archive.Controllers
             return View("Show", new SolutionViewModel(task, solution, comments, rating, counter));
         }
 
-        [Authorize(Roles = "TRUSTED_USER, MODERATOR")]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int forTaskId)
         {
             _logger.LogDebug($"Requested solution creation form for task {forTaskId}");
@@ -104,7 +104,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "TRUSTED_USER, MODERATOR")]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TaskId,Content")] Solution solution)
         {
@@ -177,7 +177,7 @@ namespace archive.Controllers
 
         }
 
-        [Authorize(Roles = "TRUSTED_USER, MODERATOR")]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> AddRating(bool rating, int solutionId)
         {
             _logger.LogDebug($"Requested to add rating for {solutionId}; ");
