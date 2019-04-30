@@ -10,6 +10,10 @@ using archive.Models.Taskset;
 using archive.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using archive.Data.Entities;
+using archive.Data.Enums;
 
 namespace archive.Controllers
 {
@@ -18,12 +22,15 @@ namespace archive.Controllers
         private readonly TasksetController _tasksetController;
         private readonly ILogger _logger;
         private readonly IRepository _repository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<SolutionController> logger, IRepository repository, TasksetController tasksetController)
+        public HomeController(ILogger<SolutionController> logger, IRepository repository, TasksetController tasksetController,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _repository = repository;
             _tasksetController = tasksetController;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
@@ -38,6 +45,7 @@ namespace archive.Controllers
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
+        [Authorize]
         public async Task<IActionResult> Shortcut(string shcCourse, string shcTaskset=null, short? shcTask=null)
         {
             if (string.IsNullOrEmpty(shcCourse))
