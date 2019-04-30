@@ -47,7 +47,7 @@ namespace archive.Controllers
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
-        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public IActionResult CreateCourse()
         {
 
@@ -55,7 +55,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> CreateCourse(CreateCourseModel model)
         {
             _logger.LogDebug($"Requested to add course: " + model.Name);
@@ -74,7 +74,7 @@ namespace archive.Controllers
 
             return RedirectToAction("Index");
         }
-        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> EditCourse()
         {
             var courses = await _repository.Courses.ToListAsync();
@@ -82,7 +82,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> EditCourse(EditCourseModel model)
         {
             _logger.LogDebug($"Requested to edit name:" + model.Name);
@@ -104,6 +104,7 @@ namespace archive.Controllers
         }
 
         [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> ArchiveCourse()
         {
             var courses = await _repository.Courses.Where(c => c.Archive == false).ToListAsync();
@@ -111,7 +112,7 @@ namespace archive.Controllers
         } 
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> ArchiveCourse(ArchiveCourseModel model)
         {
             _logger.LogDebug($"Archive to course id :" + model.CourseId);
@@ -132,7 +133,7 @@ namespace archive.Controllers
             return RedirectToAction("Index");;
         }
 
-        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> UnarchiveCourse()
         {
             var courses = await _repository.Courses.Where(c => c.Archive == true).ToListAsync();
@@ -140,7 +141,7 @@ namespace archive.Controllers
         } 
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<IActionResult> UnarchiveCourse(ArchiveCourseModel model)
         {
             _logger.LogDebug($"Archive to course id :" + model.CourseId);
