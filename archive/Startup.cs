@@ -48,11 +48,7 @@ namespace archive
 
             
             // Wymaga potwierdzenia maila przed zrobieniem czegokolwiek na stronce
-            services.AddDefaultIdentity<ApplicationUser>(/*
-                    config =>
-                    {
-                        config.SignIn.RequireConfirmedEmail = true;
-                    }*/)
+            services.AddDefaultIdentity<ApplicationUser>()
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -65,15 +61,6 @@ namespace archive
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddAuthorization(options =>
-            {
-
-                options.AddPolicy("ConfirmedUser", policy => policy.RequireRole("ConfirmedUser"));
-                //moderator nie do końca jest potrzebny chyba. 
-                options.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
-            });
-
             services.Configure<IdentityOptions>(ConfigureIdentityOptions);
             
 
