@@ -11,6 +11,7 @@ using archive.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Identity;
 using archive.Data.Entities;
 using archive.Data.Enums;
@@ -54,6 +55,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateCourse(CreateCourseModel model)
         {
             _logger.LogDebug($"Requested to add course: " + model.Name);
@@ -72,7 +74,7 @@ namespace archive.Controllers
 
             return RedirectToAction("Index");
         }
-
+        [Authorize]
         public async Task<IActionResult> EditCourse()
         {
             var courses = await _repository.Courses.ToListAsync();
@@ -80,6 +82,7 @@ namespace archive.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> EditCourse(EditCourseModel model)
         {
             _logger.LogDebug($"Requested to edit name:" + model.Name);
@@ -100,13 +103,15 @@ namespace archive.Controllers
             return RedirectToAction("Index");;
         }
 
+        [Authorize]
         public async Task<IActionResult> ArchiveCourse()
         {
             var courses = await _repository.Courses.Where(c => c.Archive == false).ToListAsync();
             return View(new ArchiveCourseModel(courses));
         } 
 
-         [HttpPost]
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ArchiveCourse(ArchiveCourseModel model)
         {
             _logger.LogDebug($"Archive to course id :" + model.CourseId);
@@ -127,13 +132,15 @@ namespace archive.Controllers
             return RedirectToAction("Index");;
         }
 
+        [Authorize]
         public async Task<IActionResult> UnarchiveCourse()
         {
             var courses = await _repository.Courses.Where(c => c.Archive == true).ToListAsync();
             return View(new ArchiveCourseModel(courses));
         } 
 
-         [HttpPost]
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> UnarchiveCourse(ArchiveCourseModel model)
         {
             _logger.LogDebug($"Archive to course id :" + model.CourseId);
