@@ -10,8 +10,8 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190430193733_RemovedCircularDependency")]
-    partial class RemovedCircularDependency
+    [Migration("20190501164413_SolutionEditingAndVersionHistory")]
+    partial class SolutionEditingAndVersionHistory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -33,6 +33,12 @@
       <Compile Remove="Migrations\20190430165904_SolutionVersions.Designer.cs" />
       <Compile Remove="Migrations\20190430170229_SolutionVersions.cs" />
       <Compile Remove="Migrations\20190430170229_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190430170354_SolutionVersions.cs" />
+      <Compile Remove="Migrations\20190430170354_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190430192906_SomethingChanged.cs" />
+      <Compile Remove="Migrations\20190430192906_SomethingChanged.Designer.cs" />
+      <Compile Remove="Migrations\20190430193733_RemovedCircularDependency.cs" />
+      <Compile Remove="Migrations\20190430193733_RemovedCircularDependency.Designer.cs" />
       <Compile Remove="Migrations\20190501162413_SolutionAuthorId.cs" />
       <Compile Remove="Migrations\20190501162413_SolutionAuthorId.Designer.cs" />
     </ItemGroup>

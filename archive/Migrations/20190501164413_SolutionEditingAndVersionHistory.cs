@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace archive.Migrations
 {
-    public partial class SolutionVersions : Migration
+    public partial class SolutionEditingAndVersionHistory : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -18,14 +18,13 @@ namespace archive.Migrations
                 table: "Solutions",
                 nullable: true);
 
-            /* Now we allow it to be null, as we populate it later on using Solution.CachedDontent */
             migrationBuilder.AddColumn<long>(
                 name: "CurrentVersionId",
                 table: "Solutions",
                 nullable: true);
 
             migrationBuilder.CreateTable(
-                name: "SolutionVersion",
+                name: "SolutionsVersions",
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
@@ -36,9 +35,9 @@ namespace archive.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SolutionVersion", x => x.Id);
+                    table.PrimaryKey("PK_SolutionsVersions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SolutionVersion_Solutions_SolutionId",
+                        name: "FK_SolutionsVersions_Solutions_SolutionId",
                         column: x => x.SolutionId,
                         principalTable: "Solutions",
                         principalColumn: "Id",
@@ -47,19 +46,17 @@ namespace archive.Migrations
 
             /* Take Solution's content and insert it as versions into SolutionVersion */
             migrationBuilder.Sql(@"
-                INSERT INTO ""SolutionVersion""(""SolutionId"", ""Created"", ""Content"")
+                INSERT INTO ""SolutionsVersions""(""SolutionId"", ""Created"", ""Content"")
                   SELECT ""Id"", NOW(), ""CachedContent"" FROM ""Solutions""
             ");
             /* Now set corresponging SolutionVersion.Id in table Solutions */
             /* WARNING: the syntax ist PostgreSQL-specific (see https://stackoverflow.com/questions/1293330/) */
             migrationBuilder.Sql(@"
                 UPDATE ""Solutions""
-                SET ""CurrentVersionId"" = ""SolutionVersion"".""Id""
-                FROM ""SolutionVersion""
-                  WHERE ""Solutions"".""Id"" = ""SolutionVersion"".""SolutionId""
+                SET ""CurrentVersionId"" = ""SolutionsVersions"".""Id""
+                FROM ""SolutionsVersions""
+                  WHERE ""Solutions"".""Id"" = ""SolutionsVersions"".""SolutionId""
             ");
-            /* And finally mark the CurrentVersionId as non-nullable */
-            migrationBuilder.AlterColumn<long>("CurrentVersionId", "Solutions", nullable: false);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Solutions_AuthorId",
@@ -72,8 +69,8 @@ namespace archive.Migrations
                 column: "CurrentVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SolutionVersion_SolutionId",
-                table: "SolutionVersion",
+                name: "IX_SolutionsVersions_SolutionId",
+                table: "SolutionsVersions",
                 column: "SolutionId");
 
             migrationBuilder.AddForeignKey(
@@ -85,12 +82,12 @@ namespace archive.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Solutions_SolutionVersion_CurrentVersionId",
+                name: "FK_Solutions_SolutionsVersions_CurrentVersionId",
                 table: "Solutions",
                 column: "CurrentVersionId",
-                principalTable: "SolutionVersion",
+                principalTable: "SolutionsVersions",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -100,11 +97,11 @@ namespace archive.Migrations
                 table: "Solutions");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Solutions_SolutionVersion_CurrentVersionId",
+                name: "FK_Solutions_SolutionsVersions_CurrentVersionId",
                 table: "Solutions");
 
             migrationBuilder.DropTable(
-                name: "SolutionVersion");
+                name: "SolutionsVersions");
 
             migrationBuilder.DropIndex(
                 name: "IX_Solutions_AuthorId",
