@@ -7,6 +7,7 @@ using archive.Migrations;
 using archive.Models.Taskset;
 using archive.Models.User;
 using archive.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace archive.Controllers
             _activityService = activityService;
         }
 
+        [Authorize]
         public async Task<IActionResult> ShowProfile(string name)
         {
             _logger.LogDebug($"Requested profile of user with name={name}");
