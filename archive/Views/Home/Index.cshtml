@@ -1,6 +1,15 @@
 ﻿@model IEnumerable<archive.Data.Entities.Course>
 <h1>Archwium zadań</h1>
 
+@if (ViewContext.HttpContext.User.IsInRole("MODERATOR"))
+{
+    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="CreateCourse">Dodaj przedmiot</a>
+    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="EditCourse">Edytuj przedmiot</a>
+    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="ArchiveCourse">Archiwizuj przedmiot</a>
+    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="UnarchiveCourse">Odarchiwizuj przedmiot</a>
+}
+
+
 <h2>Przedmioty:</h2>
 @foreach (var course in Model)
 {
