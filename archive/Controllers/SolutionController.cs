@@ -302,5 +302,20 @@ namespace archive.Controllers
             return RedirectToAction("Show", new { solutionId = solutionId });
         }
 
+        [Authorize(Roles = UserRoles.MODERATOR)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var solution = await _repository.Solutions.Include(s => s.Task)
+                .Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (solution == null)
+            {
+                _logger.LogDebug($"Solution(Id={id}) not found");
+                return new StatusCodeResult(404);
+            }
+
+            _repository.Solutions.Remove(solution);
+            await _repository.SaveChangesAsync();
+            return RedirectToAction("ShowTaskset", "Taskset", new { id = solution.Task.TasksetId });
+        }
     }
 }

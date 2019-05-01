@@ -4,6 +4,10 @@
 <h2>@Model.Taskset.Name (@Model.Taskset.Year):</h2>
 <a asp-controller="Task" asp-action="Create"
    asp-route-forTasksetId="@Model.Taskset.Id">Dodaj zadanie</a>
+@if (Model.Tasks.Count() == 0)
+{
+    <a asp-action="Delete" asp-route-id="@Model.Taskset.Id">Usuń egzamin</a>
+}
 <hr/>
 
 @foreach (var task in Model.Tasks)
@@ -16,6 +20,7 @@
     <a asp-controller="Solution" asp-action="Create"
        asp-route-forTaskId="@task.Id">Dodaj rozwiązanie</a>
     <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id">Edytuj</a>
+    <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id">Usuń</a>
     int counter = 0;
 
     foreach (var solution in Model.ListOfSolutions[task.Id])

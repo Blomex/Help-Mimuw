@@ -19,6 +19,7 @@
         <p><em>Rozwiązanie:</em></p>
         <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;" class="Solution">@Model.Solution.CachedContent</pre>
         <a asp-action="Edit" asp-route-id="@Model.Solution.Id">Edytuj</a>
+        <a asp-action="Delete" asp-route-id="@Model.Solution.Id">Usuń</a>
         <section>
             <style scoped>
                 .Comment {
@@ -27,27 +28,31 @@
                     margin-bottom: 16px;
                 }
 
-                .Comment .AuthorHere::before {
-                    color: dimgray;
-                    margin-right: 1mm;
-                    content: "Autor:";
-                }
-                .Comment .AuthorHere { 
-                    font-size: 80%; 
-                    grid-area: Author
-                }
+                    .Comment .AuthorHere::before {
+                        color: dimgray;
+                        margin-right: 1mm;
+                        content: "Autor:";
+                    }
 
-                .Comment .DateHere::before {
-                    color: dimgray;
-                    margin-right: 3px;
-                    content: "Data:";
-                }
-                .Comment .DateHere { 
-                    font-size: 80%; 
-                    grid-area: Date 
-                }
+                    .Comment .AuthorHere {
+                        font-size: 80%;
+                        grid-area: Author
+                    }
 
-                .Comment .ContentHere { grid-area: Content }
+                    .Comment .DateHere::before {
+                        color: dimgray;
+                        margin-right: 3px;
+                        content: "Data:";
+                    }
+
+                    .Comment .DateHere {
+                        font-size: 80%;
+                        grid-area: Date
+                    }
+
+                    .Comment .ContentHere {
+                        grid-area: Content
+                    }
             </style>
             <section>
 
@@ -57,7 +62,8 @@
                     double average = counter == 0 ? 0 : rating / counter;
                     var percent = average * 100;
                 }
-                <p> Ocena: @percent % (@rating / @Model.Counter)
+                <p>
+                    Ocena: @percent % (@rating / @Model.Counter)
                 </p>
             </section>
             <form asp-action="AddRating">
@@ -68,22 +74,23 @@
             @if (Model.Solution.Comments != null)
             {
                 foreach (var a in Model.Solution.Comments)
-                 {
-            <div class="Comment">
-                <div class="AuthorHere">
-                    <a asp-controller="User" asp-action="ShowProfile" asp-route-name="@a.ApplicationUser.UserName">
-                        @a.ApplicationUser.UserName
-                    </a>
-                </div>
-                <div class="DateHere">@a.CommentDate.AddHours(2)</div>
-                <div class="ContentHere">
-                    @a.Content
-                </div>
-            </div>
-                 }
+                {
+                    <div class="Comment">
+                        <div class="AuthorHere">
+                            <a asp-controller="User" asp-action="ShowProfile" asp-route-name="@a.ApplicationUser.UserName">
+                                @a.ApplicationUser.UserName
+                            </a>
+                        </div>
+                        <div class="DateHere">@a.CommentDate.AddHours(2)</div>
+                        <div class="ContentHere">
+                            @a.Content
+                        </div>
+                    </div>
+                }
             }
-            @if(Model.Solution.Comments == null || Model.Solution.Comments?.Count() == 0){
-            <p>brak</p>
+            @if (Model.Solution.Comments == null || Model.Solution.Comments?.Count() == 0)
+            {
+                <p>brak</p>
             }
             <br>
             <a asp-controller="Solution" asp-action="CreateComment"

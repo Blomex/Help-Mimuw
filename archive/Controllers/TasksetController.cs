@@ -117,5 +117,28 @@ namespace archive.Controllers
             await _repository.SaveChangesAsync();
             return await Index(taskset.CourseId);
         }
+
+        [Authorize(Roles = UserRoles.MODERATOR)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var taskset = await _repository.Tasksets.FindAsync(id);
+            if (taskset == null)
+            {
+                _logger.LogDebug($"Task(Id={id}) not found");
+                return new StatusCodeResult(404);
+            }
+
+            // We can only delete empty tasksets
+            int tasksCount = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).CountAsync();
+            if (tasksCount > 0)
+            {
+                _logger.LogDebug($"Taskset(Id={id}) it nonempty and cannot be deleted");
+                return new StatusCodeResult(400);
+            }
+
+            _repository.Tasksets.Remove(taskset);
+            await _repository.SaveChangesAsync();
+            return RedirectToAction("Index",  new { id = taskset.CourseId });
+        }
     }
 }

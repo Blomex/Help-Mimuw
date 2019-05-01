@@ -126,5 +126,20 @@ namespace archive.Controllers
 
             return RedirectToAction("ShowTaskset", "Taskset", new { id = task.TasksetId });
         }
+
+        [Authorize(Roles = UserRoles.MODERATOR)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var task = await _repository.Tasks.FindAsync(id);
+            if (task == null)
+            {
+                _logger.LogDebug($"Task(Id={id}) not found");
+                return new StatusCodeResult(404);
+            }
+
+            _repository.Tasks.Remove(task);
+            await _repository.SaveChangesAsync();
+            return RedirectToAction("ShowTaskset", "Taskset", new { id = task.TasksetId });
+        }
     }
 }
