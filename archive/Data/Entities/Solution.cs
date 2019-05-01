@@ -9,6 +9,7 @@ namespace archive.Data.Entities
         [Key]
         public int Id { get; set; }
 
+        public string AuthorId { get; set; }
         /* Author is not necessary, and making it required would cause problems with migrations. */
         public virtual ApplicationUser Author { get; set; }
 

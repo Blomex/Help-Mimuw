@@ -33,6 +33,8 @@
       <Compile Remove="Migrations\20190430165904_SolutionVersions.Designer.cs" />
       <Compile Remove="Migrations\20190430170229_SolutionVersions.cs" />
       <Compile Remove="Migrations\20190430170229_SolutionVersions.Designer.cs" />
+      <Compile Remove="Migrations\20190501162413_SolutionAuthorId.cs" />
+      <Compile Remove="Migrations\20190501162413_SolutionAuthorId.Designer.cs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Transactions;
+using archive.Commons.Authorization;
 using archive.Data;
 using archive.Data.Entities;
 using archive.Data.Enums;
@@ -27,13 +28,16 @@ namespace archive.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _repository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
         public SolutionController(ILogger<SolutionController> logger, ApplicationDbContext repository, 
-            UserManager<ApplicationUser> userManager, IUserActivityService activityService) : base(activityService)
+            UserManager<ApplicationUser> userManager, IUserActivityService activityService,
+            IAuthorizationService authorizationService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         [Authorize]
@@ -154,7 +158,7 @@ namespace archive.Controllers
             return RedirectToAction("Show", new { solutionId = solution.Id });
         }
 
-        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogDebug($"Requested solution edition form for solution with id {id}");
@@ -172,6 +176,14 @@ namespace archive.Controllers
                 return new StatusCodeResult(404);
             }
 
+            // Authorize
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, solution, new ModOrOwnerRequirement());
+            if (!authorizationResult.Succeeded)
+            {
+                return new ForbidResult();
+            }
+            
+            // Return form
             var model = new SolutionEditModel
             {
                 Task = solution.Task,
@@ -181,7 +193,7 @@ namespace archive.Controllers
             return View("Edit", model);
         }
 
-        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [Authorize]
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> Edit([Bind] SolutionEditModel edited)
@@ -192,13 +204,22 @@ namespace archive.Controllers
                 return new StatusCodeResult(400);
             }
 
-            // Initialize entities
+            // Load solution
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var solution = await _repository.Solutions.FindAsync(edited.SolutionId);
             if (solution == null)
             {
                 return new StatusCodeResult(404);
             }
+
+            // Authorize
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, solution, new ModOrOwnerRequirement());
+            if (!authorizationResult.Succeeded)
+            {
+                return new ForbidResult();
+            }
+
+            // Create updated version
             var version = new SolutionVersion
             {
                 Solution = solution,
