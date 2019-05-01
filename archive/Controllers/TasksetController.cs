@@ -9,15 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using archive.Data.Enums;
+using archive.Services;
 
 namespace archive.Controllers
 {
-    public class TasksetController : Controller
+    public class TasksetController : ArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
 
-        public TasksetController(ILogger<TasksetController> logger, IRepository repository)
+        public TasksetController(ILogger<TasksetController> logger, IRepository repository,
+            IUserActivityService activityService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;

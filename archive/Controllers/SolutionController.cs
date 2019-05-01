@@ -20,12 +20,13 @@ using Task = System.Threading.Tasks.Task;
 
 namespace archive.Controllers
 {
-    public class SolutionController : Controller
+    public class SolutionController : ArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
 
-        public SolutionController(ILogger<SolutionController> logger, IRepository repository)
+        public SolutionController(ILogger<SolutionController> logger, IRepository repository,
+            IUserActivityService activityService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;

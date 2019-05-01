@@ -14,15 +14,33 @@
     }
     else
     {
-        <img src="img/default-avatar.jpg" width="220px" height="280px"/>
+        <img src="/img/default-avatar.jpg" width="220px" height="280px"/>
     }
 </div>
 
 <label asp-for="UserName"></label>
-<pre>@Model.UserName != null ? @Model.UserName : <bold>brak</bold></pre>
+<pre>
+@if (Model.UserName != null)
+{
+    @Model.UserName
+}
+else
+{
+    <bold>brak</bold>
+}
+</pre>
 
 <label asp-for="HomePage"></label>
-<pre>@Model.HomePage != null ? @Model.HomePage : <bold>brak</bold></pre>
+<pre>
+@if (Model.HomePage != null)
+{
+    @Model.HomePage
+}
+else
+{
+    <bold>brak</bold>
+}
+</pre>
 
 <label asp-for="Email"></label>
 <pre>

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 using archive.Data;
@@ -11,14 +10,15 @@ namespace archive.Services
 {
     public class UserActivityService : IUserActivityService
     {
-        private readonly ConcurrentDictionary<string, DateTime> _cache = new ConcurrentDictionary<string, DateTime>();
-        private readonly ConcurrentDictionary<string, bool> _cacheDirty = new ConcurrentDictionary<string, bool>();
-        private readonly Timer _persistTimer = new Timer(30000); // in millis
-        private readonly Timer _cleanCacheTimer = new Timer(600000); // in millis
+        private static ConcurrentDictionary<string, DateTime> _cache = new ConcurrentDictionary<string, DateTime>();
+        private static ConcurrentDictionary<string, bool> _cacheDirty = new ConcurrentDictionary<string, bool>();
+        private static Timer _persistTimer = new Timer(30000); // in millis
+        private static Timer _cleanCacheTimer = new Timer(600000); // in millis
+        private static bool _persistCacheTimerElapsed = false;
         private readonly ILogger _logger;
         private readonly IRepository _repository;
 
-        private async void PersistCache(Object _, ElapsedEventArgs __)
+        private async Task PersistCache()
         {
             foreach (var name in _cache.Keys)
                 if (_cacheDirty[name])
@@ -30,11 +30,9 @@ namespace archive.Services
                 }
         }
 
-        public UserActivityService(ILogger<UserActivityService> logger, IRepository repository)
+        static UserActivityService()
         {
-            _logger = logger;
-            _repository = repository;
-            _persistTimer.Elapsed += PersistCache;
+            _persistTimer.Elapsed += (_, __) => _persistCacheTimerElapsed = true;
             _persistTimer.AutoReset = true;
             _persistTimer.Enabled = true;
             _cleanCacheTimer.Elapsed += (_, __) => _cache.Clear();
@@ -43,26 +41,38 @@ namespace archive.Services
             _cleanCacheTimer.Enabled = true;
         }
 
-        public void RegisterAction(string name)
+        public UserActivityService(ILogger<UserActivityService> logger, IRepository repository)
         {
-            _cacheDirty.AddOrUpdate(name, true, (_, __) => true);
+            _logger = logger;
+            _repository = repository;
+        }
+
+        public async Task RegisterActionAsync(string name)
+        {
+            _logger.LogDebug($"Rejestracja akcji użytkownika: name={name}");
             _cache.AddOrUpdate(name, DateTime.Now, (_, __) => DateTime.Now);
+            _cacheDirty.AddOrUpdate(name, true, (_, __) => true);
+
+            if (_persistCacheTimerElapsed)
+            {
+                await PersistCache();
+                _persistCacheTimerElapsed = false;
+            }
         }
 
         public async Task<DateTime?> GetLastActionTimeAsync(string name)
         {
+            _logger.LogDebug($"Zażadanie pobrania daty ostatniej akcji użytkownika: name={name}");
             if (_cache.ContainsKey(name))
                 return _cache[name];
 
             var user = await _repository.Users.FirstOrDefaultAsync(u => u.UserName == name);
             if (user != null)
             {
-                _cache.AddOrUpdate(user.Id, user.LastActive == new DateTime() ? user.LastActive : DateTime.Now,
-                    (_, __) => user.LastActive == new DateTime() ? user.LastActive : DateTime.Now);
-                _cacheDirty.AddOrUpdate(user.Id, true, (_, __) => true);
+                _cache.AddOrUpdate(user.UserName, user.LastActive,(_, __) => user.LastActive);
+                return _cache[user.UserName];
             }
-
-            return user != null ? _cache[user.Id] : (DateTime?) null;
+            return null;
         }
     }
 }

@@ -5,7 +5,7 @@ namespace archive.Services
 {
     public interface IUserActivityService
     {
-        void RegisterAction(string name);
-        Task<Nullable<DateTime>> GetLastActionTimeAsync(string name);
+        Task RegisterActionAsync(string name);
+        Task<DateTime?> GetLastActionTimeAsync(string name);
     }
 }

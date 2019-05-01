@@ -13,7 +13,7 @@
 <h2>Przedmioty:</h2>
 @foreach (var course in Model)
 {
-    @if (course.ShortcutCode == null)
+    if (course.ShortcutCode == null)
     {
         <a asp-controller="Taskset" asp-action="Index" asp-route-id="@course.Id">
             @course.Name

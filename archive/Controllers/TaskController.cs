@@ -4,6 +4,7 @@ using archive.Data;
 using archive.Data.Entities;
 using archive.Data.Enums;
 using archive.Models.Task;
+using archive.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,13 @@ using Microsoft.Extensions.Logging;
 
 namespace archive.Controllers
 {
-    public class TaskController : Controller
+    public class TaskController : ArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
 
-        public TaskController(IRepository repository, ILogger<TaskController> logger)
+        public TaskController(IRepository repository, ILogger<TaskController> logger,
+            IUserActivityService activityService) : base(activityService)
         {
             _repository = repository;
             _logger = logger;

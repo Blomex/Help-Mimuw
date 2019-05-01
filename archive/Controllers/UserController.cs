@@ -14,24 +14,18 @@ using Microsoft.Extensions.Logging;
 
 namespace archive.Controllers
 {
-    public class UserController : Controller
+    public class UserController : ArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
         private readonly IUserActivityService _activityService;
 
         public UserController(IRepository repository, ILogger<UserController> logger,
-            IUserActivityService activityService)
+            IUserActivityService activityService) : base(activityService)
         {
             _repository = repository;
             _logger = logger;
             _activityService = activityService;
-        }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            base.OnActionExecuting(context);
-            _activityService.RegisterAction(User.Identity.Name);
         }
 
         public async Task<IActionResult> ShowProfile(string name)
@@ -52,7 +46,7 @@ namespace archive.Controllers
             return View("/Views/User/ShowProfile.cshtml", new ProfileViewModel
             {
                 UserName = user.UserName,
-                AvatarImage = user.Avatar.Image,
+                AvatarImage = user.Avatar?.Image,
                 Email = user.Email,
                 HomePage = user.HomePage,
                 Phone = user.PhoneNumber,
