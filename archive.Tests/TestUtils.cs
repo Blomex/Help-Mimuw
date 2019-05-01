@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +14,7 @@ using AngleSharp;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using EntityFrameworkCoreMock;
+using Remotion.Linq.Clauses;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace archive.Tests
@@ -54,6 +57,18 @@ namespace archive.Tests
             repo.Setup(t => t.Solutions).Returns(solutionsDbSet.Object);
 
             return repo;
+        }
+        
+        public static string ToPostString<T>(T instance)
+        {
+            var sb = new StringBuilder();
+            foreach (FieldInfo fi in instance.GetType().GetFields())
+            {
+                sb.Append(fi.Name + "=" + fi.GetValue(instance) + "&");
+            }
+
+            sb.Append("__dummy__=1");
+            return sb.ToString();
         }
     }
     
