@@ -13,7 +13,7 @@ namespace archive.Models.Solution
 
         public bool ValidForEdit()
         {
-            return NewContent != null && NewContent.Length > 5 && SolutionId != null && SolutionId > 0;
+            return NewContent != null && NewContent.Length > 1 && SolutionId != null && SolutionId > 0;
         }
     }
 }

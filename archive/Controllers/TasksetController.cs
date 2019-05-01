@@ -73,7 +73,7 @@ namespace archive.Controllers
             return View("/Views/Taskset/Index.cshtml", model);
         }
 
-        [Authorize(Roles = UserRoles.MODERATOR)]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forCourseId)
         {
             var course = await _repository.Courses
@@ -89,7 +89,7 @@ namespace archive.Controllers
             return View(new CreateTasksetViewModel(courses));
         }
 
-        [Authorize(Roles = UserRoles.MODERATOR)]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTasksetViewModel taskset)

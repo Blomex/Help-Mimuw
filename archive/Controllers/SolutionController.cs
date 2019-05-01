@@ -323,7 +323,7 @@ namespace archive.Controllers
             return RedirectToAction("Show", new { solutionId = solutionId });
         }
 
-        [Authorize(Roles = UserRoles.MODERATOR)]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var solution = await _repository.Solutions.Include(s => s.Task)
@@ -332,6 +332,13 @@ namespace archive.Controllers
             {
                 _logger.LogDebug($"Solution(Id={id}) not found");
                 return new StatusCodeResult(404);
+            }
+
+            // Authorize
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, solution, new ModOrOwnerRequirement());
+            if (!authorizationResult.Succeeded)
+            {
+                return new ForbidResult();
             }
 
             _repository.Solutions.Remove(solution);

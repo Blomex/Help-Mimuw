@@ -13,12 +13,12 @@ namespace archive.Models.Task
         public Data.Entities.Taskset Taskset { get; set; }
 
         [Required]
-        [MinLength(5)]
+        [MinLength(1)]
         [Display(Name = "Nazwa zadania")]
         public string NewName { get; set; }
 
         [Required]
-        [MinLength(5)]
+        [MinLength(1)]
         [Display(Name = "Treść zadania")]
         public string NewContent { get; set; }
     }
