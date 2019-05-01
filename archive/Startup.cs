@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
 using archive.Data.Enums;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 
 namespace archive
 {
@@ -44,11 +46,21 @@ namespace archive
                 options.UseNpgsql(
                     Configuration.GetConnectionString("DefaultConnection")));
 
+            
+            // Ewentualnie możnaby wymagać potwierdzenia maila przed zalogowaniem się na stronce.
+            //Trzeba wtedy dodać odpowiednią opcję w argumencie do AddDefaultIdentity
             services.AddDefaultIdentity<ApplicationUser>()
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.Configure<IdentityOptions>(ConfigureIdentityOptions);
+            
 
             services.AddScoped<IRepository, ApplicationDbContext>();
             services.AddScoped<ICourseService, CourseService>();
