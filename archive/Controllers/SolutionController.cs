@@ -100,8 +100,7 @@ namespace archive.Controllers
                 return new StatusCodeResult(400);
             }
 
-            
-            return View("Create", new SolutionCreateModel { Task = task, NewContent = "" });
+            return View("Edit", new SolutionEditModel { Task = task, NewContent = "" });
         }
 
         [HttpPost]
@@ -109,7 +108,7 @@ namespace archive.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task)
         {
-            SolutionCreateModel edited_solution = new SolutionCreateModel() { NewContent = NewContent, Task = Task };
+            SolutionEditModel edited_solution = new SolutionEditModel() { NewContent = NewContent, Task = Task };
             _logger.LogDebug($"Requested to add solution for {edited_solution.Task}; " +
                 $"content: length={edited_solution.NewContent?.Length}, hash={edited_solution.NewContent?.GetHashCode()}");
             
@@ -149,6 +148,71 @@ namespace archive.Controllers
                 _repository.SolutionsVersions.Add(version);
                 await _repository.SaveChangesAsync();
                 solution.CurrentVersion = version;
+                await _repository.SaveChangesAsync();
+                transaction.Commit();
+            }
+            return RedirectToAction("Show", new { solutionId = solution.Id });
+        }
+
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        public async Task<IActionResult> Edit(int id)
+        {
+            _logger.LogDebug($"Requested solution edition form for solution with id {id}");
+
+            // Retrieve task from DB
+            var solution = await _repository.Solutions
+                .Include(s => s.CurrentVersion)
+                .Include(s => s.Task)
+                .Include(s => s.Task.Taskset)
+                .Include(s => s.Task.Taskset.Course) // TODO something with this ...
+                .Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (solution == null)
+            {
+                _logger.LogDebug($"Solution with id {id} not found");
+                return new StatusCodeResult(404);
+            }
+
+            var model = new SolutionEditModel
+            {
+                Task = solution.Task,
+                SolutionId = solution.Id,
+                NewContent = solution.CurrentVersion.Content
+            };
+            return View("Edit", model);
+        }
+
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> Edit([Bind] SolutionEditModel edited)
+        {
+            _logger.LogDebug($"Edited SolutionEditModel({edited.Task}, {edited.SolutionId}, {edited.NewContent})");
+            if (!edited.ValidForEdit())
+            {
+                return new StatusCodeResult(400);
+            }
+
+            // Initialize entities
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var solution = await _repository.Solutions.FindAsync(edited.SolutionId);
+            if (solution == null)
+            {
+                return new StatusCodeResult(404);
+            }
+            var version = new SolutionVersion
+            {
+                Solution = solution,
+                Created = DateTime.Now,
+                Content = edited.NewContent
+            };
+
+            // Now save to database in two steps to avoid circular dependency between foreign keys
+            using (var transaction = _repository.Database.BeginTransaction())
+            {
+                _repository.SolutionsVersions.Add(version);
+                await _repository.SaveChangesAsync();
+                solution.CurrentVersion = version;
+                solution.CachedContent = edited.NewContent;
                 await _repository.SaveChangesAsync();
                 transaction.Commit();
             }

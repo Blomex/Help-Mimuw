@@ -1,4 +1,4 @@
-﻿@model archive.Models.Solution.SolutionCreateModel
+﻿@model archive.Models.Solution.SolutionEditModel
 @{
     ViewData["Title"] = "Nowe rozwiązanie";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -13,16 +13,20 @@
 <h2>Dodaj rozwiązanie</h2>
 <div>
     <div>
-        <form asp-action="Create">
+        <form asp-action="@(Model.SolutionId == null ? "Create" : "Edit")">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Task.Id" />
+            @if (Model.SolutionId != null)
+            {
+                <input type="hidden" asp-for="SolutionId" />
+            }
             <div class="form-group">
                 <label asp-for="NewContent" class="control-label">Treść rozwiązania</label>
                 <textarea asp-for="NewContent" class="form-control" cols="120" rows="20" autofocus required></textarea>
                 <span asp-validation-for="NewContent" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Dodaj" class="btn btn-primary" />
+                <input type="submit" value="@(Model.SolutionId == null ? "Dodaj rozwiązanie" : "Zapisz zmiany")" class="btn btn-primary" />
             </div>
         </form>
     </div>
