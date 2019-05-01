@@ -10,8 +10,8 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190501150524_Avatar")]
-    partial class Avatar
+    [Migration("20190501164413_SolutionEditingAndVersionHistory")]
+    partial class SolutionEditingAndVersionHistory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -147,12 +147,6 @@ namespace archive.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<string>("HomePage")
-                        .HasMaxLength(256);
-
-                    b.Property<DateTime>("LastActive")
-                        .HasColumnType("timestamp");
-
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
@@ -218,8 +212,6 @@ namespace archive.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("Archive");
-
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -258,16 +250,43 @@ namespace archive.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Content")
+                    b.Property<string>("AuthorId");
+
+                    b.Property<string>("CachedContent")
                         .IsRequired();
+
+                    b.Property<long?>("CurrentVersionId");
 
                     b.Property<int>("TaskId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("CurrentVersionId");
+
                     b.HasIndex("TaskId");
 
                     b.ToTable("Solutions");
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.SolutionVersion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Content")
+                        .IsRequired();
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<int>("SolutionId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolutionId");
+
+                    b.ToTable("SolutionsVersions");
                 });
 
             modelBuilder.Entity("archive.Data.Entities.Task", b =>
@@ -312,19 +331,6 @@ namespace archive.Migrations
                         .HasAnnotation("Npgsql:IndexMethod", "btree");
 
                     b.ToTable("Tasksets");
-                });
-
-            modelBuilder.Entity("archive.Data.Entities.UserAvatar", b =>
-                {
-                    b.Property<string>("ApplicationUserId");
-
-                    b.Property<byte[]>("Image")
-                        .IsRequired()
-                        .HasMaxLength(3145728);
-
-                    b.HasKey("ApplicationUserId");
-
-                    b.ToTable("Avatars");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -387,9 +393,25 @@ namespace archive.Migrations
 
             modelBuilder.Entity("archive.Data.Entities.Solution", b =>
                 {
+                    b.HasOne("archive.Data.Entities.ApplicationUser", "Author")
+                        .WithMany("Solutions")
+                        .HasForeignKey("AuthorId");
+
+                    b.HasOne("archive.Data.Entities.SolutionVersion", "CurrentVersion")
+                        .WithMany()
+                        .HasForeignKey("CurrentVersionId");
+
                     b.HasOne("archive.Data.Entities.Task", "Task")
                         .WithMany("Solutions")
                         .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.SolutionVersion", b =>
+                {
+                    b.HasOne("archive.Data.Entities.Solution", "Solution")
+                        .WithMany("Versions")
+                        .HasForeignKey("SolutionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -406,14 +428,6 @@ namespace archive.Migrations
                     b.HasOne("archive.Data.Entities.Course", "Course")
                         .WithMany("Tasksets")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("archive.Data.Entities.UserAvatar", b =>
-                {
-                    b.HasOne("archive.Data.Entities.ApplicationUser", "ApplicationUser")
-                        .WithOne("Avatar")
-                        .HasForeignKey("archive.Data.Entities.UserAvatar", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

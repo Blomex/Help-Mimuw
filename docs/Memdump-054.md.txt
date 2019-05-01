@@ -1,0 +1,16 @@
+﻿# Edycja zadań i rozwiązań 
+
+## Cykliczne zależności i transakcje
+
+Historia jest taka: rozwiązanie ma obecną wersję (Foreign Key) i wersja ma swoje rozwiązanie (też Foreign Key). I nie wiadomo, który wstawić najpiej -- mamy cykliczną zależność i nie wiadomo, które zapisać najpierw. Chyba są jakieś cuda-wianki, żeby to obejść ([`SET CONSTRAINTS ... DEFERRED`](https://www.postgresql.org/docs/9.1/sql-set-constraints.html)), ale można tez zakceptować porażkę i pozwolić któremuś być nullem (bieżące podejście).
+
+Zdaje się niezależnie od rozwiązania chcemy mieć transakcje, a to okazuje siębardziej skomplikowane, niż to, co podlinkowałem dawno temu. Potrzebujemy do tego dostępu do bazy danych, zamiast do repozytorium (`ApplicationDbContext` zamiast `IRepository` w zależnościach) i robi się to tak:
+
+```cs
+using (var transaction = _repository.Database.BeginTransaction())
+{
+    /* ... */
+    await _repository.SaveChangesAsync();
+    transaction.Commit();
+}
+```

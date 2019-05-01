@@ -14,6 +14,8 @@ namespace archive.Data
         public DbSet<Taskset> Tasksets { get; set; }
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Solution> Solutions { get; set; }
+        public DbSet<SolutionVersion> SolutionsVersions { get; set; }
+
         public DbSet<Rating> Ratings {get; set;}
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserAvatar> Avatars { get; set; }
@@ -95,12 +97,20 @@ namespace archive.Data
                 {
                     entity.HasKey(e => e.Id);
 
-                    entity.Property(e => e.Content).IsRequired();
-
                     entity.HasOne(e => e.Task)
                         .WithMany(e => e.Solutions)
                         .HasForeignKey(e => e.TaskId);
+
+                    entity.HasOne(s => s.Author).WithMany(a => a.Solutions);
+                    entity.HasOne(s => s.CurrentVersion);
                 });
+
+            builder.Entity<SolutionVersion>(solutionVersion => 
+            {
+                solutionVersion.HasKey(v => v.Id);
+
+                solutionVersion.HasOne(v => v.Solution).WithMany(s => s.Versions);
+            });
             
             builder.Entity<UserAvatar>(
                 entity =>

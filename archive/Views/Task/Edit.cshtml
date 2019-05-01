@@ -1,0 +1,28 @@
+@model archive.Models.Task.TaskEditModel
+@{
+    ViewData["Title"] = Model.NewName + " (Edycja)";
+}
+
+<h1>@Model.NewName (Edycja)</h1>
+<h2>@Model.Taskset.Name (@Model.Taskset.Year)</h2>  
+<hr/>
+
+
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label asp-for="NewName"></label>
+        <input asp-for="NewName" class="form-control" required />
+        <span asp-validation-for="NewName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NewContent"></label>
+        <textarea asp-for="NewContent" class="form-control" rows="6" autofocus required></textarea>
+        <span asp-validation-for="NewContent" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Zapisz zmiany" class="btn btn-primary" />
+    </div>
+</form>

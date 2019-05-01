@@ -1,0 +1,33 @@
+﻿@model archive.Models.Solution.SolutionEditModel
+@{
+    ViewData["Title"] = "Nowe rozwiązanie";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>@Model.Task.Taskset.Course.Name</h1>
+<h2>@Model.Task.Taskset.Name (@Model.Task.Taskset.Year)</h2>
+<hr/>
+<h2>@Model.Task.Name</h2>
+<section>
+    <pre style="white-space: pre-wrap; word-wrap: break-word;">@Model.Task.Content</pre>
+</section>
+<h2>Dodaj rozwiązanie</h2>
+<div>
+    <div>
+        <form asp-action="@(Model.SolutionId == null ? "Create" : "Edit")">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Task.Id" />
+            @if (Model.SolutionId != null)
+            {
+                <input type="hidden" asp-for="SolutionId" />
+            }
+            <div class="form-group">
+                <label asp-for="NewContent" class="control-label">Treść rozwiązania</label>
+                <textarea asp-for="NewContent" class="form-control" cols="120" rows="20" autofocus required></textarea>
+                <span asp-validation-for="NewContent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@(Model.SolutionId == null ? "Dodaj rozwiązanie" : "Zapisz zmiany")" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

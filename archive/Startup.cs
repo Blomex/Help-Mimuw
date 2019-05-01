@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
 using archive.Data.Enums;
+using archive.Commons.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 
@@ -59,6 +61,12 @@ namespace archive
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("EditPolicy", policy =>
+                    policy.AddRequirements(new ModOrOwnerRequirement()));
+            });
+            services.AddScoped<IAuthorizationHandler, SolutionAuthorizationHandler>();
             services.Configure<IdentityOptions>(ConfigureIdentityOptions);
             
 

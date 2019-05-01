@@ -256,16 +256,43 @@ namespace archive.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Content")
+                    b.Property<string>("AuthorId");
+
+                    b.Property<string>("CachedContent")
                         .IsRequired();
+
+                    b.Property<long?>("CurrentVersionId");
 
                     b.Property<int>("TaskId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("CurrentVersionId");
+
                     b.HasIndex("TaskId");
 
                     b.ToTable("Solutions");
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.SolutionVersion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Content")
+                        .IsRequired();
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<int>("SolutionId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolutionId");
+
+                    b.ToTable("SolutionsVersions");
                 });
 
             modelBuilder.Entity("archive.Data.Entities.Task", b =>
@@ -385,9 +412,25 @@ namespace archive.Migrations
 
             modelBuilder.Entity("archive.Data.Entities.Solution", b =>
                 {
+                    b.HasOne("archive.Data.Entities.ApplicationUser", "Author")
+                        .WithMany("Solutions")
+                        .HasForeignKey("AuthorId");
+
+                    b.HasOne("archive.Data.Entities.SolutionVersion", "CurrentVersion")
+                        .WithMany()
+                        .HasForeignKey("CurrentVersionId");
+
                     b.HasOne("archive.Data.Entities.Task", "Task")
                         .WithMany("Solutions")
                         .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.SolutionVersion", b =>
+                {
+                    b.HasOne("archive.Data.Entities.Solution", "Solution")
+                        .WithMany("Versions")
+                        .HasForeignKey("SolutionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

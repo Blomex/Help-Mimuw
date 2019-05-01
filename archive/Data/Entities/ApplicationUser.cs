@@ -15,5 +15,6 @@ namespace archive.Data.Entities
 
         public virtual UserAvatar Avatar { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Solution> Solutions { get; set; }
     }
 }
