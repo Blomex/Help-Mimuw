@@ -1,13 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.IO;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using archive.Data;
+using archive.Data.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace archive.Areas.Identity.Pages.Account.Manage
 {
@@ -15,16 +18,18 @@ namespace archive.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<archive.Data.Entities.ApplicationUser> _userManager;
         private readonly SignInManager<archive.Data.Entities.ApplicationUser> _signInManager;
+        private readonly IRepository _repository;
         private readonly IEmailSender _emailSender;
 
         public IndexModel(
             UserManager<archive.Data.Entities.ApplicationUser> userManager,
             SignInManager<archive.Data.Entities.ApplicationUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender, IRepository repository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _repository = repository;
         }
 
         [Display(Name = "Nazwa użytkownika")]
@@ -34,6 +39,9 @@ namespace archive.Areas.Identity.Pages.Account.Manage
 
         [TempData]
         public string StatusMessage { get; set; }
+
+        [Display(Name = "Awatar")]
+        public byte[] AvatarImage { get; set; }
 
         [BindProperty]
         public InputModel Input { get; set; }
@@ -48,6 +56,12 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Numer telefonu")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name = "Strona domowa")]
+            public string HomePage { get; set; }
+
+            [Display(Name = "Ustaw nowy awatar")]
+            public IFormFile AvatarImage { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -58,16 +72,17 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var userName = await _userManager.GetUserNameAsync(user);
-            var email = await _userManager.GetEmailAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
+            Username = user.UserName;
+            AvatarImage = (await _repository.Users
+                    .Include(u => u.Avatar)
+                    .FirstOrDefaultAsync(a => a.Id == user.Id))?
+                .Avatar?.Image;
 
             Input = new InputModel
             {
-                Email = email,
-                PhoneNumber = phoneNumber
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                HomePage = user.HomePage,
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -83,35 +98,74 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             }
 
             var user = await _userManager.GetUserAsync(User);
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var email = await _userManager.GetEmailAsync(user);
-            if (Input.Email != email)
+            if (Input.Email != user.Email)
             {
                 var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
                 if (!setEmailResult.Succeeded)
                 {
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    throw new InvalidOperationException($"Unexpected error occurred setting email for user with ID '{userId}'.");
+                    throw new InvalidOperationException(
+                        $"Unexpected error occurred setting email for user with ID '{user.Id}'.");
                 }
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            if (Input.PhoneNumber != user.PhoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
+                    throw new InvalidOperationException(
+                        $"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
+                }
+            }
+
+            user.HomePage = Input.HomePage;
+            if (!(await _userManager.UpdateAsync(user)).Succeeded)
+            {
+                throw new InvalidOperationException(
+                    $"Unexpected error occurred setting homepage for user with ID '{user.Id}'.");
+            }
+
+            if (Input.AvatarImage != null)
+            {
+                var stream = Input.AvatarImage.OpenReadStream();
+                if (stream.Length > UserAvatar.ImageSizeLimit)
+                {
+                    StatusMessage = $"Błąd. Przekroczono limit {UserAvatar.ImageSizeLimit} bajtów per awatar.";
+                    return RedirectToPage();
+                }
+
+                if (!Input.AvatarImage.ContentType.Contains("image"))
+                {
+                    StatusMessage = $"Błąd. Awatar nie jest obrazkiem.";
+                    return RedirectToPage();
+                }
+                
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+
+                var avatar = await _repository.Avatars
+                    .FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
+
+                if (avatar.Image != null)
+                {
+                    avatar.Image = memoryStream.ToArray();
+                    await _repository.SaveChangesAsync();
+                }
+                else
+                {
+                    user.Avatar = new UserAvatar {Image = memoryStream.ToArray(), ApplicationUserId = user.Id};
+                    await _repository.SaveChangesAsync();
                 }
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Twój profil został pomyślnie zaktualizowany.";
             return RedirectToPage();
         }
 
@@ -135,7 +189,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             var callbackUrl = Url.Page(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
-                values: new { userId = userId, code = code },
+                values: new {userId = userId, code = code},
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(email, "Potwierdzenie adresu email",
                 $"Potwierdź swój adres email <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>klikając tutaj</a>.");

@@ -20,12 +20,13 @@ using Task = System.Threading.Tasks.Task;
 
 namespace archive.Controllers
 {
-    public class SolutionController : Controller
+    public class SolutionController : ArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
 
-        public SolutionController(ILogger<SolutionController> logger, IRepository repository)
+        public SolutionController(ILogger<SolutionController> logger, IRepository repository,
+            IUserActivityService activityService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
@@ -170,7 +171,7 @@ namespace archive.Controllers
                 return new StatusCodeResult(400);
             }
             // Update
-            comment.CommentDate = DateTime.Now;
+            comment.CommentDate = DateTime.UtcNow;
             comment.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             _repository.Comments.Add(comment);
             await _repository.SaveChangesAsync(); /* FIXME Can it fail? */

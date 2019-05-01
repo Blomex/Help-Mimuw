@@ -69,8 +69,12 @@
                 foreach (var a in Model.Solution.Comments)
                  {
             <div class="Comment">
-                <div class="AuthorHere">@a.ApplicationUser.UserName</div>
-                <div class="DateHere">@a.CommentDate</div>
+                <div class="AuthorHere">
+                    <a asp-controller="User" asp-action="ShowProfile" asp-route-name="@a.ApplicationUser.UserName">
+                        @a.ApplicationUser.UserName
+                    </a>
+                </div>
+                <div class="DateHere">@a.CommentDate.AddHours(2)</div>
                 <div class="ContentHere">
                     @a.Content
                 </div>

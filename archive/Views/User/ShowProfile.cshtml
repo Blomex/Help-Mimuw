@@ -1,0 +1,79 @@
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model archive.Models.User.ProfileViewModel
+@{
+    ViewData["Title"] = $"Profil użytkownika {@Model.UserName}.";
+}
+
+<label asp-for="AvatarImage"></label>
+<div style="max-height: 640px; overflow: auto">
+    @if (Model.AvatarImage != null)
+    {
+        var base64 = Convert.ToBase64String(Model.AvatarImage);
+        var imgSrc = $"data:image/gif;base64,{base64}";
+            <img src="@imgSrc" alt="Awatar użytkownika"/>
+    }
+    else
+    {
+        <img src="/img/default-avatar.jpg"/>
+    }
+</div>
+
+<label asp-for="UserName"></label>
+<pre>
+@if (Model.UserName != null)
+{
+    @Model.UserName
+}
+else
+{
+<i>brak</i>
+}
+</pre>
+
+<label asp-for="HomePage"></label>
+<pre>
+@if (Model.HomePage != null)
+{
+    @Model.HomePage
+}
+else
+{
+<i>brak</i>
+}
+</pre>
+
+<label asp-for="Email"></label>
+<pre>
+@if (Model.Email != null)
+{
+    @Model.Email
+}
+else
+{
+<i>brak</i>
+}
+</pre>
+
+<label asp-for="Phone"></label>
+<pre>
+@if (Model.Phone != null)
+{
+    @Model.Phone
+}
+else
+{
+<i>brak</i>
+}
+</pre>
+
+<label asp-for="LastActive"></label>
+<pre>
+@if (Model.LastActive != new DateTime() && Model.LastActive != null)
+{
+    @Model.LastActive.Value.AddHours(2)
+}
+else
+{
+<i>brak</i>
+}
+</pre>

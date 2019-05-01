@@ -14,10 +14,9 @@ namespace archive.Data
         public DbSet<Taskset> Tasksets { get; set; }
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Solution> Solutions { get; set; }
-
         public DbSet<Rating> Ratings {get; set;}
-
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<UserAvatar> Avatars { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -101,6 +100,18 @@ namespace archive.Data
                     entity.HasOne(e => e.Task)
                         .WithMany(e => e.Solutions)
                         .HasForeignKey(e => e.TaskId);
+                });
+            
+            builder.Entity<UserAvatar>(
+                entity =>
+                {
+                    entity.HasKey(e => e.ApplicationUserId);
+
+                    entity.Property(e => e.ApplicationUserId).IsRequired();
+                    entity.Property(e => e.Image).IsRequired();
+
+                    entity.HasOne(e => e.ApplicationUser)
+                        .WithOne(e => e.Avatar);
                 });
         }
 

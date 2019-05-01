@@ -1,3 +1,7 @@
+.PHONY: env
+env:
+	export PATH=$$PATH:/home/${USER}/.dotnet/tools
+
 .PHONY: run
 run:
 	bash -c 'export PATH="$$PATH:/home/${USER}/.dotnet/tools" && cd archive && dotnet run .'

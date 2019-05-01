@@ -1,29 +1,25 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
-using archive.Models;
 using archive.Models.Taskset;
-using archive.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using archive.Data.Enums;
+using archive.Services;
 
 namespace archive.Controllers
 {
-    public class TasksetController : Controller
+    public class TasksetController : ArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
 
-        public TasksetController(ILogger<TasksetController> logger, IRepository repository)
+        public TasksetController(ILogger<TasksetController> logger, IRepository repository,
+            IUserActivityService activityService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;

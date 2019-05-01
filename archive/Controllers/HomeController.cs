@@ -11,15 +11,13 @@ using archive.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Identity;
 using archive.Data.Entities;
-using archive.Data.Enums;
 
 namespace archive.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : ArchiveController
     {
         private readonly TasksetController _tasksetController;
         private readonly ILogger _logger;
@@ -27,7 +25,7 @@ namespace archive.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         public HomeController(ILogger<SolutionController> logger, IRepository repository, TasksetController tasksetController,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager, IUserActivityService activityService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;

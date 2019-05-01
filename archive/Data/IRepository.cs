@@ -14,6 +14,8 @@ namespace archive.Data
         DbSet<Rating> Ratings {get;}
 
         DbSet<Comment> Comments { get; }
+        DbSet<ApplicationUser> Users { get; }
+        DbSet<UserAvatar> Avatars { get; }
         Job SaveChangesAsync();
     }
 }
