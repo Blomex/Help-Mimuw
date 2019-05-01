@@ -66,6 +66,10 @@ namespace archive.Tests
             {
                 sb.Append(fi.Name + "=" + fi.GetValue(instance) + "&");
             }
+            foreach(PropertyInfo p in instance.GetType().GetProperties())
+            {
+                sb.Append(p.Name + "=" + p.GetValue(instance) + "&");
+            }
 
             sb.Append("__dummy__=1");
             return sb.ToString();

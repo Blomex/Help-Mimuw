@@ -135,27 +135,31 @@ namespace archive.Tests.Integration
 
 
             // Act
+            var taskset = new Dictionary<string, string>
+            {
+                {"Type", TasksetType.Exam.ToString()},
+                {"Year", "2000"},
+                {"Name", name},
+                {"CourseId", "1"}
+            };
             var redirect = await client.PostAsync("/Taskset/Create",
-                new StringContent(
-                    TestUtils.ToPostString(new CreateTasksetViewModel
-                        {Type = TasksetType.Other.ToString(), Year = 2000, Name = name, CourseId = 1})));
+                new FormUrlEncodedContent(taskset));
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, redirect.StatusCode);
-            Assert.True(redirect.Headers.Location.OriginalString.StartsWith("/Taskset/Index"));
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var repository = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 var added = repository.Tasksets.Where(t => t.Name == name).ToList();
 
-                Assert.Equals(1, added.Count);
+                Assert.AreEqual(1, added.Count);
                 repository.Tasksets.Remove(added[0]);
                 repository.SaveChanges();
 
-                Assert.Equals(name, added[0].Name);
-                Assert.Equals(1, added[0].CourseId);
-                Assert.Equals(TasksetType.Exam, added[0].Type);
-                Assert.Equals(2000, added[0].Year);
+                Assert.AreEqual(name, added[0].Name);
+                Assert.AreEqual(1, added[0].CourseId);
+                Assert.AreEqual(TasksetType.Exam, added[0].Type);
+                Assert.AreEqual(2000, added[0].Year);
             }
         }
     }
