@@ -15,6 +15,7 @@
     <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
     <a asp-controller="Solution" asp-action="Create"
        asp-route-forTaskId="@task.Id">Dodaj rozwiązanie</a>
+    <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id">Edytuj</a>
     int counter = 0;
 
     foreach (var solution in Model.ListOfSolutions[task.Id])
@@ -36,6 +37,6 @@
     {
         @:</ul>
     }
-    @:</section>
+@:</section>
     <hr/>
 }
