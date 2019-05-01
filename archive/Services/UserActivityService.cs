@@ -50,7 +50,7 @@ namespace archive.Services
         public async Task RegisterActionAsync(string name)
         {
             _logger.LogDebug($"Rejestracja akcji użytkownika: name={name}");
-            _cache.AddOrUpdate(name, DateTime.Now, (_, __) => DateTime.Now);
+            _cache.AddOrUpdate(name, DateTime.UtcNow, (_, __) => DateTime.UtcNow);
             _cacheDirty.AddOrUpdate(name, true, (_, __) => true);
 
             if (_persistCacheTimerElapsed)

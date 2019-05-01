@@ -68,9 +68,9 @@ else
 
 <label asp-for="LastActive"></label>
 <pre>
-@if (Model.LastActive != new DateTime())
+@if (Model.LastActive != new DateTime() && Model.LastActive != null)
 {
-    @Model.LastActive
+    @Model.LastActive.Value.AddHours(2)
 }
 else
 {
