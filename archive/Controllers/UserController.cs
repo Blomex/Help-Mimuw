@@ -30,14 +30,14 @@ namespace archive.Controllers
 
         public async Task<IActionResult> ShowProfile(string name)
         {
-            _logger.LogDebug($"Zażądano profilu użytkownika o nazwie={name}");
+            _logger.LogDebug($"Requested profile of user with name={name}");
             var user = await _repository.Users
                 .Include(t => t.Avatar)
                 .FirstOrDefaultAsync(t => t.UserName == name);
 
             if (user == null)
             {
-                _logger.LogDebug($"Nie znaleziono użytkownika o nazwie={name}");
+                _logger.LogDebug($"Didn't find user with name={name}");
                 return new StatusCodeResult(404);
             }
 

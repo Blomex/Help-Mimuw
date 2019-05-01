@@ -105,7 +105,7 @@ namespace archive.Data
             builder.Entity<UserAvatar>(
                 entity =>
                 {
-                    entity.HasKey(e => e.Id);
+                    entity.HasKey(e => e.ApplicationUserId);
 
                     entity.Property(e => e.ApplicationUserId).IsRequired();
                     entity.Property(e => e.Image).IsRequired();

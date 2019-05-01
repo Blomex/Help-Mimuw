@@ -72,21 +72,16 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var userName = await _userManager.GetUserNameAsync(user);
-            var email = await _userManager.GetEmailAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            var id = await _userManager.GetUserIdAsync(user);
-
-            Username = userName;
+            Username = user.UserName;
             AvatarImage = (await _repository.Users
                     .Include(u => u.Avatar)
-                    .FirstOrDefaultAsync(a => a.Id == id))?
+                    .FirstOrDefaultAsync(a => a.Id == user.Id))?
                 .Avatar?.Image;
 
             Input = new InputModel
             {
-                Email = email,
-                PhoneNumber = phoneNumber,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
                 HomePage = user.HomePage,
             };
 
@@ -103,32 +98,29 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             }
 
             var user = await _userManager.GetUserAsync(User);
-            var userId = await _userManager.GetUserIdAsync(user);
 
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var email = await _userManager.GetEmailAsync(user);
-            if (Input.Email != email)
+            if (Input.Email != user.Email)
             {
                 var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
                 if (!setEmailResult.Succeeded)
                 {
                     throw new InvalidOperationException(
-                        $"Unexpected error occurred setting email for user with ID '{userId}'.");
+                        $"Unexpected error occurred setting email for user with ID '{user.Id}'.");
                 }
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            if (Input.PhoneNumber != user.PhoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
                     throw new InvalidOperationException(
-                        $"Unexpected error occurred setting phone number for user with ID '{userId}'.");
+                        $"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
                 }
             }
 
@@ -136,7 +128,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             if (!(await _userManager.UpdateAsync(user)).Succeeded)
             {
                 throw new InvalidOperationException(
-                    $"Unexpected error occurred setting homepage for user with ID '{userId}'.");
+                    $"Unexpected error occurred setting homepage for user with ID '{user.Id}'.");
             }
 
             if (Input.AvatarImage != null)
