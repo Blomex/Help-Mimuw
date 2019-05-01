@@ -10,8 +10,8 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190501142005_Avatar-deleted-id-column")]
-    partial class Avatardeletedidcolumn
+    [Migration("20190501150524_Avatar")]
+    partial class Avatar
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

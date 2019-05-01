@@ -2,7 +2,7 @@
 
 namespace archive.Migrations
 {
-    public partial class Avataruseroneoneconstraint : Migration
+    public partial class Avatar : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
