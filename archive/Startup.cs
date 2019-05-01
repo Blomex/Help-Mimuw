@@ -47,16 +47,14 @@ namespace archive
                     Configuration.GetConnectionString("DefaultConnection")));
 
             
-            // Wymaga potwierdzenia maila przed zrobieniem czegokolwiek na stronce
+            // Ewentualnie możnaby wymagać potwierdzenia maila przed zalogowaniem się na stronce.
+            //Trzeba wtedy dodać odpowiednią opcję w argumencie do AddDefaultIdentity
             services.AddDefaultIdentity<ApplicationUser>()
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-
-            // requires
-            // using Microsoft.AspNetCore.Identity.UI.Services;
-            // using archive.Services;
+            
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
