@@ -20,13 +20,13 @@ namespace archive.Tests.Integration
     [TestFixture]
     public class TasksetIntegrationTest
     {
-        private WebApplicationFactory<Startup> _factory;
+        private WebApplicationFactory<StartupWithoutAuthentication> _factory;
         private HttpClient _client;
 
         [OneTimeSetUp]
         public void InitApplication()
         {
-            _factory = new WebApplicationFactory<Startup>();
+            _factory = new WebApplicationFactory<StartupWithoutAuthentication>();
             _client = _factory.CreateClient();
         }
 
@@ -122,7 +122,6 @@ namespace archive.Tests.Integration
         }
 
         [Test]
-        [Ignore("Require being logged -- unsupported yet.")]
         public async Task CreateTaskset()
         {
             // Arrange
