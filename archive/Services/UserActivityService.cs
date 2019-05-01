@@ -34,7 +34,7 @@ namespace archive.Services
             }
 
             _cache.AddOrUpdate(name, DateTime.UtcNow, 
-                (k, v) => DateTime.UtcNow > v ? DateTime.UtcNow : v);
+                (_, __) => DateTime.UtcNow);
         }
 
         public async Task<DateTime?> GetLastActionTimeAsync(string name)
