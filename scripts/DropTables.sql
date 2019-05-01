@@ -13,4 +13,4 @@ drop table "Solutions" cascade;
 drop table "SolutionsVersions" cascade;
 drop table "Tasks" cascade;
 drop table "Tasksets" cascade;
-drop table "__EFMigrationsHistory"
+drop table "__EFMigrationsHistory" cascade;
