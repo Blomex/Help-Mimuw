@@ -144,17 +144,32 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 var stream = Input.AvatarImage.OpenReadStream();
                 if (stream.Length > UserAvatar.ImageSizeLimit)
                 {
-                    throw new InvalidOperationException(
-                        $"Przekroczono limit '{UserAvatar.ImageSizeLimit}' bajtów per awatar.");
+                    StatusMessage = $"Błąd. Przekroczono limit {UserAvatar.ImageSizeLimit} bajtów per awatar.";
+                    return RedirectToPage();
                 }
 
+                if (!Input.AvatarImage.ContentType.Contains("image"))
+                {
+                    StatusMessage = $"Błąd. Awatar nie jest obrazkiem.";
+                    return RedirectToPage();
+                }
+                
                 var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream);
 
                 var avatar = await _repository.Avatars
                     .FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
-                avatar.Image = AvatarImage;
-                await _repository.SaveChangesAsync();
+
+                if (avatar.Image != null)
+                {
+                    avatar.Image = memoryStream.ToArray();
+                    await _repository.SaveChangesAsync();
+                }
+                else
+                {
+                    user.Avatar = new UserAvatar {Image = memoryStream.ToArray(), ApplicationUserId = user.Id};
+                    await _repository.SaveChangesAsync();
+                }
             }
 
             await _signInManager.RefreshSignInAsync(user);
