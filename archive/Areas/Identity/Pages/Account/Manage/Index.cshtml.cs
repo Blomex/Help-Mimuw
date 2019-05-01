@@ -152,14 +152,16 @@ namespace archive.Areas.Identity.Pages.Account.Manage
                 var avatar = await _repository.Avatars
                     .FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
 
-                if (avatar.Image != null)
+                if (avatar != null)
                 {
                     avatar.Image = memoryStream.ToArray();
                     await _repository.SaveChangesAsync();
                 }
                 else
                 {
-                    user.Avatar = new UserAvatar {Image = memoryStream.ToArray(), ApplicationUserId = user.Id};
+                    avatar = new UserAvatar {Image = memoryStream.ToArray(), ApplicationUserId = user.Id};
+                    user.Avatar = user.Avatar;
+                    _repository.Avatars.Add(avatar);
                     await _repository.SaveChangesAsync();
                 }
             }
