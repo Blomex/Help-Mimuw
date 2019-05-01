@@ -14,13 +14,13 @@ namespace archive.Tests.Integration
     [TestFixture]
     public class CourseIntegrationTest
     {
-        private WebApplicationFactory<Startup> _factory;
+        private WebApplicationFactoryWithoutAuthentication _factory;
         private HttpClient _client;
 
         [OneTimeSetUp]
         public void InitApplication()
         {
-            _factory = new WebApplicationFactory<Startup>();
+            _factory = new WebApplicationFactoryWithoutAuthentication();
             _client = _factory.CreateClient();
         }
 

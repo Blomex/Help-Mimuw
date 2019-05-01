@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using archive.Data;
 using archive.Data.Entities;
 using archive.Data.Enums;
@@ -20,13 +21,13 @@ namespace archive.Tests.Integration
     [TestFixture]
     public class TasksetIntegrationTest
     {
-        private WebApplicationFactory<Startup> _factory;
+        private WebApplicationFactoryWithoutAuthentication _factory;
         private HttpClient _client;
 
         [OneTimeSetUp]
         public void InitApplication()
         {
-            _factory = new WebApplicationFactory<Startup>();
+            _factory = new WebApplicationFactoryWithoutAuthentication();
             _client = _factory.CreateClient();
         }
 
@@ -44,7 +45,7 @@ namespace archive.Tests.Integration
                 repository.Tasksets.Add(taskset1);
                 repository.Tasksets.Add(taskset2);
                 repository.SaveChanges();
-                
+
                 // Act
                 var tasksetsResponse = await _client.GetAsync("/Taskset/Index/1");
                 var tasksetsHtmlDocument = await HtmlHelpers.GetDocumentAsync(tasksetsResponse);
@@ -61,13 +62,13 @@ namespace archive.Tests.Integration
                 repository.Remove(taskset1);
                 repository.Remove(taskset2);
                 repository.SaveChanges();
-                
+
                 var obtainedTasksets = new List<string>();
                 foreach (var a in main.Children("li a"))
                 {
                     obtainedTasksets.Add(a.TextContent);
                 }
-                
+
                 obtainedTasksets.Sort();
                 expectedTasksets.Sort();
 
@@ -122,7 +123,6 @@ namespace archive.Tests.Integration
         }
 
         [Test]
-        [Ignore("Require being logged -- unsupported yet.")]
         public async Task CreateTaskset()
         {
             // Arrange
@@ -135,26 +135,31 @@ namespace archive.Tests.Integration
 
 
             // Act
-            var redirect = await client.PostAsJsonAsync("/Taskset/Create",
-                new CreateTasksetViewModel
-                    {Type = TasksetType.Other.ToString(), Year = 2000, Name = name, CourseId = 1});
+            var taskset = new Dictionary<string, string>
+            {
+                {"Type", TasksetType.Exam.ToString()},
+                {"Year", "2000"},
+                {"Name", name},
+                {"CourseId", "1"}
+            };
+            var redirect = await client.PostAsync("/Taskset/Create",
+                new FormUrlEncodedContent(taskset));
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, redirect.StatusCode);
-            Assert.True(redirect.Headers.Location.OriginalString.StartsWith("/Taskset/Index"));
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var repository = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 var added = repository.Tasksets.Where(t => t.Name == name).ToList();
 
-                Assert.Equals(1, added.Count);
+                Assert.AreEqual(1, added.Count);
                 repository.Tasksets.Remove(added[0]);
                 repository.SaveChanges();
 
-                Assert.Equals(name, added[0].Name);
-                Assert.Equals(1, added[0].CourseId);
-                Assert.Equals(TasksetType.Exam, added[0].Type);
-                Assert.Equals(2000, added[0].Year);
+                Assert.AreEqual(name, added[0].Name);
+                Assert.AreEqual(1, added[0].CourseId);
+                Assert.AreEqual(TasksetType.Exam, added[0].Type);
+                Assert.AreEqual(2000, added[0].Year);
             }
         }
     }
