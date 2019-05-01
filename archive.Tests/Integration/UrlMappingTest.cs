@@ -38,6 +38,7 @@ namespace archive.Tests.Integration
         [TestCase("/Identity/Account/Login")]
         [TestCase("/Identity/Account/Register")]
         [TestCase("/Identity/Account/ForgotPassword")]
+        [TestCase("/Identity/Account/Manage")]
         public async Task EnterMappedPath(string path)
         {
             // Act
@@ -60,6 +61,7 @@ namespace archive.Tests.Integration
         [TestCase("/solution/addrating/1?rating=true")]
         [TestCase("/solution/addrating/1?rating=false")]
         [TestCase("/Solution/CreateComment?forSolutionId=1")]
+        [TestCase("/Identity/Account/Manage")]
         public async Task RedirectToLoginPage(string path)
         {
             // Arrange
