@@ -39,7 +39,10 @@ namespace archive.Areas.Identity.Pages.Account
                 throw new InvalidOperationException($"Error confirming email for user with ID '{userId}':");
             }
 
-            await _userManager.AddToRoleAsync(user, "TRUSTED_USER");
+            var users =  await _userManager.GetUsersInRoleAsync("TRUSTED_USER");
+
+            if (!users.Contains(user))
+                await _userManager.AddToRoleAsync(user, "TRUSTED_USER");
             return Page();
         }
     }
