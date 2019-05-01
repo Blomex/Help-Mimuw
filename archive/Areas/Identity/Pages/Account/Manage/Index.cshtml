@@ -28,7 +28,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Input.AvatarImage"></label>
-                <input asp-for="Input.AvatarImage" class="form-control" /> <!-- FIXME walidacja -->
+                <input accept="image/*" asp-for="Input.AvatarImage" class="form-control"/>
                 <span asp-validation-for="Input.AvatarImage" class="text-danger"></span>
             </div>
             <div class="form-group">

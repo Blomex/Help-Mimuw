@@ -142,18 +142,23 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             if (Input.AvatarImage != null)
             {
                 var stream = Input.AvatarImage.OpenReadStream();
-                var memoryStream = new MemoryStream();
-                await stream.CopyToAsync(memoryStream);
-                user.Avatar = new UserAvatar {Image = memoryStream.ToArray(), ApplicationUserId = user.Id};
-                if (!(await _userManager.UpdateAsync(user)).Succeeded)
+                if (stream.Length > UserAvatar.ImageSizeLimit)
                 {
                     throw new InvalidOperationException(
-                        $"Unexpected error occurred setting avatar for user with ID '{userId}'.");
+                        $"Przekroczono limit '{UserAvatar.ImageSizeLimit}' bajtów per awatar.");
                 }
+
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+
+                var avatar = await _repository.Avatars
+                    .FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
+                avatar.Image = AvatarImage;
+                await _repository.SaveChangesAsync();
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Twój profil został pomyślnie zaktualizowany.";
             return RedirectToPage();
         }
 

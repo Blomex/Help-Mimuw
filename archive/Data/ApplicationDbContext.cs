@@ -110,7 +110,8 @@ namespace archive.Data
                     entity.Property(e => e.ApplicationUserId).IsRequired();
                     entity.Property(e => e.Image).IsRequired();
 
-                    entity.HasOne(e => e.ApplicationUser);
+                    entity.HasOne(e => e.ApplicationUser)
+                        .WithOne(e => e.Avatar);
                 });
         }
 
