@@ -97,6 +97,7 @@ namespace archive.Controllers
 
             var tasksets = await _repository.Tasksets
                 .Where(s => s.CourseId == id)
+                .Include(s => s.Tasks)
                 .OrderByDescending(s => s.Year)
                 .ToListAsync();
 
@@ -113,8 +114,9 @@ namespace archive.Controllers
                                 tasksToShow.Add(taskset);
                             }
                             else{
-                                foreach( var taks in taskset.Tasks){
-                                    if(taks.Solutions.Count() > 0){
+                                foreach( var task in taskset.Tasks){
+                                    var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
+                                    if(solutions.Count() > 0){
                                         tasksToShow.Add(taskset);
                                         break;
                                     }
