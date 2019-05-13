@@ -34,11 +34,14 @@ namespace archive.Controllers
             var taskset = await TasksetOrDefaultAsync(forTasksetId);
             if (taskset != null)
             {
+                if(taskset.Course.Archive)
+                    return new StatusCodeResult(403);
                 return View(new CreateTaskViewModel(taskset));
             }
             
             var tasksets = (await _repository.Tasksets
                 .Include(t => t.Course)
+                .Where(t => t.Course.Archive == false)
                 .ToListAsync());
             return View(new CreateTaskViewModel(tasksets));
         }
@@ -49,6 +52,9 @@ namespace archive.Controllers
         {
             _logger.LogDebug($"Requested to add task: " + task);
             var tasksetForTask = await TasksetOrDefaultAsync(task.TasksetId);
+
+            if(tasksetForTask.Course.Archive)
+                    return new StatusCodeResult(403);
                 
             if (tasksetForTask == null || !ModelState.IsValid)
             {

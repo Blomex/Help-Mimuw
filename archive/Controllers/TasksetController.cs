@@ -37,6 +37,11 @@ namespace archive.Controllers
                 return new StatusCodeResult(404);
             }
 
+            if (taskset.Course.Archive == true)
+            {
+                return new StatusCodeResult(403);
+            }
+
             var tasks = await _repository.Tasks.Where(s => s.TasksetId == id).ToListAsync();
 
             var listOfSolutions = new Dictionary<int, List<Solution>>();
@@ -62,6 +67,11 @@ namespace archive.Controllers
                 _logger.LogDebug($"Cannot find course with id={id}");
                 return new StatusCodeResult(404);
             }
+
+            if (course.Archive == true)
+            {
+                return new StatusCodeResult(403);
+            }
             
             var tasksets = await _repository.Tasksets
                 .Where(s => s.CourseId == id)
@@ -76,6 +86,7 @@ namespace archive.Controllers
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forCourseId)
         {
+            
             var course = await _repository.Courses
                 .Where(c => c.Id == forCourseId)
                 .FirstOrDefaultAsync();
@@ -83,6 +94,11 @@ namespace archive.Controllers
             if (course != null)
             {
                 return View(new CreateTasksetViewModel(course));
+            }
+
+            if (course.Archive == true)
+            {
+                return new StatusCodeResult(403);
             }
             
             var courses = await _repository.Courses.ToListAsync();
