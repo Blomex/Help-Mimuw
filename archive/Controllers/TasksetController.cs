@@ -73,6 +73,55 @@ namespace archive.Controllers
             return View("/Views/Taskset/Index.cshtml", model);
         }
 
+        [Authorize]
+        public async Task<IActionResult> IndexFilter(int id, IndexViewModel model)
+        {
+            _logger.LogDebug($"Requested taskset for course id={id}");
+
+            var course = await _repository.Courses.FindAsync(id);
+            if (course == null)
+            {
+                _logger.LogDebug($"Cannot find course with id={id}");
+                return new StatusCodeResult(404);
+            }
+
+            var tasksets = await _repository.Tasksets
+                .Where(s => s.CourseId == id)
+                .OrderByDescending(s => s.Year)
+                .ToListAsync();
+
+            var tasksToShow = new List<archive.Data.Entities.Taskset>();
+
+            foreach (var taskset in tasksets) {
+                if(taskset.Year >= model.yearFrom && taskset.Year <=model.yearTo){
+                    if(model.haveTasks == false){
+                        tasksToShow.Add(taskset);
+                    }
+                    else{
+                        if(taskset.Tasks.Count() > 0){
+                            if(model.haveSolutions == false){
+                                tasksToShow.Add(taskset);
+                            }
+                            else{
+                                foreach( var taks in taskset.Tasks){
+                                    if(taks.Solutions.Count() > 0){
+                                        tasksToShow.Add(taskset);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }                
+            }
+            
+            
+            model.Tasksets = tasksToShow;    
+            model.Course = course;
+            // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
+            return View("/Views/Taskset/Index.cshtml", model);
+        }
+
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forCourseId)
         {
@@ -140,5 +189,6 @@ namespace archive.Controllers
             await _repository.SaveChangesAsync();
             return RedirectToAction("Index",  new { id = taskset.CourseId });
         }
-    }
+
+    }    
 }
