@@ -13,9 +13,9 @@ namespace archive.Models.Taskset
         [Display(Name = "Czy posiada rozwiązane zadania?")]
         public bool haveSolutions {get; set;}
         [Display(Name = "Egzaminy od:")]
-        public int yearFrom {get; set;}
+        public int yearFrom {get; set;} = 2010;
         [Display(Name = "Egzaminy do:")]
-        public int yearTo {get; set;}
+        public int yearTo {get; set;} = 2020;
 
     }
 
