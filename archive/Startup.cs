@@ -77,7 +77,7 @@ namespace archive
             services.AddScoped<ISolutionService, SolutionService>();
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IUserActivityService, UserActivityService>();
-            services.AddScoped<StorageService, StorageService>();
+            services.AddScoped<IStorageService, StorageService>();
             services.AddMvc().AddControllersAsServices()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
