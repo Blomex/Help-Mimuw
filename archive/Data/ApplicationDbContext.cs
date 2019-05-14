@@ -20,6 +20,8 @@ namespace archive.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserAvatar> Avatars { get; set; }
 
+        public DbSet<File> Files { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -123,6 +125,8 @@ namespace archive.Data
                     entity.HasOne(e => e.ApplicationUser)
                         .WithOne(e => e.Avatar);
                 });
+
+            builder.Entity<File>();
         }
 
         public Job SaveChangesAsync() => base.SaveChangesAsync();
