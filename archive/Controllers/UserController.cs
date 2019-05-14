@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace archive.Controllers
 {
-    public class UserController : ArchiveController
+    public class UserController : AbstractArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;

@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace archive.Controllers
 {
-    public class ArchiveController : Controller
+    public abstract class AbstractArchiveController : Controller
     {
         private readonly IUserActivityService _activityService;
 
-        public ArchiveController(IUserActivityService activityService)
+        protected AbstractArchiveController(IUserActivityService activityService)
         {
             _activityService = activityService;
         }

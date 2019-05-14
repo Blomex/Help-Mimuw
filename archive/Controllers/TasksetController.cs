@@ -13,7 +13,7 @@ using archive.Services;
 
 namespace archive.Controllers
 {
-    public class TasksetController : ArchiveController
+    public class TasksetController : AbstractArchiveController
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;

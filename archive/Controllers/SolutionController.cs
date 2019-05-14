@@ -23,7 +23,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace archive.Controllers
 {
-    public class SolutionController : ArchiveController
+    public class SolutionController : AbstractArchiveController
     {
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _repository;

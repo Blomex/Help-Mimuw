@@ -10,21 +10,23 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace archive.Controllers
 {
-    public class StorageController : Controller
+    public class StorageController : AbstractArchiveController
     {
-        protected IStorageService storageService_ { get; }
-        protected ILogger<StorageController> logger_ { get; }
+        protected IStorageService _storageService { get; }
+        protected ILogger<StorageController> _logger { get; }
 
-        public StorageController(ILogger<StorageController> logger, IStorageService storageService)
+        public StorageController(ILogger<StorageController> logger, IStorageService storageService,
+            IUserActivityService userActivityService)
+            : base(userActivityService)
         {
-            storageService_ = storageService;
-            logger_ = logger;
+            _storageService = storageService;
+            _logger = logger;
         }
 
         [Authorize]
         public async Task<ActionResult> Index(string id)
         {
-            logger_.LogDebug($"Working in directory '{Directory.GetCurrentDirectory()}'");
+            _logger.LogDebug($"Working in directory '{Directory.GetCurrentDirectory()}'");
 
             Guid fileGuid;
             try
@@ -34,19 +36,19 @@ namespace archive.Controllers
                 var i = id.IndexOf('.');
                 var guidString = i > 0 ? id.Substring(0, i) : id;
                 fileGuid = new Guid(guidString);
-                logger_.LogDebug($"File(GUID={fileGuid}) requested");
+                _logger.LogDebug($"File(GUID={fileGuid}) requested");
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 if (e is ArgumentNullException || e is FormatException || e is OverflowException)
                     return new StatusCodeResult(404);
                 throw;
             }
 
-            var file = await storageService_.Retrieve(fileGuid);
+            var file = await _storageService.Retrieve(fileGuid);
             if (file == null)
                 return new StatusCodeResult(404);
-            logger_.LogDebug($"Stream file from '{file.Path}'");
+            _logger.LogDebug($"Stream file from '{file.Path}'");
             return File(System.IO.File.OpenRead(file.Path), file.MimeType + "/" + file.MimeSubtype, file.FileName);
         }
     }

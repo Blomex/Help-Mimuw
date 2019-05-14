@@ -17,7 +17,7 @@ using archive.Data.Entities;
 
 namespace archive.Controllers
 {
-    public class HomeController : ArchiveController
+    public class HomeController : AbstractArchiveController
     {
         private readonly TasksetController _tasksetController;
         private readonly ILogger _logger;
