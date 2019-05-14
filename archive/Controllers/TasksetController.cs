@@ -108,6 +108,12 @@ namespace archive.Controllers
                 model.haveTasks=true;
             }
 
+            // yearTo is 0 when we dont fill YearTo field in form, but 0 year isnt exist
+            if(model.yearTo == 0)
+            {
+                model.yearTo = 3000;
+            }
+
             foreach (var taskset in tasksets)
             {
                 if(taskset.Year >= model.yearFrom && taskset.Year <=model.yearTo)
