@@ -87,26 +87,41 @@ namespace archive.Controllers
 
             var tasksets = await _repository.Tasksets
                 .Where(s => s.CourseId == id)
-                .Include(s => s.Tasks)
                 .OrderByDescending(s => s.Year)
                 .ToListAsync();
 
             var tasksToShow = new List<archive.Data.Entities.Taskset>();
 
-            foreach (var taskset in tasksets) {
-                if(taskset.Year >= model.yearFrom && taskset.Year <=model.yearTo){
-                    if(model.haveTasks == false){
+            //if we want solution we need task
+            if(model.haveSolutions == true)
+            {
+                model.haveTasks=true;
+            }
+
+            foreach (var taskset in tasksets)
+            {
+                if(taskset.Year >= model.yearFrom && taskset.Year <=model.yearTo)
+                {
+                    if(!model.haveTasks)
+                    {
                         tasksToShow.Add(taskset);
                     }
-                    else{
-                        if(taskset.Tasks.Count() > 0){
-                            if(model.haveSolutions == false){
+                    else
+                    {
+                        var tasks = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
+                        if(tasks.Count() > 0)
+                        {
+                            if(!model.haveSolutions)
+                            {
                                 tasksToShow.Add(taskset);
                             }
-                            else{
-                                foreach( var task in taskset.Tasks){
-                                    var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
-                                    if(solutions.Count() > 0){
+                            else
+                            {
+                                foreach( var task in tasks)
+                                {
+                                    var solutionsNumber = await _repository.Solutions.Where(s => s.TaskId == task.Id).CountAsync();
+                                    if(solutionsNumber > 0)
+                                    {
                                         tasksToShow.Add(taskset);
                                         break;
                                     }
