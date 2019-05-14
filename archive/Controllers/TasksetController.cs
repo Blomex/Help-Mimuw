@@ -88,20 +88,19 @@ namespace archive.Controllers
         {
             
             var course = await _repository.Courses
-                .Where(c => c.Id == forCourseId)
+                .Where(c => c.Id == forCourseId
+                            && c.Archive == false)
                 .FirstOrDefaultAsync();
 
             if (course != null)
             {
                 return View(new CreateTasksetViewModel(course));
             }
-
-            if (course.Archive == true)
-            {
-                return new StatusCodeResult(403);
-            }
             
-            var courses = await _repository.Courses.ToListAsync();
+            //if course was not selected, user will be allowed to choose course
+            var courses = await _repository
+                .Courses.Where(e => e.Archive == false)
+                .ToListAsync();
             return View(new CreateTasksetViewModel(courses));
         }
 
