@@ -77,6 +77,7 @@ namespace archive
             services.AddScoped<ISolutionService, SolutionService>();
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IUserActivityService, UserActivityService>();
+            services.AddScoped<StorageService, StorageService>();
             services.AddMvc().AddControllersAsServices()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -105,6 +106,8 @@ namespace archive
             app.UseMvc(routes =>
             {
                 routes
+                    .MapRoute("Storage", "storage/{id}", 
+                        defaults: new { controller = "Storage", action = "Index" })
                     .MapRoute("Solution", "solution/{solutionId}",
                         defaults: new { controller = "Solution", action = "Show" })
                     .MapRoute("Solution", "solution/create/{forTaskId}",
