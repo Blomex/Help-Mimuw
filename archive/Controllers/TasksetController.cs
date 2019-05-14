@@ -37,7 +37,7 @@ namespace archive.Controllers
                 return new StatusCodeResult(404);
             }
 
-            if (taskset.Course.Archive == true)
+            if (taskset.Course.Archive == true || !ModelState.IsValid)
             {
                 return new StatusCodeResult(403);
             }

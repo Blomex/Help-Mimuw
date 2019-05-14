@@ -163,6 +163,7 @@ namespace archive.Controllers
         }
 
 
+        [Authorize]
         public async Task<IActionResult> Shortcut(string shcCourse, string shcTaskset=null, short? shcTask=null)
         {
             if (string.IsNullOrEmpty(shcCourse))

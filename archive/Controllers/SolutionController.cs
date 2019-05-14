@@ -61,6 +61,12 @@ namespace archive.Controllers
                     $"id={solution.TaskId} which does not");
                 return new StatusCodeResult(404); // Surely?
             }
+
+            if (task.Taskset.Course.Archive)
+            {
+                _logger.LogWarning(($""));
+            }
+
             _logger.LogDebug($"Found solution with id={solutionId}: Solution={solution}, Task={task}");
 
             var comments = await _repository.Comments
