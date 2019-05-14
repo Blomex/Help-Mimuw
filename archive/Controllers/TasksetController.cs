@@ -105,54 +105,30 @@ namespace archive.Controllers
                 _logger.LogDebug($"Cannot find course with id={id}");
                 return new StatusCodeResult(404);
             }
-
-            var tasksets = await _repository.Tasksets
-                .Where(s => s.CourseId == id)
-                .OrderByDescending(s => s.Year)
-                .ToListAsync();
-
             var tasksToShow = new List<archive.Data.Entities.Taskset>();
 
-            //if we want solution we need task
-            if(model.haveSolutions == true)
+            if (model.haveSolutions)
             {
-                model.haveTasks=true;
+                var tasksets = await _repository.Solutions
+                    .Where(e => e.Task.Taskset.CourseId == id
+                                && e.Task.Taskset.Year >= model.yearFrom
+                                && e.Task.Taskset.Year <= model.yearTo
+                                && ((!model.haveTasks) || e.Task.Taskset.Tasks.Any())) //Not sure if needed, solution shouldn't exist without task
+                    .Select(s => s.Task.Taskset).Distinct()
+                    .ToListAsync();
+                tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
             }
-
-            foreach (var taskset in tasksets)
+            else
             {
-                if(taskset.Year >= model.yearFrom && taskset.Year <=model.yearTo)
-                {
-                    if(!model.haveTasks)
-                    {
-                        tasksToShow.Add(taskset);
-                    }
-                    else
-                    {
-                        var tasks = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
-                        if(tasks.Count() > 0)
-                        {
-                            if(!model.haveSolutions)
-                            {
-                                tasksToShow.Add(taskset);
-                            }
-                            else
-                            {
-                                foreach( var task in tasks)
-                                {
-                                    var solutionsNumber = await _repository.Solutions.Where(s => s.TaskId == task.Id).CountAsync();
-                                    if(solutionsNumber > 0)
-                                    {
-                                        tasksToShow.Add(taskset);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }                
+                var tasksets = await _repository.Tasksets
+                    .Where(s => s.CourseId == id
+                                && s.Year >= model.yearFrom
+                                && s.Year <= model.yearTo
+                                && ((!model.haveTasks) || s.Tasks.Any()))
+                    .OrderByDescending(s => s.Year)
+                    .ToListAsync();
+                tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
             }
-            
             
             model.Tasksets = tasksToShow;    
             model.Course = course;
