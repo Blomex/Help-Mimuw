@@ -12,10 +12,10 @@ namespace archive.Controllers
 {
     public class StorageController : Controller
     {
-        protected StorageService storageService_ { get; }
+        protected IStorageService storageService_ { get; }
         protected ILogger<StorageController> logger_ { get; }
 
-        public StorageController(ILogger<StorageController> logger, StorageService storageService)
+        public StorageController(ILogger<StorageController> logger, IStorageService storageService)
         {
             storageService_ = storageService;
             logger_ = logger;

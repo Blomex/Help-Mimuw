@@ -9,16 +9,19 @@ using Microsoft.Extensions.Logging;
 
 namespace archive.Services
 {
-    public class StorageService
+    public class StorageService: IStorageService
     {
         /// <summary>
-        /// How deep is subdirectory tree for storage folders.
+        /// jak głębokie jest drzewo katalogów w STORAGE_DIRECTORY.
         /// </summary>
-        /// For example when euals to 3, file with GUID "030B4A82-1B7C-11CF-9D53-00AA003C9CB6"
-        /// is stored under "03/0B/42/030B4A82-1B7C-11CF-9D53-00AA003C9CB6.someextension"
-        static readonly int SUBDIRECTORY_LEVELS = 3;
+        /// Na przykład gdy jest równe 3, plik z GUID="030B4A82-1B7C-11CF-9D53-00AA003C9CB6"
+        /// jest przechowywany jako "03/0B/42/030B4A82-1B7C-11CF-9D53-00AA003C9CB6"
+        public static readonly int SUBDIRECTORY_LEVELS = 3;
 
-        static readonly string STORAGE_DIRACTORY = "storage";
+        /// <summary>
+        /// Nazwa katalogu, w którym zapisywane są przechowywane pliki.
+        /// </summary>
+        public static readonly string STORAGE_DIRACTORY = "storage";
 
         public string StorageDirectory { get; }
 
