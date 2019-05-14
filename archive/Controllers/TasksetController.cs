@@ -130,6 +130,7 @@ namespace archive.Controllers
                 tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
             }
             
+            
             model.Tasksets = tasksToShow;    
             model.Course = course;
             // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
