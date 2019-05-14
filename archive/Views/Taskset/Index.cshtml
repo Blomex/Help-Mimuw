@@ -6,6 +6,37 @@
    asp-route-forCourseId="@Model.Course.Id">Dodaj egzamin</a>
 <hr/>
 
+<h2>Filtrowanie:</h2>
+<div class="row">
+<form method="GET" asp-controller="Taskset" asp-action="IndexFilter" asp-route-id="@Model.Course.Id">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="yearFrom"></label>
+            <input asp-for="yearFrom" class="form-control"/> 
+            <span asp-validation-for="yearFrom" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="yearTo"></label>
+            <input asp-for="yearTo" class="form-control"/> 
+            <span asp-validation-for="yearTo" class="text-danger"></span>
+        </div>
+         <div class="form-group">
+            <label asp-for="haveTasks"></label>
+            <input asp-for="haveTasks" class="form-control"\> 
+            <span asp-validation-for="haveTasks" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="haveSolutions"></label>
+            <input asp-for="haveSolutions" class="form-control"\> 
+            <span asp-validation-for="haveSolutions" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Filtruj" class="btn btn-primary"/>
+        </div>
+    </form>
+</div>
+
 <h2>Lista egzaminów:</h2>
 @{
     int lastYear = 0;
