@@ -6,3 +6,5 @@ obj/
 .vscode/
 appsettings-local.json
 archive.csproj.user
+
+storage/
