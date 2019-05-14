@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using archive.Data.Entities;
 using archive.Data.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace archive.Models.Taskset
@@ -26,6 +27,9 @@ namespace archive.Models.Taskset
         [Display(Name = "Przedmiot")]
         [Required]
         public int CourseId { get; set; }
+        
+        [Display(Name = "Załączniki")]
+        public List<IFormFile> Attachments { get; set; }
 
         public List<SelectListItem> Types { get; }
 

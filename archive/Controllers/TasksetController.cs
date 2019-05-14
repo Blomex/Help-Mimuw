@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using archive.Data.Enums;
 using archive.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace archive.Controllers
 {
@@ -17,12 +18,14 @@ namespace archive.Controllers
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
+        private readonly IStorageService _storageService;
 
         public TasksetController(ILogger<TasksetController> logger, IRepository repository,
-            IUserActivityService activityService) : base(activityService)
+            IUserActivityService activityService, IStorageService storageService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
+            _storageService = storageService;
         }
 
         [Authorize]
@@ -30,6 +33,7 @@ namespace archive.Controllers
         {
             var taskset = await _repository.Tasksets
                 .Include(t => t.Course)
+                .Include(t => t.Attachments)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (taskset == null)
@@ -46,7 +50,8 @@ namespace archive.Controllers
 
             var listOfSolutions = new Dictionary<int, List<Solution>>();
 
-            foreach (var task in tasks) {
+            foreach (var task in tasks)
+            {
                 var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
                 listOfSolutions.Add(task.Id, solutions);
             }
@@ -72,10 +77,10 @@ namespace archive.Controllers
             {
                 return new StatusCodeResult(403);
             }
-            
+
             var tasksets = await _repository.Tasksets
-                .Where(s => s.CourseId == id)
-                .OrderByDescending(s => s.Year)
+                .Where(t => t.CourseId == id)
+                .OrderByDescending(t => t.Year)
                 .ToListAsync();
 
             var model = new IndexViewModel {Tasksets = tasksets, Course = course};
@@ -94,6 +99,7 @@ namespace archive.Controllers
                 _logger.LogDebug($"Cannot find course with id={id}");
                 return new StatusCodeResult(404);
             }
+
             var tasksToShow = new List<archive.Data.Entities.Taskset>();
 
             if (model.haveSolutions)
@@ -102,7 +108,9 @@ namespace archive.Controllers
                     .Where(e => e.Task.Taskset.CourseId == id
                                 && e.Task.Taskset.Year >= model.yearFrom
                                 && e.Task.Taskset.Year <= model.yearTo
-                                && ((!model.haveTasks) || e.Task.Taskset.Tasks.Any())) //Not sure if needed, solution shouldn't exist without task
+                                && ((!model.haveTasks) ||
+                                    e.Task.Taskset.Tasks
+                                        .Any())) //Not sure if needed, solution shouldn't exist without task
                     .Select(s => s.Task.Taskset).Distinct()
                     .ToListAsync();
                 tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
@@ -118,8 +126,8 @@ namespace archive.Controllers
                     .ToListAsync();
                 tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
             }
-            
-            model.Tasksets = tasksToShow;    
+
+            model.Tasksets = tasksToShow;
             model.Course = course;
             // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
             return View("/Views/Taskset/Index.cshtml", model);
@@ -128,7 +136,6 @@ namespace archive.Controllers
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forCourseId)
         {
-            
             var course = await _repository.Courses
                 .Where(c => c.Id == forCourseId
                             && c.Archive == false)
@@ -138,7 +145,7 @@ namespace archive.Controllers
             {
                 return View(new CreateTasksetViewModel(course));
             }
-            
+
             //if course was not selected, user will be allowed to choose course
             var courses = await _repository
                 .Courses.Where(e => e.Archive == false)
@@ -161,17 +168,26 @@ namespace archive.Controllers
                 _logger.LogDebug($"Cannot add:" + taskset);
                 return new StatusCodeResult(400);
             }
+
+            var entity = new Taskset
+            {
+                Type = taskset.TypeAsEnum,
+                Name = taskset.Name,
+                Year = taskset.Year,
+                CourseId = taskset.CourseId,
+            };
             
-            _repository.Tasksets
-                .Add(new Taskset
-                {
-                    Type = taskset.TypeAsEnum, 
-                    Name = taskset.Name,
-                    Year = taskset.Year,
-                    CourseId = taskset.CourseId
-                });
+            _repository.Tasksets.Add(entity);
+
+            // FIXME error handling ...
+            foreach (var file in taskset.Attachments)
+            {
+                var fileEntity = await _storageService.Store(file.FileName, file.OpenReadStream());
+                // Assign to file?
+            }
             
             await _repository.SaveChangesAsync();
+          
             return await Index(taskset.CourseId);
         }
 
@@ -195,8 +211,7 @@ namespace archive.Controllers
 
             _repository.Tasksets.Remove(taskset);
             await _repository.SaveChangesAsync();
-            return RedirectToAction("Index",  new { id = taskset.CourseId });
+            return RedirectToAction("Index", new {id = taskset.CourseId});
         }
-
-    }    
+    }
 }

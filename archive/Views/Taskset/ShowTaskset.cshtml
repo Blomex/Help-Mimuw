@@ -2,6 +2,13 @@
 
 <h1>@Model.Taskset.Course.Name</h1>
 <h2>@Model.Taskset.Name (@Model.Taskset.Year):</h2>
+<h2>Załączniki:</h2>
+@foreach (var file in Model.Taskset.Attachments)
+{
+    <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.Id">@file.FileName</a>
+}
+<br/> <!-- FIXME znacznik puste -->
+
 <a asp-controller="Task" asp-action="Create"
    asp-route-forTasksetId="@Model.Taskset.Id">Dodaj zadanie</a>
 @if (Model.Tasks.Count() == 0)
