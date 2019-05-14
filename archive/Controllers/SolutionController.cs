@@ -64,7 +64,8 @@ namespace archive.Controllers
 
             if (task.Taskset.Course.Archive)
             {
-                _logger.LogWarning(($""));
+                _logger.LogWarning(($"Solution with id={solutionId} exists but course is archived"));
+                return new StatusCodeResult(404);
             }
 
             _logger.LogDebug($"Found solution with id={solutionId}: Solution={solution}, Task={task}");
