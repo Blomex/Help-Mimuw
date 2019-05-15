@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using archive.Data;
@@ -9,9 +10,10 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190515170443_Tasksets-attachments")]
+    partial class Tasksetsattachments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -335,19 +337,6 @@ namespace archive.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("archive.Data.Entities.TasksFiles", b =>
-                {
-                    b.Property<int>("TaskId");
-
-                    b.Property<Guid>("FileId");
-
-                    b.HasKey("TaskId", "FileId");
-
-                    b.HasIndex("FileId");
-
-                    b.ToTable("TasksFiles");
-                });
-
             modelBuilder.Entity("archive.Data.Entities.Taskset", b =>
                 {
                     b.Property<int>("Id")
@@ -487,19 +476,6 @@ namespace archive.Migrations
                     b.HasOne("archive.Data.Entities.Taskset", "Taskset")
                         .WithMany("Tasks")
                         .HasForeignKey("TasksetId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("archive.Data.Entities.TasksFiles", b =>
-                {
-                    b.HasOne("archive.Data.Entities.File", "File")
-                        .WithMany("TasksReferers")
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("archive.Data.Entities.Task", "Task")
-                        .WithMany("Attachments")
-                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

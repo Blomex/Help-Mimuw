@@ -20,5 +20,6 @@ namespace archive.Data.Entities
         public virtual Course Course { get; set; }
         
         public virtual ICollection<Task> Tasks { get; set; } = new HashSet<Task>();
+        public virtual ICollection<TasksetsFiles> Attachments { get; set; } = new HashSet<TasksetsFiles>();
     }
 }

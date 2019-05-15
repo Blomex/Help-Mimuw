@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using archive.Data.Entities;
 
 namespace archive.Models.Task
 {
@@ -11,6 +12,7 @@ namespace archive.Models.Task
         public int Id { get; set; }
 
         public Data.Entities.Taskset Taskset { get; set; }
+        public List<File> Attachments { get; set; }
 
         [Required]
         [MinLength(1)]

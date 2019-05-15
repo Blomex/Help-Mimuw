@@ -11,9 +11,9 @@
 <h2>@Html.DisplayNameFor(model => model)</h2>
 <hr/>
 <div class="row">
-    <form asp-controller="Taskset" asp-action="Create">
+    <form asp-controller="Taskset" asp-action="Create" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        
+
         @if (Model.Course == null)
         {
             <div class="form-group">
@@ -26,7 +26,7 @@
         {
             <input asp-for="CourseId" value="@Model.Course.Id" hidden/>
         }
-        
+
         <div class="form-group">
             <label asp-for="Type"></label>
             <select asp-for="Type" asp-items="Model.Types" class="form-control" required></select>
@@ -41,6 +41,11 @@
             <label asp-for="Name"></label>
             <input asp-for="Name" class="form-control" required/>
             <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Attachments"></label>
+            <input asp-for="Attachments" class="form-control" type="file" multiple/>
+            <span asp-validation-for="Attachments" class="text-danger"></span>
         </div>
 
         <div class="form-group">

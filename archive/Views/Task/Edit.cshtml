@@ -7,7 +7,6 @@
 <h2>@Model.Taskset.Name (@Model.Taskset.Year)</h2>  
 <hr/>
 
-
 <form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="Id" />
@@ -21,7 +20,15 @@
         <textarea asp-for="NewContent" class="form-control" rows="6" autofocus required></textarea>
         <span asp-validation-for="NewContent" class="text-danger"></span>
     </div>
-
+    <h4>Załączniki:</h4>
+    @foreach (var file in Model.Attachments)
+    {
+    <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.Id">@file.FileName</a>
+    <br/>
+    }
+    (<a asp-controller="Task" asp-action="AddAttachmentsView" asp-route-taskId="@Model.Id">Dodaj/Usuń załączniki</a>) 
+    <hr/>
+    
     <div class="form-group">
         <input type="submit" value="Zapisz zmiany" class="btn btn-primary" />
     </div>

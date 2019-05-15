@@ -16,11 +16,12 @@ namespace archive.Data
         public DbSet<Solution> Solutions { get; set; }
         public DbSet<SolutionVersion> SolutionsVersions { get; set; }
 
-        public DbSet<Rating> Ratings {get; set;}
+        public DbSet<Rating> Ratings { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserAvatar> Avatars { get; set; }
 
         public DbSet<File> Files { get; set; }
+        public DbSet<TasksetsFiles> TasksetsFiles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -36,7 +37,6 @@ namespace archive.Data
                 {
                     entity.HasKey(e => e.Id);
                     entity.HasAlternateKey(e => new {e.IdSolution, e.NameUser});
-
                 });
 
             builder.Entity<Course>(
@@ -54,7 +54,7 @@ namespace archive.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
-                    entity.HasIndex(e => new { e.CourseId, e.ShortcutCode }).IsUnique().ForNpgsqlHasMethod("btree");
+                    entity.HasIndex(e => new {e.CourseId, e.ShortcutCode}).IsUnique().ForNpgsqlHasMethod("btree");
 
                     entity.Property(e => e.Type).IsRequired();
                     entity.Property(e => e.Year).IsRequired();
@@ -77,7 +77,6 @@ namespace archive.Data
                     entity.HasOne(e => e.Solution)
                         .WithMany(e => e.Comments);
                     entity.HasOne(e => e.ApplicationUser).WithMany(u => u.Comments);
-
                 });
 
             builder.Entity<Task>(
@@ -107,13 +106,13 @@ namespace archive.Data
                     entity.HasOne(s => s.CurrentVersion);
                 });
 
-            builder.Entity<SolutionVersion>(solutionVersion => 
+            builder.Entity<SolutionVersion>(solutionVersion =>
             {
                 solutionVersion.HasKey(v => v.Id);
 
                 solutionVersion.HasOne(v => v.Solution).WithMany(s => s.Versions);
             });
-            
+
             builder.Entity<UserAvatar>(
                 entity =>
                 {
@@ -127,6 +126,32 @@ namespace archive.Data
                 });
 
             builder.Entity<File>();
+
+            builder.Entity<TasksetsFiles>(entity =>
+            {
+                entity.HasOne(tf => tf.File)
+                    .WithMany(f => f.TasksetReferers)
+                    .HasForeignKey(tf => tf.FileId);
+
+                entity.HasOne(tf => tf.Taskset)
+                    .WithMany(t => t.Attachments)
+                    .HasForeignKey(tf => tf.TasksetId);
+
+                entity.HasKey(t => new {t.TasksetId, t.FileId});
+            });
+
+            builder.Entity<TasksFiles>(entity =>
+            {
+                entity.HasOne(tf => tf.File)
+                    .WithMany(f => f.TasksReferers)
+                    .HasForeignKey(tf => tf.FileId);
+
+                entity.HasOne(tf => tf.Task)
+                    .WithMany(t => t.Attachments)
+                    .HasForeignKey(tf => tf.TaskId);
+
+                entity.HasKey(t => new {t.TaskId, t.FileId});
+            });
         }
 
         public Job SaveChangesAsync() => base.SaveChangesAsync();

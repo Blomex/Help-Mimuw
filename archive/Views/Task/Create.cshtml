@@ -14,7 +14,7 @@
 <hr/>
 
 <div class="row">
-    <form asp-action="Create">
+    <form asp-controller="Task" asp-action="Create" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         
         @if (Model.Taskset == null) /* No taskset specified */
@@ -47,7 +47,11 @@
             <textarea asp-for="Content" class="form-control" cols="120" rows="20" autofocus required></textarea>
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
-
+        <div class="form-group">
+            <label asp-for="Attachments"></label>
+            <input asp-for="Attachments" class="form-control" type="file" multiple/>
+            <span asp-validation-for="Attachments" class="text-danger"></span>
+        </div>
         <div class="form-group">
             <input type="submit" value="Dodaj" class="btn btn-primary"/>
         </div>

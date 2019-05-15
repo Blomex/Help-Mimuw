@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using archive.Data.Enums;
 using archive.Services;
+using Microsoft.AspNetCore.Http;
+using Task = System.Threading.Tasks.Task;
 
 namespace archive.Controllers
 {
@@ -17,12 +19,15 @@ namespace archive.Controllers
     {
         private readonly ILogger _logger;
         private readonly IRepository _repository;
+        private readonly IStorageService _storageService;
+        public const int AttachmentRequestLimit = 20_000_000; // in bytes
 
         public TasksetController(ILogger<TasksetController> logger, IRepository repository,
-            IUserActivityService activityService) : base(activityService)
+            IUserActivityService activityService, IStorageService storageService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
+            _storageService = storageService;
         }
 
         [Authorize]
@@ -30,6 +35,8 @@ namespace archive.Controllers
         {
             var taskset = await _repository.Tasksets
                 .Include(t => t.Course)
+                .Include(t => t.Attachments)
+                .ThenInclude(a => a.File)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (taskset == null)
@@ -42,11 +49,15 @@ namespace archive.Controllers
                 return new StatusCodeResult(403);
             }
 
-            var tasks = await _repository.Tasks.Where(s => s.TasksetId == id).ToListAsync();
+            var tasks = await _repository.Tasks // FIXME można tu ładować od razu z tasksetem
+                .Include(t => t.Attachments)
+                .ThenInclude(a => a.File)
+                .Where(t => t.TasksetId == id).ToListAsync();
 
             var listOfSolutions = new Dictionary<int, List<Solution>>();
 
-            foreach (var task in tasks) {
+            foreach (var task in tasks)
+            {
                 var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
                 listOfSolutions.Add(task.Id, solutions);
             }
@@ -72,15 +83,81 @@ namespace archive.Controllers
             {
                 return new StatusCodeResult(403);
             }
-            
+
             var tasksets = await _repository.Tasksets
-                .Where(s => s.CourseId == id)
-                .OrderByDescending(s => s.Year)
+                .Where(t => t.CourseId == id)
+                .OrderByDescending(t => t.Year)
                 .ToListAsync();
 
             var model = new IndexViewModel {Tasksets = tasksets, Course = course};
             // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
             return View("/Views/Taskset/Index.cshtml", model);
+        }
+
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        public async Task<IActionResult> RemoveAttachment(int tasksetId, string fileId)
+        {
+            _logger.LogDebug($"Requested to remove attachment={fileId} from taskset={tasksetId}");
+            var taskset = await _repository.Tasksets
+                .Include(t => t.Attachments)
+                .FirstOrDefaultAsync(t => t.Id == tasksetId);
+
+            if (taskset == null)
+            {
+                _logger.LogDebug($"Cannot find taskset with id={tasksetId}");
+                return new StatusCodeResult(404);
+            }
+
+            var toRemove = taskset.Attachments
+                .FirstOrDefault(a => a.FileId.ToString() == fileId);
+
+            if (toRemove != null)
+            {
+                // "Detach" attachment, remove file
+                taskset.Attachments.Remove(toRemove);
+                await _storageService.Delete(toRemove.FileId);
+            }
+            else
+            {
+                _logger.LogDebug($"Cannot find file with id={fileId}");
+                return new StatusCodeResult(404);
+            }
+
+            return await AddAttachmentsView(tasksetId);
+        }
+
+        private async Task StoreAttachments(Taskset entity, List<IFormFile> files)
+        {
+            if (files == null) return;
+
+            // Store files attaching them to taskset
+            foreach (var file in files)
+            {
+                var fileEntity = await _storageService.Store(file.FileName, file.OpenReadStream());
+                entity.Attachments.Add(new TasksetsFiles() {TasksetId = entity.Id, FileId = fileEntity.Id});
+            }
+
+            await _repository.SaveChangesAsync();
+        }
+
+
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [RequestSizeLimit(AttachmentRequestLimit)]
+        public async Task<IActionResult> AddAttachments(AddAttachmentsModel add)
+        {
+            _logger.LogDebug($"Requested to add attachments to taskset={add.EntityId}");
+            var taskset = await _repository.Tasksets
+                .Include(t => t.Attachments)
+                .FirstOrDefaultAsync(t => t.Id == add.EntityId);
+
+            if (taskset == null)
+            {
+                _logger.LogDebug($"Cannot find taskset with id={add.EntityId}");
+                return new StatusCodeResult(404);
+            }
+
+            await StoreAttachments(taskset, add.Attachments);
+            return await AddAttachmentsView(add.EntityId);
         }
 
         [Authorize]
@@ -94,6 +171,7 @@ namespace archive.Controllers
                 _logger.LogDebug($"Cannot find course with id={id}");
                 return new StatusCodeResult(404);
             }
+
             var tasksToShow = new List<archive.Data.Entities.Taskset>();
 
             if (model.haveSolutions)
@@ -102,7 +180,9 @@ namespace archive.Controllers
                     .Where(e => e.Task.Taskset.CourseId == id
                                 && e.Task.Taskset.Year >= model.yearFrom
                                 && e.Task.Taskset.Year <= model.yearTo
-                                && ((!model.haveTasks) || e.Task.Taskset.Tasks.Any())) //Not sure if needed, solution shouldn't exist without task
+                                && ((!model.haveTasks) ||
+                                    e.Task.Taskset.Tasks
+                                        .Any())) //Not sure if needed, solution shouldn't exist without task
                     .Select(s => s.Task.Taskset).Distinct()
                     .ToListAsync();
                 tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
@@ -118,8 +198,8 @@ namespace archive.Controllers
                     .ToListAsync();
                 tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
             }
-            
-            model.Tasksets = tasksToShow;    
+
+            model.Tasksets = tasksToShow;
             model.Course = course;
             // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
             return View("/Views/Taskset/Index.cshtml", model);
@@ -128,7 +208,6 @@ namespace archive.Controllers
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forCourseId)
         {
-            
             var course = await _repository.Courses
                 .Where(c => c.Id == forCourseId
                             && c.Archive == false)
@@ -138,7 +217,7 @@ namespace archive.Controllers
             {
                 return View(new CreateTasksetViewModel(course));
             }
-            
+
             //if course was not selected, user will be allowed to choose course
             var courses = await _repository
                 .Courses.Where(e => e.Archive == false)
@@ -147,10 +226,12 @@ namespace archive.Controllers
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [RequestSizeLimit(AttachmentRequestLimit)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTasksetViewModel taskset)
         {
+            // Validate request
             _logger.LogDebug($"Requested to create taskset:" + taskset);
             var same = await _repository.Tasksets
                 .Where(t => t.Name == taskset.Name && t.Year == taskset.Year)
@@ -161,17 +242,21 @@ namespace archive.Controllers
                 _logger.LogDebug($"Cannot add:" + taskset);
                 return new StatusCodeResult(400);
             }
-            
-            _repository.Tasksets
-                .Add(new Taskset
-                {
-                    Type = taskset.TypeAsEnum, 
-                    Name = taskset.Name,
-                    Year = taskset.Year,
-                    CourseId = taskset.CourseId
-                });
-            
+
+            // Save taskset
+            var entity = new Taskset
+            {
+                Type = taskset.TypeAsEnum,
+                Name = taskset.Name,
+                Year = taskset.Year,
+                CourseId = taskset.CourseId,
+            };
+
+            _repository.Tasksets.Add(entity);
             await _repository.SaveChangesAsync();
+
+            entity.Attachments = new List<TasksetsFiles>();
+            await StoreAttachments(entity, taskset.Attachments);
             return await Index(taskset.CourseId);
         }
 
@@ -195,8 +280,24 @@ namespace archive.Controllers
 
             _repository.Tasksets.Remove(taskset);
             await _repository.SaveChangesAsync();
-            return RedirectToAction("Index",  new { id = taskset.CourseId });
+            return RedirectToAction("Index", new {id = taskset.CourseId});
         }
 
-    }    
+        public async Task<IActionResult> AddAttachmentsView(int tasksetId)
+        {
+            var taskset = await _repository.Tasksets
+                .Include(t => t.Course)
+                .Include(t => t.Attachments)
+                .ThenInclude(a => a.File)
+                .FirstOrDefaultAsync(t => t.Id == tasksetId);
+
+            if (taskset == null)
+            {
+                _logger.LogDebug($"Cannot find taskset with id={tasksetId}");
+                return new StatusCodeResult(404);
+            }
+
+            return View("AddAttachments", new AddAttachmentsModel() {Taskset = taskset, EntityId = tasksetId});
+        }
+    }
 }
