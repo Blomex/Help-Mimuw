@@ -10,7 +10,7 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190514222046_Tasksets-attachments")]
+    [Migration("20190515170443_Tasksets-attachments")]
     partial class Tasksetsattachments
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -251,11 +251,7 @@ namespace archive.Migrations
                         .IsRequired()
                         .HasColumnType("VARCHAR(127)");
 
-                    b.Property<int?>("TasksetId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TasksetId");
 
                     b.ToTable("Files");
                 });
@@ -367,6 +363,19 @@ namespace archive.Migrations
                     b.ToTable("Tasksets");
                 });
 
+            modelBuilder.Entity("archive.Data.Entities.TasksetsFiles", b =>
+                {
+                    b.Property<int>("TasksetId");
+
+                    b.Property<Guid>("FileId");
+
+                    b.HasKey("TasksetId", "FileId");
+
+                    b.HasIndex("FileId");
+
+                    b.ToTable("TasksetsFiles");
+                });
+
             modelBuilder.Entity("archive.Data.Entities.UserAvatar", b =>
                 {
                     b.Property<string>("ApplicationUserId");
@@ -438,13 +447,6 @@ namespace archive.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("archive.Data.Entities.File", b =>
-                {
-                    b.HasOne("archive.Data.Entities.Taskset")
-                        .WithMany("Attachments")
-                        .HasForeignKey("TasksetId");
-                });
-
             modelBuilder.Entity("archive.Data.Entities.Solution", b =>
                 {
                     b.HasOne("archive.Data.Entities.ApplicationUser", "Author")
@@ -482,6 +484,19 @@ namespace archive.Migrations
                     b.HasOne("archive.Data.Entities.Course", "Course")
                         .WithMany("Tasksets")
                         .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.TasksetsFiles", b =>
+                {
+                    b.HasOne("archive.Data.Entities.File", "File")
+                        .WithMany("TasksetReferers")
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("archive.Data.Entities.Taskset", "Taskset")
+                        .WithMany("Attachments")
+                        .HasForeignKey("TasksetId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
