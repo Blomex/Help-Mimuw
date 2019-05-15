@@ -15,6 +15,7 @@ using archive.Models.Solution;
 using archive.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -30,15 +31,17 @@ namespace archive.Controllers
         private readonly ApplicationDbContext _repository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IStorageService _storageService;
 
         public SolutionController(ILogger<SolutionController> logger, ApplicationDbContext repository, 
             UserManager<ApplicationUser> userManager, IUserActivityService activityService,
-            IAuthorizationService authorizationService) : base(activityService)
+            IAuthorizationService authorizationService, IStorageService storageService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
             _userManager = userManager;
             _authorizationService = authorizationService;
+            _storageService = storageService;
         }
 
         [Authorize]
@@ -46,7 +49,10 @@ namespace archive.Controllers
         {
             _logger.LogDebug($"Requested solution with id={solutionId}");
 
-            var solution = await _repository.Solutions.FindAsync(solutionId);
+            var solution = await _repository.Solutions
+                .Include(s => s.Attachments)
+                .ThenInclude(a => a.File)
+                .FirstOrDefaultAsync(s => s.Id == solutionId);
             if (solution == null)
             {
                 _logger.LogDebug($"Solution with id={solutionId} not found");
@@ -85,7 +91,8 @@ namespace archive.Controllers
             var counter =_repository.Ratings.Count(r => r.IdSolution == solutionId);
             var rating = _repository.Ratings.Count(r => r.IdSolution == solutionId && r.Value);
             
-            return View("Show", new SolutionViewModel(task, solution, comments, rating, counter));
+            return View("Show", new SolutionViewModel(task, solution, comments, rating, counter, 
+                solution.Attachments.Select(a => a.File).ToList()));
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
@@ -108,7 +115,8 @@ namespace archive.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task)
+        public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task,
+            List<IFormFile> Attachments)
         {
             SolutionEditModel edited_solution = new SolutionEditModel() { NewContent = NewContent, Task = Task };
             _logger.LogDebug($"Requested to add solution for {edited_solution.Task}; " +
@@ -160,7 +168,23 @@ namespace archive.Controllers
                 await _repository.SaveChangesAsync();
                 transaction.Commit();
             }
+
+            await StoreAttachments(solution, Attachments);
             return RedirectToAction("Show", new { solutionId = solution.Id });
+        }
+        
+        private async Task StoreAttachments(Solution entity, List<IFormFile> files)
+        {
+            if (files == null) return;
+
+            // Store files attaching them to taskset
+            foreach (var file in files)
+            {
+                var fileEntity = await _storageService.Store(file.FileName, file.OpenReadStream());
+                entity.Attachments.Add(new SolutionsFiles() {SolutionId = entity.Id, FileId = fileEntity.Id});
+            }
+
+            await _repository.SaveChangesAsync();
         }
 
         [Authorize]

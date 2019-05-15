@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using archive.Data.Entities;
 
 namespace archive.Models.Solution
@@ -12,14 +13,18 @@ namespace archive.Models.Solution
         public int Counter { get; }
 
         public List<Data.Entities.Comment> Comments { get; }
+        
+        [Display(Name = "Załączniki")]
+        public List<File> Attachments { get; }
 
-        public SolutionViewModel(Data.Entities.Task task, Data.Entities.Solution solution, List<Data.Entities.Comment> comments, int good, int counter)
+        public SolutionViewModel(Data.Entities.Task task, Data.Entities.Solution solution, List<Data.Entities.Comment> comments, int good, int counter, List<File> attachments)
         {
             Task = task;
             Solution = solution;
             GoodVotes=good;
             Comments = comments;
             Counter = counter;
+            Attachments = attachments;
         }
     }
 }
