@@ -1,0 +1,87 @@
+@model archive.Models.Taskset.AllFilterTasksViewModel
+@using System.Web
+
+<h1>Wszystkie zadania:</h1>
+
+
+<h2>Filtrowanie:</h2>
+<div class="row">
+<form method="GET" asp-controller="Taskset" asp-action="AllFilterTasks">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+          <label asp-for="courseId"></label>
+            <select asp-for="courseId" asp-items="Model.Courses" class="form-control"></select>
+            <span asp-validation-for="courseId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="yearFrom"></label>
+            <input asp-for="yearFrom" class="form-control"/> 
+            <span asp-validation-for="yearFrom" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="yearTo"></label>
+            <input asp-for="yearTo" class="form-control"/> 
+            <span asp-validation-for="yearTo" class="text-danger"></span>
+        </div>
+         <div class="form-group">
+            <label asp-for="haveTasks"></label>
+            <input asp-for="haveTasks" class="form-control"\> 
+            <span asp-validation-for="haveTasks" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="haveSolutions"></label>
+            <input asp-for="haveSolutions" class="form-control"\> 
+            <span asp-validation-for="haveSolutions" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="minRating"></label>
+            <input asp-for="minRating" class="form-control"\> 
+            <span asp-validation-for="minRating" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="minRatingNumber"></label>
+            <input asp-for="minRatingNumber" class="form-control"\> 
+            <span asp-validation-for="minRatingNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Filtruj" class="btn btn-primary"/>
+        </div>
+    </form>
+</div>
+
+@foreach (var task in Model.Tasks)
+{
+    @:<section>
+    <h3>
+        @task.Name
+    </h3>
+    <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
+    <a asp-controller="Solution" asp-action="Create"
+       asp-route-forTaskId="@task.Id">Dodaj rozwiązanie</a>
+    <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id">Edytuj</a>
+    <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id">Usuń</a>
+    int counter = 0;
+
+    foreach (var solution in Model.ListOfSolutions[task.Id])
+    {
+        if (counter != 0)
+        {
+            @:</ul>
+        }
+        counter++;
+        <li>
+            <a asp-controller="Solution" asp-action="show"
+               asp-route-solutionId="@solution.Id">
+                rozwiązanie @counter
+            </a>
+        </li>
+    }
+
+    if (counter != 0)
+    {
+        @:</ul>
+    }
+@:</section>
+    <hr/>
+}

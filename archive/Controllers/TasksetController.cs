@@ -94,6 +94,118 @@ namespace archive.Controllers
             return View("/Views/Taskset/Index.cshtml", model);
         }
 
+        [Authorize]
+        public async Task<IActionResult> IndexFilter(int id, IndexViewModel model)
+        {
+            _logger.LogDebug($"Requested taskset for course id={id}");
+
+            var course = await _repository.Courses.FindAsync(id);
+            if (course == null)
+            {
+                _logger.LogDebug($"Cannot find course with id={id}");
+                return new StatusCodeResult(404);
+            }
+            var tasksets = new List<archive.Data.Entities.Taskset>();
+
+            if (model.haveSolutions)
+            {
+                tasksets = await _repository.Solutions
+                    .Where(e => e.Task.Taskset.CourseId == id
+                                && e.Task.Taskset.Year >= model.yearFrom
+                                && e.Task.Taskset.Year <= model.yearTo
+                                && ((!model.haveTasks) || e.Task.Taskset.Tasks.Any())) //Not sure if needed, solution shouldn't exist without task
+                    .Select(s => s.Task.Taskset).Distinct()
+                    .ToListAsync();
+            }
+            else
+            {
+                tasksets = await _repository.Tasksets
+                    .Where(s => s.CourseId == id
+                                && s.Year >= model.yearFrom
+                                && s.Year <= model.yearTo
+                                && ((!model.haveTasks) || s.Tasks.Any()))
+                    .OrderByDescending(s => s.Year)
+                    .ToListAsync();
+            }
+            
+            model.Tasksets = tasksets;    
+            model.Course = course;
+            // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
+            return View("/Views/Taskset/Index.cshtml", model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> AllFilterTasks(AllFilterTasksViewModel model)
+        {
+            
+            var courses = await _repository.Courses.Where(c => c.Archive == false).ToListAsync();
+            model.AddCourseList(courses);           
+
+            if(model.minRating > 0 || model.minRatingNumber > 0)
+            {
+                model.haveSolutions = true;
+                model.haveTasks = true;
+            }
+
+            if(model.haveSolutions == true)
+            {
+                model.haveTasks = true;
+            }
+
+            var tasksToShow = new List<archive.Data.Entities.Task>();
+
+            var listOfSolutions = new Dictionary<int, List<Solution>>();
+
+            var tasksets = await _repository.Tasksets
+                    .Where(s => (model.courseId == 0 || s.CourseId == model.courseId)
+                                && s.Year >= model.yearFrom
+                                && s.Year <= model.yearTo
+                                && ((!model.haveTasks) || s.Tasks.Any()))
+                    .OrderByDescending(s => s.Year)
+                    .ToListAsync();
+           
+           foreach(var taskset in tasksets)
+           {
+               var tasks = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
+               foreach(var task in tasks){
+                    if(model.haveSolutions)
+                    {
+                        var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
+
+                        foreach(var solution in solutions)
+                        {
+                            var ratings = await _repository.Ratings.Where(r => r.IdSolution == solution.Id).ToListAsync();
+
+                            int rating = 0;
+                            int counter = 0;
+                    
+                            foreach (var r in ratings)
+                            {
+                                if(r.Value){rating++;}
+                                counter++;
+                            }
+                            if(rating >= model.minRating && counter >= model.minRatingNumber)
+                            {
+                                tasksToShow.Add(task);
+                                listOfSolutions.Add(task.Id, solutions);
+                                break;
+                            }
+                        }  
+                    }
+                    else{
+                        tasksToShow.Add(task);
+                        var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
+                        listOfSolutions.Add(task.Id, solutions);
+                    }
+               }
+           }
+
+            model.Tasks = tasksToShow;
+            model.ListOfSolutions = listOfSolutions;    
+            // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
+            return View("/Views/Taskset/AllFilterTasks.cshtml", model);
+        }
+
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> RemoveAttachment(int tasksetId, string fileId)
         {
@@ -158,51 +270,6 @@ namespace archive.Controllers
 
             await StoreAttachments(taskset, add.Attachments);
             return await AddAttachmentsView(add.EntityId);
-        }
-
-        [Authorize]
-        public async Task<IActionResult> IndexFilter(int id, IndexViewModel model)
-        {
-            _logger.LogDebug($"Requested taskset for course id={id}");
-
-            var course = await _repository.Courses.FindAsync(id);
-            if (course == null)
-            {
-                _logger.LogDebug($"Cannot find course with id={id}");
-                return new StatusCodeResult(404);
-            }
-
-            var tasksToShow = new List<archive.Data.Entities.Taskset>();
-
-            if (model.haveSolutions)
-            {
-                var tasksets = await _repository.Solutions
-                    .Where(e => e.Task.Taskset.CourseId == id
-                                && e.Task.Taskset.Year >= model.yearFrom
-                                && e.Task.Taskset.Year <= model.yearTo
-                                && ((!model.haveTasks) ||
-                                    e.Task.Taskset.Tasks
-                                        .Any())) //Not sure if needed, solution shouldn't exist without task
-                    .Select(s => s.Task.Taskset).Distinct()
-                    .ToListAsync();
-                tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
-            }
-            else
-            {
-                var tasksets = await _repository.Tasksets
-                    .Where(s => s.CourseId == id
-                                && s.Year >= model.yearFrom
-                                && s.Year <= model.yearTo
-                                && ((!model.haveTasks) || s.Tasks.Any()))
-                    .OrderByDescending(s => s.Year)
-                    .ToListAsync();
-                tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
-            }
-
-            model.Tasksets = tasksToShow;
-            model.Course = course;
-            // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
-            return View("/Views/Taskset/Index.cshtml", model);
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
@@ -299,5 +366,6 @@ namespace archive.Controllers
 
             return View("AddAttachments", new AddAttachmentsModel() {Taskset = taskset, EntityId = tasksetId});
         }
-    }
+
+    }    
 }
