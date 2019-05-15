@@ -139,6 +139,19 @@ namespace archive.Data
 
                 entity.HasKey(t => new {t.TasksetId, t.FileId});
             });
+
+            builder.Entity<TasksFiles>(entity =>
+            {
+                entity.HasOne(tf => tf.File)
+                    .WithMany(f => f.TasksReferers)
+                    .HasForeignKey(tf => tf.FileId);
+
+                entity.HasOne(tf => tf.Task)
+                    .WithMany(t => t.Attachments)
+                    .HasForeignKey(tf => tf.TaskId);
+
+                entity.HasKey(t => new {t.TaskId, t.FileId});
+            });
         }
 
         public Job SaveChangesAsync() => base.SaveChangesAsync();

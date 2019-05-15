@@ -1,15 +1,19 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
 using archive.Data.Enums;
 using archive.Models.Task;
+using archive.Models.Taskset;
 using archive.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Task = archive.Data.Entities.Task;
 
 namespace archive.Controllers
 {
@@ -18,14 +22,17 @@ namespace archive.Controllers
         private readonly ILogger _logger;
         private readonly IRepository _repository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IStorageService _storageService;
 
-        public TaskController(IRepository repository, ILogger<TaskController> logger, 
-            IUserActivityService activityService, UserManager<ApplicationUser> userManager)
+        public TaskController(IRepository repository, ILogger<TaskController> logger,
+            IUserActivityService activityService, UserManager<ApplicationUser> userManager,
+            IStorageService storageService)
             : base(activityService)
         {
             _repository = repository;
             _logger = logger;
             _userManager = userManager;
+            _storageService = storageService;
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
@@ -34,18 +41,18 @@ namespace archive.Controllers
             var taskset = await TasksetOrDefaultAsync(forTasksetId);
             if (taskset != null)
             {
-                if(taskset.Course.Archive)
+                if (taskset.Course.Archive)
                     return new StatusCodeResult(403);
                 return View(new CreateTaskViewModel(taskset));
             }
-            
+
             var tasksets = (await _repository.Tasksets
                 .Include(t => t.Course)
                 .Where(t => t.Course.Archive == false)
                 .ToListAsync());
             return View(new CreateTaskViewModel(tasksets));
         }
-        
+
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateTaskViewModel task)
@@ -53,25 +60,31 @@ namespace archive.Controllers
             _logger.LogDebug($"Requested to add task: " + task);
             var tasksetForTask = await TasksetOrDefaultAsync(task.TasksetId);
 
-            if(tasksetForTask.Course.Archive)
-                    return new StatusCodeResult(403);
-                
             if (tasksetForTask == null || !ModelState.IsValid)
             {
                 _logger.LogDebug($"Cannot add task: " + task);
                 return new StatusCodeResult(400);
             }
+
+            if (tasksetForTask.Course.Archive)
+                return new StatusCodeResult(403);
+
+            var entity = new Data.Entities.Task
+            {
+                TasksetId = task.TasksetId,
+                Name = task.Name,
+                Content = task.Content
+            };
             
-            _repository.Tasks
-                .Add(new Data.Entities.Task
-                {
-                    TasksetId = task.TasksetId,
-                    Name = task.Name,
-                    Content = task.Content
-                });
-            
+            _repository.Tasks.Add(entity);
             await _repository.SaveChangesAsync();
-            return RedirectToAction("ShowTaskset", "Taskset", new { id = task.TasksetId });
+
+            if (task.Attachments != null)
+            {
+                await StoreAttachments(entity, task.Attachments);
+            }
+            
+            return RedirectToAction("ShowTaskset", "Taskset", new {id = task.TasksetId});
         }
 
         private Task<Taskset> TasksetOrDefaultAsync(int? id)
@@ -85,7 +98,11 @@ namespace archive.Controllers
         [Authorize(Roles = UserRoles.MODERATOR)]
         public async Task<IActionResult> Edit(int id)
         {
-            var task = await _repository.Tasks.Include(t => t.Taskset).Where(t => t.Id == id).FirstOrDefaultAsync();
+            var task = await _repository.Tasks
+                .Include(t => t.Taskset)
+                .Include(t => t.Attachments)
+                .ThenInclude(a => a.File)
+                .Where(t => t.Id == id).FirstOrDefaultAsync();
             if (task == null)
             {
                 _logger.LogDebug($"Task(Id={id}) not found");
@@ -97,7 +114,8 @@ namespace archive.Controllers
                 Id = task.Id,
                 Taskset = task.Taskset,
                 NewName = task.Name,
-                NewContent = task.Content
+                NewContent = task.Content,
+                Attachments = task.Attachments.Select(a => a.File).ToList()
             };
             return View(model);
         }
@@ -130,7 +148,7 @@ namespace archive.Controllers
             task.Name = edited.NewName;
             await _repository.SaveChangesAsync();
 
-            return RedirectToAction("ShowTaskset", "Taskset", new { id = task.TasksetId });
+            return RedirectToAction("ShowTaskset", "Taskset", new {id = task.TasksetId});
         }
 
         [Authorize(Roles = UserRoles.MODERATOR)]
@@ -145,7 +163,93 @@ namespace archive.Controllers
 
             _repository.Tasks.Remove(task);
             await _repository.SaveChangesAsync();
-            return RedirectToAction("ShowTaskset", "Taskset", new { id = task.TasksetId });
+            return RedirectToAction("ShowTaskset", "Taskset", new {id = task.TasksetId});
+        }
+
+        private async System.Threading.Tasks.Task StoreAttachments(Task entity, List<IFormFile> files)
+        {
+            // Store files attaching them to task
+            foreach (var file in files)
+            {
+                var fileEntity = await _storageService.Store(file.FileName, file.OpenReadStream());
+                entity.Attachments.Add(new TasksFiles() {TaskId = entity.Id, FileId = fileEntity.Id});
+            }
+
+            await _repository.SaveChangesAsync();
+        }
+        
+        /// FIXME: Metody Add/Remove Attachments to trochę copy pasta z TaksetsController
+        /// Ale z drugiej strony nie ma tu wielkiej logiki i częściowo się różnią.
+        /// Jednakże warto byłoby wygeneralizować metody niezależnie od typu.
+        
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        public async Task<IActionResult> AddAttachmentsView(int taskId)
+        {
+            var task = await _repository.Tasks
+                .Include(t => t.Taskset)
+                .ThenInclude(t => t.Course)
+                .Include(t => t.Attachments)
+                .ThenInclude(a => a.File)
+                .FirstOrDefaultAsync(t => t.Id == taskId);
+
+            if (task == null)
+            {
+                _logger.LogDebug($"Cannot find task with id={taskId}");
+                return new StatusCodeResult(404);
+            }
+
+            return View("AddAttachments", new AddAttachmentsModel() {Task = task, EntityId = taskId});
+        }
+        
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        public async Task<IActionResult> RemoveAttachment(int taskId, string fileId)
+        {
+            _logger.LogDebug($"Requested to remove attachment={fileId} from task={taskId}");
+            var task = await _repository.Tasks
+                .Include(t => t.Attachments)
+                .FirstOrDefaultAsync(t => t.Id == taskId);
+
+            if (task == null)
+            {
+                _logger.LogDebug($"Cannot find task with id={taskId}");
+                return new StatusCodeResult(404);
+            }
+
+            var toRemove = task.Attachments
+                .FirstOrDefault(a => a.FileId.ToString() == fileId);
+            
+            if (toRemove != null)
+            {
+                // Detach attachment, remove file — TODO może wystarczy tylko usunąć plik?
+                task.Attachments.Remove(toRemove);
+                await _storageService.Delete(toRemove.FileId);
+            }
+            else
+            {
+                _logger.LogDebug($"Cannot find file with id={fileId}");
+                return new StatusCodeResult(404);
+            }
+
+            return await AddAttachmentsView(taskId);
+        }
+
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [RequestSizeLimit(20_000_000)]
+        public async Task<IActionResult> AddAttachments(AddAttachmentsModel add)
+        {
+            _logger.LogDebug($"Requested to add attachments to task={add.EntityId}");
+            var task = await _repository.Tasks
+                .Include(t => t.Attachments)
+                .FirstOrDefaultAsync(t => t.Id == add.EntityId);
+
+            if (task == null)
+            {
+                _logger.LogDebug($"Cannot find task with id={add.EntityId}");
+                return new StatusCodeResult(404);
+            }
+
+            await StoreAttachments(task, add.Attachments);
+            return await AddAttachmentsView(add.EntityId);
         }
     }
 }

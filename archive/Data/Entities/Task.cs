@@ -9,11 +9,11 @@ namespace archive.Data.Entities
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        /* Tu gienieczko ma listę wersji zamiast pojedyńczej zawartości. */
         public string Content { get; set; }
    
         public int TasksetId { get; set; }
         public virtual Taskset Taskset { get; set; }
         public virtual ICollection<Solution> Solutions { get; set; } = new HashSet<Solution>();
+        public virtual ICollection<TasksFiles> Attachments { get; set; } = new HashSet<TasksFiles>();
     }
 }

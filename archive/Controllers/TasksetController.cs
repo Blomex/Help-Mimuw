@@ -48,7 +48,10 @@ namespace archive.Controllers
                 return new StatusCodeResult(403);
             }
 
-            var tasks = await _repository.Tasks.Where(s => s.TasksetId == id).ToListAsync();
+            var tasks = await _repository.Tasks // FIXME można tu ładować od razu z tasksetem
+                .Include(t => t.Attachments)
+                .ThenInclude(a => a.File)
+                .Where(t => t.TasksetId == id).ToListAsync();
 
             var listOfSolutions = new Dictionary<int, List<Solution>>();
 
@@ -104,13 +107,22 @@ namespace archive.Controllers
                 return new StatusCodeResult(404);
             }
 
-            // "Detach" attachment, without removing file
             var toRemove = taskset.Attachments
                 .FirstOrDefault(a => a.FileId.ToString() == fileId);
-            taskset.Attachments.Remove(toRemove);
-            await _repository.SaveChangesAsync();
+          
+            if (toRemove != null)
+            {
+                // "Detach" attachment, remove file
+                taskset.Attachments.Remove(toRemove);
+                await _storageService.Delete(toRemove.FileId);
+            }
+            else
+            {
+                _logger.LogDebug($"Cannot find file with id={fileId}");
+                return new StatusCodeResult(404);
+            }
 
-            return await ShowTaskset(tasksetId);
+            return await AddAttachmentsView(tasksetId);
         }
 
         private async Task StoreAttachments(Taskset entity, List<IFormFile> files)
@@ -129,19 +141,19 @@ namespace archive.Controllers
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> AddAttachments(AddAttachmentsModel add)
         {
-            _logger.LogDebug($"Requested to add attachments to taskset={add.TasksetId}");
+            _logger.LogDebug($"Requested to add attachments to taskset={add.EntityId}");
             var taskset = await _repository.Tasksets
                 .Include(t => t.Attachments)
-                .FirstOrDefaultAsync(t => t.Id == add.TasksetId);
+                .FirstOrDefaultAsync(t => t.Id == add.EntityId);
 
             if (taskset == null)
             {
-                _logger.LogDebug($"Cannot find taskset with id={add.TasksetId}");
+                _logger.LogDebug($"Cannot find taskset with id={add.EntityId}");
                 return new StatusCodeResult(404);
             }
 
             await StoreAttachments(taskset, add.Attachments);
-            return await ShowTaskset(add.TasksetId);
+            return await AddAttachmentsView(add.EntityId);
         }
 
         [Authorize]
@@ -208,7 +220,7 @@ namespace archive.Controllers
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
-        [RequestSizeLimit(100_000_000)]
+        [RequestSizeLimit(20_000_000)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTasksetViewModel taskset)

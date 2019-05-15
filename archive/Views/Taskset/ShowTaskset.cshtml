@@ -2,7 +2,7 @@
 
 <h1>@Model.Taskset.Course.Name</h1>
 <h2>@Model.Taskset.Name (@Model.Taskset.Year):</h2>
-<h2>Załączniki</h2> 
+<h2>Załączniki</h2>
 @foreach (var file in Model.Taskset.Attachments)
 {
     <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.File.Id">@file.File.FileName</a>
@@ -28,6 +28,16 @@
         @task.Name
     </h3>
     <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
+                                                                            
+    <h4>Załączniki:</h4>
+    foreach (var file in task.Attachments)
+    {
+        <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.File.Id">@file.File.FileName</a>
+        <br/>
+    }
+    <text>(</text><a asp-controller="Task" asp-action="AddAttachmentsView" asp-route-taskId="@task.Id">Dodaj/Usuń załączniki</a><text>)</text> 
+    <hr/>
+
     <a asp-controller="Solution" asp-action="Create"
        asp-route-forTaskId="@task.Id">
         Dodaj rozwiązanie

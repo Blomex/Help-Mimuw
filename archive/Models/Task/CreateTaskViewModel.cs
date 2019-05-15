@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace archive.Models.Task
@@ -24,6 +25,9 @@ namespace archive.Models.Task
 
         [Display(Name = "Przedmiot")]
         public List<SelectListItem> Courses { get; }
+
+        [Display(Name = "Załączniki")] 
+        public List<IFormFile> Attachments { get; set; }
 
         public CreateTaskViewModel()
         {
