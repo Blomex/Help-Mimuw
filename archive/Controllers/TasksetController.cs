@@ -20,7 +20,8 @@ namespace archive.Controllers
         private readonly ILogger _logger;
         private readonly IRepository _repository;
         private readonly IStorageService _storageService;
-
+        public const int AttachmentRequestLimit = 20_000_000; // in bytes
+        
         public TasksetController(ILogger<TasksetController> logger, IRepository repository,
             IUserActivityService activityService, IStorageService storageService) : base(activityService)
         {
@@ -109,7 +110,7 @@ namespace archive.Controllers
 
             var toRemove = taskset.Attachments
                 .FirstOrDefault(a => a.FileId.ToString() == fileId);
-          
+
             if (toRemove != null)
             {
                 // "Detach" attachment, remove file
@@ -127,6 +128,8 @@ namespace archive.Controllers
 
         private async Task StoreAttachments(Taskset entity, List<IFormFile> files)
         {
+            if (files == null) return;
+            
             // Store files attaching them to taskset
             foreach (var file in files)
             {
@@ -139,6 +142,7 @@ namespace archive.Controllers
 
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [RequestSizeLimit(AttachmentRequestLimit)]
         public async Task<IActionResult> AddAttachments(AddAttachmentsModel add)
         {
             _logger.LogDebug($"Requested to add attachments to taskset={add.EntityId}");
@@ -176,7 +180,9 @@ namespace archive.Controllers
                     .Where(e => e.Task.Taskset.CourseId == id
                                 && e.Task.Taskset.Year >= model.yearFrom
                                 && e.Task.Taskset.Year <= model.yearTo
-                                && ((!model.haveTasks) || e.Task.Taskset.Tasks.Any())) //Not sure if needed, solution shouldn't exist without task
+                                && ((!model.haveTasks) ||
+                                    e.Task.Taskset.Tasks
+                                        .Any())) //Not sure if needed, solution shouldn't exist without task
                     .Select(s => s.Task.Taskset).Distinct()
                     .ToListAsync();
                 tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
@@ -220,7 +226,7 @@ namespace archive.Controllers
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
-        [RequestSizeLimit(20_000_000)]
+        [RequestSizeLimit(AttachmentRequestLimit)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTasksetViewModel taskset)
@@ -295,7 +301,7 @@ namespace archive.Controllers
                 return new StatusCodeResult(404);
             }
 
-            return View("AddAttachments", new AddAttachmentsModel() {Taskset = taskset});
+            return View("AddAttachments", new AddAttachmentsModel() {Taskset = taskset, EntityId = tasksetId});
         }
     }
 }

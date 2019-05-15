@@ -16,7 +16,7 @@
     <input asp-for="EntityId" hidden/>
     <div class="form-group">
         <label asp-for="Attachments"></label>
-        <input asp-for="Attachments" class="form-control" type="file" multiple/>
+        <input asp-for="Attachments" class="form-control" type="file" multiple required/>
         <span asp-validation-for="Attachments" class="text-danger"></span>
     </div>
     <input value="Dodaj!" type="submit" class="btn btn-primary"/>

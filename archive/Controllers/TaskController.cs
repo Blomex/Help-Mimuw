@@ -54,7 +54,9 @@ namespace archive.Controllers
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        [RequestSizeLimit(TasksetController.AttachmentRequestLimit)]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTaskViewModel task)
         {
             _logger.LogDebug($"Requested to add task: " + task);
@@ -123,6 +125,7 @@ namespace archive.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = UserRoles.MODERATOR)]
+        [RequestSizeLimit(TasksetController.AttachmentRequestLimit)]
         public async Task<IActionResult> Edit([Bind] TaskEditModel edited)
         {
             _logger.LogDebug($"Requested to edit Task(Id={edited.Id})");
@@ -168,6 +171,8 @@ namespace archive.Controllers
 
         private async System.Threading.Tasks.Task StoreAttachments(Task entity, List<IFormFile> files)
         {
+            if (files == null) return;
+            
             // Store files attaching them to task
             foreach (var file in files)
             {
@@ -234,7 +239,8 @@ namespace archive.Controllers
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
-        [RequestSizeLimit(20_000_000)]
+        [RequestSizeLimit(TasksetController.AttachmentRequestLimit)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddAttachments(AddAttachmentsModel add)
         {
             _logger.LogDebug($"Requested to add attachments to task={add.EntityId}");
