@@ -79,20 +79,11 @@ namespace archive.Controllers
             {
                 _logger.LogDebug($"There are no comments for solution with id={solutionId}");
             }
-            
-            var rating_list = await _repository.Ratings.Where(r => r.IdSolution == solutionId).ToListAsync();
-            int rating = 0;
-            int counter = 0;
-            //sumujemy oceny
-            foreach (var r in rating_list)
-            {
-                //może jednak zła ocena to 0 zamiast 1?
-                // i podawanie rzeczy w stylu '85% osób uważa to rozwiązanie za dobre'
-                if(r.Value){rating++;}
-                counter++;
-            }
 
-            //just to check if they are seen correctly
+            //is it possible to do with one SQL call?
+            var counter =_repository.Ratings.Count(r => r.IdSolution == solutionId);
+            var rating = _repository.Ratings.Count(r => r.IdSolution == solutionId && r.Value);
+            
             return View("Show", new SolutionViewModel(task, solution, comments, rating, counter));
         }
 
