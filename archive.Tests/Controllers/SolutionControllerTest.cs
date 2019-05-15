@@ -97,6 +97,74 @@ namespace archive.Tests.Controllers
             }
         }
 
+        [Test]
+        public async Task OwnerCanEditSolution()
+        {
+            using (var scope = factory.Server.Host.Services.CreateScope())
+            {
+                // Given solution by Akatsuki
+                var solution = await InsertAkatsukiSolution(scope);
+
+                // When she tries to edit it
+                var controller = LoginToController<SolutionController>(scope, akatsuki);
+                var editedModel = new SolutionEditModel
+                {
+                    SolutionId = solution.Id,
+                    NewContent = "Za trudne, nie wymówię..."
+                };
+                var r = await controller.Edit(editedModel) as RedirectToActionResult;
+
+                // It is accepted and redirects her to to solution
+                Assert.NotNull(r != null);
+                Assert.AreEqual(r.ActionName, "Show");
+                Assert.AreEqual((int)r.RouteValues["solutionId"], solution.Id);
+            }
+        }
+
+        [Test]
+        public async Task NotOwnerCannotEditSolution()
+        {
+            using (var scope = factory.Server.Host.Services.CreateScope())
+            {
+                // Given solution by Akatsuki
+                var solution = await InsertAkatsukiSolution(scope);
+
+                // When henrietta tries to edit it
+                var controller = LoginToController<SolutionController>(scope, henrietta);
+                var editedModel = new SolutionEditModel
+                {
+                    SolutionId = solution.Id,
+                    NewContent = "BUHAHA"
+                };
+                var r = await controller.Edit(editedModel) as ForbidResult;
+
+                // She cannot
+                Assert.NotNull(r != null);
+            }
+        }
+
+        /* Z jakiegoś powodu rzuca Circular dependency
+        [Test]
+        public async Task ModCanRemoveAnySolution()
+        {
+            using (var scope = factory.Server.Host.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                // Given solution by Akatsuki
+                var solution = await InsertAkatsukiSolution(scope);
+
+                // When he tries to remove it
+                var controller = LoginToController<SolutionController>(scope, shiroe);
+                var r = await controller.Delete(solution.Id) as RedirectToActionResult;
+                
+
+                // It really gets deleted
+                Assert.NotNull(r != null);
+                Assert.Null(await db.Solutions.FindAsync(solution.Id));
+            }
+        }*/
+
         [OneTimeTearDown]
         public void TearDown()
         {
@@ -104,11 +172,32 @@ namespace archive.Tests.Controllers
             {
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 db.Courses.Remove(course);
-                db.Tasksets.Remove(taskset);
                 db.SaveChanges();
             }
         }
 
-        
+        protected async Task<Solution> InsertAkatsukiSolution(IServiceScope scope)
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var solution = new Solution
+            {
+                AuthorId = akatsuki.Id,
+                CachedContent = "xD",
+                TaskId = task.Id
+            };
+            var version = new SolutionVersion
+            {
+                Solution = solution,
+                Created = DateTime.Now,
+                Content = "Tracz tak tarcicę tarł, tak takt w takt, jak takt w takt, tercicę tartak tarł"
+            };
+            db.Add(solution);
+            await db.SaveChangesAsync();
+            solution.CurrentVersion = version;
+            db.Add(version);
+            await db.SaveChangesAsync();
+
+            return solution;
+        }
     }
 }
