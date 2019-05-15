@@ -121,11 +121,11 @@ namespace archive.Controllers
                 var fileEntity = await _storageService.Store(file.FileName, file.OpenReadStream());
                 entity.Attachments.Add(new TasksetsFiles() {TasksetId = entity.Id, FileId = fileEntity.Id});
             }
-            
+
             await _repository.SaveChangesAsync();
         }
 
-        
+
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> AddAttachments(AddAttachmentsModel add)
         {
@@ -164,9 +164,7 @@ namespace archive.Controllers
                     .Where(e => e.Task.Taskset.CourseId == id
                                 && e.Task.Taskset.Year >= model.yearFrom
                                 && e.Task.Taskset.Year <= model.yearTo
-                                && ((!model.haveTasks) ||
-                                    e.Task.Taskset.Tasks
-                                        .Any())) //Not sure if needed, solution shouldn't exist without task
+                                && ((!model.haveTasks) || e.Task.Taskset.Tasks.Any())) //Not sure if needed, solution shouldn't exist without task
                     .Select(s => s.Task.Taskset).Distinct()
                     .ToListAsync();
                 tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
