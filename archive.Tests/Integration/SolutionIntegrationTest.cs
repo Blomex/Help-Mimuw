@@ -31,7 +31,7 @@ namespace archive.Tests.Integration
             {
                 // Arrange
                 var repository = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var user = new ApplicationUser()
+                var addedUser = new ApplicationUser()
                 {
                     HomePage = "mimuw.edu.pl",
                     LastActive = DateTime.UtcNow,
@@ -39,14 +39,14 @@ namespace archive.Tests.Integration
                     Email = "a@b.c",
                     UserName = Guid.NewGuid().ToString()
                 };
-                await repository.Users.AddAsync(user);
+                await repository.Users.AddAsync(addedUser);
                 await repository.SaveChangesAsync();
-                var testUser = await repository.Users.FirstOrDefaultAsync();
+                var user = await repository.Users.FirstOrDefaultAsync();
                 var solution = new Solution {CachedContent = "Indukcja po $n$.", TaskId = 1};
                 repository.Solutions.Add(solution);
                 await repository.SaveChangesAsync();
-                var comment1 = new Comment {Content = "Fajne", SolutionId = solution.Id, ApplicationUserId = testUser.Id};
-                var comment2 = new Comment {Content = "Niefajne", SolutionId = solution.Id, ApplicationUserId = testUser.Id};
+                var comment1 = new Comment {Content = "Fajne", SolutionId = solution.Id, ApplicationUserId = user.Id};
+                var comment2 = new Comment {Content = "Niefajne", SolutionId = solution.Id, ApplicationUserId = user.Id};
                 repository.Comments.Add(comment1);
                 repository.Comments.Add(comment2);
                 await repository.SaveChangesAsync();
