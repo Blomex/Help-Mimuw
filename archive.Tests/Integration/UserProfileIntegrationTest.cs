@@ -102,7 +102,7 @@ namespace archive.Tests.Integration
                 Assert.AreEqual(user.HomePage, properties[1].TextContent.Trim());
                 Assert.AreEqual(user.Email, properties[2].TextContent.Trim());
                 Assert.AreEqual(user.PhoneNumber, properties[3].TextContent.Trim());
-                var culture = new CultureInfo("en-US");
+                var culture = new CultureInfo("pl-PL");
                 var resultDate = Convert.ToDateTime(properties[4].TextContent.Trim(), culture);
                 Assert.AreEqual(user.LastActive.AddHours(2).Year, resultDate.Year);
                 Assert.AreEqual(user.LastActive.AddHours(2).Month, resultDate.Month);
