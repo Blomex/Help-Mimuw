@@ -80,12 +80,7 @@ namespace archive.Controllers
             
             _repository.Tasks.Add(entity);
             await _repository.SaveChangesAsync();
-
-            if (task.Attachments != null)
-            {
-                await StoreAttachments(entity, task.Attachments);
-            }
-            
+            await StoreAttachments(entity, task.Attachments);
             return RedirectToAction("ShowTaskset", "Taskset", new {id = task.TasksetId});
         }
 

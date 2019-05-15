@@ -21,7 +21,7 @@ namespace archive.Controllers
         private readonly IRepository _repository;
         private readonly IStorageService _storageService;
         public const int AttachmentRequestLimit = 20_000_000; // in bytes
-        
+
         public TasksetController(ILogger<TasksetController> logger, IRepository repository,
             IUserActivityService activityService, IStorageService storageService) : base(activityService)
         {
@@ -129,7 +129,7 @@ namespace archive.Controllers
         private async Task StoreAttachments(Taskset entity, List<IFormFile> files)
         {
             if (files == null) return;
-            
+
             // Store files attaching them to taskset
             foreach (var file in files)
             {
@@ -256,11 +256,7 @@ namespace archive.Controllers
             await _repository.SaveChangesAsync();
 
             entity.Attachments = new List<TasksetsFiles>();
-            if (taskset.Attachments != null)
-            {
-                await StoreAttachments(entity, taskset.Attachments);
-            }
-
+            await StoreAttachments(entity, taskset.Attachments);
             return await Index(taskset.CourseId);
         }
 
