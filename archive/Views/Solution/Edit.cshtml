@@ -13,7 +13,7 @@
 <h2>Dodaj rozwiązanie</h2>
 <div>
     <div>
-        <form asp-action="@(Model.SolutionId == null ? "Create" : "Edit")">
+        <form asp-action="@(Model.SolutionId == null ? "Create" : "Edit")" entype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Task.Id" />
             @if (Model.SolutionId != null)
@@ -24,6 +24,11 @@
                 <label asp-for="NewContent" class="control-label">Treść rozwiązania</label>
                 <textarea asp-for="NewContent" class="form-control" cols="120" rows="20" autofocus required></textarea>
                 <span asp-validation-for="NewContent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Attachments"></label>
+                <input asp-for="Attachments" class="form-control" type="file" multiple enctype="multipart/form-data"/>
+                <span asp-validation-for="Attachments" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="@(Model.SolutionId == null ? "Dodaj rozwiązanie" : "Zapisz zmiany")" class="btn btn-primary" />

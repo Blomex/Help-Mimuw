@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace archive.Data.Entities
 {
@@ -22,6 +23,7 @@ namespace archive.Data.Entities
         public int TaskId { get; set; }
         
         public virtual Task Task { get; set; }
+        public virtual ICollection<SolutionFiles> Attachments { get; set; } = new HashSet<SolutionFiles>();
         public IEnumerable<Comment> Comments { get; set; }
     }
 }

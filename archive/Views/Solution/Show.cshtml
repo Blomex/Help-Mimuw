@@ -18,6 +18,14 @@
     <section>
         <p><em>Rozwiązanie:</em></p>
         <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;" class="Solution">@Model.Solution.CachedContent</pre>
+        <h2>Załączniki</h2> 
+        @foreach (var file in Model.Solution.Attachments)
+        {
+            <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.File.Id">@file.File.FileName</a>
+            <br/>
+        }
+        (<a asp-controller="Solution" asp-action="AddAttachmentsView" asp-route-tasksetId="@Model.Solution.Id">Dodaj/Usuń załączniki</a>)
+        <hr/>
         <a asp-action="Edit" asp-route-id="@Model.Solution.Id">Edytuj</a>
         <a asp-action="Delete" asp-route-id="@Model.Solution.Id">Usuń</a>
         <section>

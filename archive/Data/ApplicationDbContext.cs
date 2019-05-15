@@ -5,6 +5,7 @@ using archive.Data.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Job = System.Threading.Tasks.Task;
+using Solution = archive.Data.Entities.Solution;
 
 namespace archive.Data
 {
@@ -22,6 +23,7 @@ namespace archive.Data
 
         public DbSet<File> Files { get; set; }
         public DbSet<TasksetsFiles> TasksetsFiles { get; set; }
+        public DbSet<TasksetsFiles> SolutionFiles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -106,6 +108,19 @@ namespace archive.Data
                     entity.HasOne(s => s.CurrentVersion);
                 });
 
+            builder.Entity<SolutionFiles>(entity =>
+            {
+                entity.HasOne(tf => tf.File)
+                    .WithMany(f => f.SolutionReferers)
+                    .HasForeignKey(tf => tf.FileId);
+                entity.HasOne(s => s.Solution)
+                    .WithMany(s => s.Attachments)
+                    .HasForeignKey(s => s.SolutionId);
+
+                     entity.HasKey(t => new {t.SolutionId, t.FileId});
+
+            });
+
             builder.Entity<SolutionVersion>(solutionVersion =>
             {
                 solutionVersion.HasKey(v => v.Id);
@@ -139,6 +154,7 @@ namespace archive.Data
 
                 entity.HasKey(t => new {t.TasksetId, t.FileId});
             });
+            
         }
 
         public Job SaveChangesAsync() => base.SaveChangesAsync();

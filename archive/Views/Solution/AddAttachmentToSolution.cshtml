@@ -1,0 +1,24 @@
+﻿@page
+@model archive.Models.Solution.AddAttachmentToSolutionModel
+@{
+}
+<h2>@Model.Solution.CurrentVersion.Content</h2>
+<h2>Załączniki:</h2>
+@foreach (var file in Model.Solution.Attachments)
+{
+    <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.File.Id">@file.File.FileName</a>
+    <span> — </span><a asp-controller="Taskset" asp-action="RemoveAttachment" asp-route-tasksetId="@Model.Solution.Id" asp-route-fileId="@file.File.Id">Usuń!</a>
+    <br />
+}
+<hr />
+
+<form asp-controller="Solution" asp-action="AddAttachmentToSolution" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="SolutionId" hidden />
+    <div class="form-group">
+        <label asp-for="Attachments"></label>
+        <input asp-for="Attachments" class="form-control" type="file" multiple />
+        <span asp-validation-for="Attachments" class="text-danger"></span>
+    </div>
+    <input value="Dodaj!" type="submit" class="btn btn-primary" />
+</form>

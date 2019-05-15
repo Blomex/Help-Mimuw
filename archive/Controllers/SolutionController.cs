@@ -12,8 +12,10 @@ using archive.Data.Enums;
 using archive.Models;
 using archive.Models.Comment;
 using archive.Models.Solution;
+using archive.Models.Taskset;
 using archive.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -29,15 +31,17 @@ namespace archive.Controllers
         private readonly ApplicationDbContext _repository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IStorageService _storageService;
 
         public SolutionController(ILogger<SolutionController> logger, ApplicationDbContext repository, 
             UserManager<ApplicationUser> userManager, IUserActivityService activityService,
-            IAuthorizationService authorizationService) : base(activityService)
+            IAuthorizationService authorizationService, IStorageService storageService) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
             _userManager = userManager;
             _authorizationService = authorizationService;
+            _storageService = storageService;
         }
 
         [Authorize]
@@ -45,7 +49,10 @@ namespace archive.Controllers
         {
             _logger.LogDebug($"Requested solution with id={solutionId}");
 
-            var solution = await _repository.Solutions.FindAsync(solutionId);
+            var solution = await _repository.Solutions
+                .Include(t => t.Attachments)
+                .ThenInclude(a => a.File)
+                .FirstOrDefaultAsync(t=> t.Id == solutionId);
             if (solution == null)
             {
                 _logger.LogDebug($"Solution with id={solutionId} not found");
@@ -111,15 +118,15 @@ namespace archive.Controllers
                 return new StatusCodeResult(400);
             }
 
-            return View("Edit", new SolutionEditModel { Task = task, NewContent = "" });
+            return View("Edit", new SolutionEditModel { Task = task, NewContent = "", Attachments = new List<SolutionFiles>()});
         }
 
         [HttpPost]
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task)
+        public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task, List<IFormFile> attachments)
         {
-            SolutionEditModel edited_solution = new SolutionEditModel() { NewContent = NewContent, Task = Task };
+            SolutionEditModel edited_solution = new SolutionEditModel() { NewContent = NewContent, Task = Task, Attachments = attachments};
             _logger.LogDebug($"Requested to add solution for {edited_solution.Task}; " +
                 $"content: length={edited_solution.NewContent?.Length}, hash={edited_solution.NewContent?.GetHashCode()}");
             
@@ -197,6 +204,12 @@ namespace archive.Controllers
                 SolutionId = solution.Id,
                 NewContent = solution.CurrentVersion.Content
             };
+
+            model.Attachments = new List<SolutionFiles>();
+            if (solution.Attachments != null)
+            {
+                await StoreSolutionAttachments(model, solution.Attachments);
+            }
             return View("Edit", model);
         }
 
@@ -231,7 +244,7 @@ namespace archive.Controllers
             {
                 Solution = solution,
                 Created = DateTime.Now,
-                Content = edited.NewContent
+                Content = edited.NewContent,
             };
 
             // Now save to database in two steps to avoid circular dependency between foreign keys
@@ -352,5 +365,93 @@ namespace archive.Controllers
             await _repository.SaveChangesAsync();
             return RedirectToAction("ShowTaskset", "Taskset", new { id = solution.Task.TasksetId });
         }
+
+
+
+
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+        public async Task<IActionResult> RemoveAttachment(int solutionId, string fileId)
+        {
+            _logger.LogDebug($"Requested to remove attachment={fileId} from taskset={solutionId}");
+            var solution = await _repository.Solutions
+                .Include(t => t.Attachments)
+                .FirstOrDefaultAsync(t => t.Id == solutionId);
+
+            if (solution == null)
+            {
+                _logger.LogDebug($"Cannot find taskset with id={solutionId}");
+                return new StatusCodeResult(404);
+            }
+
+            // "Detach" attachment, without removing file
+            var toRemove = solution.Attachments
+                .FirstOrDefault(a => a.FileId.ToString() == fileId);
+            solution.Attachments.Remove(toRemove);
+            await _repository.SaveChangesAsync();
+
+            return await Show(solutionId);
+        }
+
+        private async Task StoreSolutionAttachments(SolutionEditModel entity, List<IFormFile> files)
+        {
+            // Store files attaching them to taskset
+            foreach (var file in files)
+            {
+                var fileEntity = await _storageService.Store(file.FileName, file.OpenReadStream());
+                entity.Attachments.Add(new SolutionFiles() { SolutionId = entity.SolutionId ?? default(int), FileId = fileEntity.Id });
+            }
+
+            await _repository.SaveChangesAsync();
+        }
+        
+
+        [Authorize(Roles = UserRoles.MODERATOR)]
+        public async Task<IActionResult> AddAttachmentToSolution(AddAttachmentToSolutionModel add)
+        {
+            _logger.LogDebug($"Requested to add attachments to taskset={add.SolutionId}");
+            var solution = await _repository.Solutions
+                .Include(t => t.Attachments)
+                .FirstOrDefaultAsync(t => t.Id == add.SolutionId);
+
+            if (solution == null)
+            {
+                _logger.LogDebug($"Cannot find taskset with id={add.SolutionId}");
+                return new StatusCodeResult(404);
+            }
+
+            await StoreSolutionAttachments(solution, add.Attachments);
+            return await Show(add.SolutionId);
+        }
+
+
+
+
+        [Authorize]
+    public async Task<IActionResult> AddAttachmentsView(int SolutionId)
+    {
+        var solution2 = _repository.Solutions.Include(s => s.Task)
+            .Where(s => s.Id == SolutionId).FirstOrDefaultAsync();
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, solution2, new ModOrOwnerRequirement());
+        if (!authorizationResult.Succeeded)
+    {
+        return new ForbidResult();
     }
+        var solution = await _repository.Solutions
+            .Include(t => t.Task)
+            .Include( t => t.Task.Taskset)
+            .Include(t => t.Task.Taskset.Course)
+            .Include(t => t.Attachments)
+            .ThenInclude(a => a.File)
+            .FirstOrDefaultAsync(t => t.Id == SolutionId);
+
+        if (solution == null)
+    {
+        _logger.LogDebug($"Cannot find taskset with id={SolutionId}");
+        return new StatusCodeResult(404);
+    }
+
+    return View("AddAttachmentToSolution", new AddAttachmentToSolutionModel() { Solution = solution });
+    }
+}
+
 }
