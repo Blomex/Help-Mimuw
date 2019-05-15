@@ -280,6 +280,7 @@ namespace archive.Controllers
             if (taskset == null)
             {
                 _logger.LogDebug($"Cannot find taskset with id={tasksetId}");
+                return new StatusCodeResult(404);
             }
 
             return View("AddAttachments", new AddAttachmentsModel() {Taskset = taskset});
