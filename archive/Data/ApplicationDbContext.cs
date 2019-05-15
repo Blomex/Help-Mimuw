@@ -21,7 +21,6 @@ namespace archive.Data
         public DbSet<UserAvatar> Avatars { get; set; }
 
         public DbSet<File> Files { get; set; }
-        public DbSet<TasksetsFiles> TasksetsFiles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -151,6 +150,19 @@ namespace archive.Data
                     .HasForeignKey(tf => tf.TaskId);
 
                 entity.HasKey(t => new {t.TaskId, t.FileId});
+            });
+
+            builder.Entity<SolutionsFiles>(entity =>
+            {
+                entity.HasOne(tf => tf.File)
+                    .WithMany(f => f.SolutionsReferers)
+                    .HasForeignKey(tf => tf.FileId);
+
+                entity.HasOne(tf => tf.Solution)
+                    .WithMany(t => t.Attachments)
+                    .HasForeignKey(tf => tf.SolutionId);
+
+                entity.HasKey(t => new {t.SolutionId, t.FileId});
             });
         }
 

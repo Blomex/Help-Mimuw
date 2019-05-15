@@ -23,5 +23,6 @@ namespace archive.Data.Entities
         
         public virtual Task Task { get; set; }
         public IEnumerable<Comment> Comments { get; set; }
+        public virtual ICollection<SolutionsFiles> Attachments { get; set; } = new HashSet<SolutionsFiles>();
     }
 }
