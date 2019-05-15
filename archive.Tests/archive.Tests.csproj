@@ -20,4 +20,8 @@
     <ProjectReference Include="..\archive\archive.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Integration\Utility\" />
+  </ItemGroup>
+
 </Project>

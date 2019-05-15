@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace archive.Tests.Integration.Utility
+namespace archive.Tests.Controllers
 {
-    class AuthorizedTestSuite
+    class ControllerTestSuite
     {
         protected WebApplicationFactory<Startup> factory;
 
@@ -43,7 +43,7 @@ namespace archive.Tests.Integration.Utility
         protected ApplicationUser shiroe;
 
 
-        public AuthorizedTestSuite()
+        public ControllerTestSuite()
         {
             factory = new WebApplicationFactory<Startup>();
             /* Need to create client before doing anything */

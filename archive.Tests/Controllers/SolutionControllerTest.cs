@@ -15,9 +15,9 @@ using Task = System.Threading.Tasks.Task;
 using archive.Controllers;
 using archive.Models.Solution;
 
-namespace archive.Tests.Integration
+namespace archive.Tests.Controllers
 {
-    class SolutionTest : Utility.AuthorizedTestSuite
+    class SolutionControllerTest : ControllerTestSuite
     {
         private Course course;
         private Taskset taskset;
