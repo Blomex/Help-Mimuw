@@ -272,51 +272,6 @@ namespace archive.Controllers
             return await AddAttachmentsView(add.EntityId);
         }
 
-        [Authorize]
-        public async Task<IActionResult> IndexFilter(int id, IndexViewModel model)
-        {
-            _logger.LogDebug($"Requested taskset for course id={id}");
-
-            var course = await _repository.Courses.FindAsync(id);
-            if (course == null)
-            {
-                _logger.LogDebug($"Cannot find course with id={id}");
-                return new StatusCodeResult(404);
-            }
-
-            var tasksToShow = new List<archive.Data.Entities.Taskset>();
-
-            if (model.haveSolutions)
-            {
-                var tasksets = await _repository.Solutions
-                    .Where(e => e.Task.Taskset.CourseId == id
-                                && e.Task.Taskset.Year >= model.yearFrom
-                                && e.Task.Taskset.Year <= model.yearTo
-                                && ((!model.haveTasks) ||
-                                    e.Task.Taskset.Tasks
-                                        .Any())) //Not sure if needed, solution shouldn't exist without task
-                    .Select(s => s.Task.Taskset).Distinct()
-                    .ToListAsync();
-                tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
-            }
-            else
-            {
-                var tasksets = await _repository.Tasksets
-                    .Where(s => s.CourseId == id
-                                && s.Year >= model.yearFrom
-                                && s.Year <= model.yearTo
-                                && ((!model.haveTasks) || s.Tasks.Any()))
-                    .OrderByDescending(s => s.Year)
-                    .ToListAsync();
-                tasksToShow.AddRange(tasksets.GetRange(0, tasksets.Count));
-            }
-
-            model.Tasksets = tasksToShow;
-            model.Course = course;
-            // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
-            return View("/Views/Taskset/Index.cshtml", model);
-        }
-
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> Create(int? forCourseId)
         {
