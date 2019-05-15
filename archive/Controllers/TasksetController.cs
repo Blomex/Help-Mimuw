@@ -158,6 +158,7 @@ namespace archive.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTasksetViewModel taskset)
         {
+            // Validate request
             _logger.LogDebug($"Requested to create taskset:" + taskset);
             var same = await _repository.Tasksets
                 .Where(t => t.Name == taskset.Name && t.Year == taskset.Year)
@@ -169,6 +170,7 @@ namespace archive.Controllers
                 return new StatusCodeResult(400);
             }
 
+            // Save taskset
             var entity = new Taskset
             {
                 Type = taskset.TypeAsEnum,
@@ -178,14 +180,17 @@ namespace archive.Controllers
             };
             
             _repository.Tasksets.Add(entity);
-
-            // FIXME error handling ...
+            await _repository.SaveChangesAsync();
+            
+            // Attach saved files
+            var attachments = new List<TasksetsFiles>();
             foreach (var file in taskset.Attachments)
             {
                 var fileEntity = await _storageService.Store(file.FileName, file.OpenReadStream());
-                // Assign to file?
+                attachments.Add(new TasksetsFiles() {TasksetId = entity.Id, FileId = fileEntity.Id});
             }
-            
+
+            entity.Attachments = attachments;
             await _repository.SaveChangesAsync();
           
             return await Index(taskset.CourseId);

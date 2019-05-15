@@ -5,7 +5,7 @@
 <h2>Załączniki:</h2>
 @foreach (var file in Model.Taskset.Attachments)
 {
-    <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.Id">@file.FileName</a>
+    <a asp-controller="Storage" asp-action="Index" asp-route-id="@file">@file.File.FileName</a>
 }
 <br/> <!-- FIXME znacznik puste -->
 

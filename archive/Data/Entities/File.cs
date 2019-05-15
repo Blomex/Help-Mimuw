@@ -26,5 +26,7 @@ namespace archive.Data.Entities
 
         [NotMapped]
         public string Path { get; set; }
+        
+        public virtual ICollection<TasksetsFiles> TasksetReferers { get; set; } = new HashSet<TasksetsFiles>();
     }
 }
