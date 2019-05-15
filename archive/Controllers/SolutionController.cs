@@ -14,6 +14,7 @@ using archive.Models.Comment;
 using archive.Models.Solution;
 using archive.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -106,13 +107,19 @@ namespace archive.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = UserRoles.TRUSTED_USER)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task)
         {
             SolutionEditModel edited_solution = new SolutionEditModel() { NewContent = NewContent, Task = Task };
             _logger.LogDebug($"Requested to add solution for {edited_solution.Task}; " +
                 $"content: length={edited_solution.NewContent?.Length}, hash={edited_solution.NewContent?.GetHashCode()}");
+            // Authorize
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, null, 
+                new RolesAuthorizationRequirement(new string[] { UserRoles.TRUSTED_USER }));
+            if (!authorizationResult.Succeeded)
+            {
+                return new ForbidResult();
+            }
             
             // Check if such task exists
             if (await _repository.Tasks.FindAsync(edited_solution.Task.Id) == null)
