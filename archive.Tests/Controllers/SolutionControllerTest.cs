@@ -67,7 +67,7 @@ namespace archive.Tests.Controllers
                 var controller = LoginToController<SolutionController>(scope, marielle);
                 const string content = "Nasz golem wybucha.";
 
-                var createResult = await controller.Create(content, task) as RedirectToActionResult;
+                var createResult = await controller.Create(content, task, new List<IFormFile>()) as RedirectToActionResult;
                 Assert.NotNull(createResult != null);
                 Assert.AreEqual(createResult.ActionName, "Show");
                 var id = (int)createResult.RouteValues["solutionId"];
@@ -91,7 +91,7 @@ namespace archive.Tests.Controllers
                 var controller = LoginToController<SolutionController>(scope, lenesia);
                 const string content = "Nasz golem wybucha.";
 
-                var r = await controller.Create(content, task);
+                var r = await controller.Create(content, task, new List<IFormFile>());
                 var createResult = r as ForbidResult;
                 Assert.NotNull(createResult);
             }

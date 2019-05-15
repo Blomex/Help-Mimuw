@@ -29,5 +29,6 @@ namespace archive.Data.Entities
         
         public virtual ICollection<TasksetsFiles> TasksetReferers { get; set; } = new HashSet<TasksetsFiles>();
         public virtual ICollection<TasksFiles> TasksReferers { get; set; } = new HashSet<TasksFiles>();
+        public virtual ICollection<SolutionsFiles> SolutionsReferers { get; set; } = new HashSet<SolutionsFiles>();
     }
 }
