@@ -22,6 +22,8 @@ namespace archive.Data
 
         public DbSet<File> Files { get; set; }
 
+        public DbSet<FileGroupEntry> FileGroupEntries { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

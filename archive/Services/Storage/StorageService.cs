@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using archive.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using File = archive.Data.Entities.File;
+using Task = System.Threading.Tasks.Task;
 
 namespace archive.Services.Storage
 {
@@ -112,24 +116,66 @@ namespace archive.Services.Storage
             }
         }
 
-        public Task<Guid> CreateFilesGroup(ISet<File> files)
+        public async Task<Guid> CreateFilesGroup(ISet<File> files)
         {
-            throw new NotImplementedException();
+            Guid guid = Guid.NewGuid();
+
+            using (var transaction = database_.Database.BeginTransaction())
+            {
+                while (await database_.FileGroupEntries.FindAsync(guid) != null)
+                    guid = Guid.NewGuid();
+                foreach (var file in files)
+                    database_.FileGroupEntries.Add(new FileGroupEntry {FileId = file.Id, FileGroupId = guid});
+                await database_.SaveChangesAsync();
+                transaction.Commit();
+            }
+
+            return guid;
         }
 
-        public Task<Guid?> CreateFilesGroup(Guid likeGroup, ISet<File> with = null, ISet<File> except = null)
+        public async Task<Guid?> CreateFilesGroup(Guid likeGroup, ISet<File> with = null, ISet<File> except = null)
         {
-            throw new NotImplementedException();
+            ISet<File> filesInNewGroup = with != null ? new HashSet<File>(with) : new HashSet<File>();
+
+            foreach (var file in await FilesFromGroup(likeGroup))
+            {
+                if (!except.Contains(file))
+                    filesInNewGroup.Add(file);
+            }
+
+            return await CreateFilesGroup(filesInNewGroup);
         }
 
-        public Task<int> DeleteFilesGroup(Guid @group, bool removeUnused = true)
+        public async Task<int> DeleteFilesGroup(Guid group, bool removeUnused = true)
         {
-            throw new NotImplementedException();
+            var filesInGroup = await FilesFromGroup(group);
+
+            // Remove group
+            database_.FileGroupEntries.RemoveRange(
+                database_.FileGroupEntries.Where(e => e.FileGroupId == group));
+            await database_.SaveChangesAsync();
+
+            int deleted = 0;
+            foreach (var file in filesInGroup)
+            {
+                var refCount = await database_.FileGroupEntries.Where(e => e.FileId == file.Id).CountAsync();
+                if (refCount == 0)
+                {
+                    ++deleted;
+                    Delete(file.Id);
+                }
+            }
+
+            return deleted;
         }
 
-        public Task<ISet<File>> FilesFromGroup(Guid @group)
+        public async Task<ISet<File>> FilesFromGroup(Guid group)
         {
-            throw new NotImplementedException();
+            var fileEntries = await database_.FileGroupEntries.Where(e => e.FileGroupId == group).ToListAsync();
+            var files = new HashSet<File>();
+            foreach (var entry in fileEntries)
+                files.Add(await Retrieve(entry.FileId));
+            return files;
         }
 
         protected string GuidToPath(Guid guid)
