@@ -126,6 +126,15 @@ namespace archive.Data
 
             builder.Entity<File>();
 
+            builder.Entity<FileGroupEntry>(entity =>
+            {
+                entity.HasKey(e => new {fileGroup = e.FileGroupId, e.FileId});
+                entity.HasIndex(e => e.FileGroupId);
+                entity.HasIndex(e => e.FileId);
+                entity.HasOne(e => e.File)
+                    .WithMany(f => f.GroupReferers);
+            });
+
             builder.Entity<TasksetsFiles>(entity =>
             {
                 entity.HasOne(tf => tf.File)
