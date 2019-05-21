@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -16,7 +18,7 @@ namespace archive.Models.Taskset
         [Display(Name = "Egzaminy od:")]
         public int yearFrom {get; set;} = 2010;
         [Display(Name = "Egzaminy do:")]
-        public int yearTo {get; set;} = 2020;
+        public int yearTo {get; set;} = DateTime.Now.Year;
 
         [Display(Name = "Minimalna ocena:")]
         public double minRating {get; set;} = 0;
