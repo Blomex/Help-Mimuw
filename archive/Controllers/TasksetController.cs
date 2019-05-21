@@ -144,12 +144,6 @@ namespace archive.Controllers
             if(model.minRating > 0 || model.minRatingNumber > 0)
             {
                 model.haveSolutions = true;
-                model.haveTasks = true;
-            }
-
-            if(model.haveSolutions == true)
-            {
-                model.haveTasks = true;
             }
 
             var tasksToShow = new List<archive.Data.Entities.Task>();
@@ -160,7 +154,7 @@ namespace archive.Controllers
                     .Where(s => (model.courseId == 0 || s.CourseId == model.courseId)
                                 && s.Year >= model.yearFrom
                                 && s.Year <= model.yearTo
-                                && ((!model.haveTasks) || s.Tasks.Any()))
+                                && s.Tasks.Any())
                     .OrderByDescending(s => s.Year)
                     .ToListAsync();
            

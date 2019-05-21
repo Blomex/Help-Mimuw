@@ -11,8 +11,6 @@ namespace archive.Models.Taskset
 
         public Dictionary<int, List<Data.Entities.Solution>> ListOfSolutions { get; set;}
 
-        [Display(Name = "Czy posiada zadania?")]
-        public bool haveTasks {get; set;}
         [Display(Name = "Czy posiada rozwiązane zadania?")]
         public bool haveSolutions {get; set;}
         [Display(Name = "Egzaminy od:")]
