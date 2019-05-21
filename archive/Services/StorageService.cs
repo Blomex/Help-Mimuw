@@ -59,7 +59,7 @@ namespace archive.Services
                 throw new ArgumentException($"Invalid mime type: '{mimeType}'");
             if (mime[0].Length > 127)
                 throw new ArgumentException($"Mime type too long: '{mime[0]}'");
-            if (mime[0].Length > 127)
+            if (mime[1].Length > 127)
                 throw new ArgumentException($"Mime subtype too long: '{mime[1]}'");
 
             // Populate the entry in database
@@ -96,7 +96,10 @@ namespace archive.Services
         {
             if (await database_.Files.FindAsync(fileId) == null)
                 throw new FileNotFoundException($"File with guid={fileId} not found");
-            await newContent.CopyToAsync(System.IO.File.Open(GuidToPath(fileId), FileMode.Create));
+            using (var stream = System.IO.File.Open(GuidToPath(fileId), FileMode.Create))
+            {
+                await newContent.CopyToAsync(stream);
+            }
         }
 
         public async Task Delete(Guid fileId)
