@@ -50,6 +50,7 @@ namespace archive.Controllers
             _logger.LogDebug($"Requested solution with id={solutionId}");
 
             var solution = await _repository.Solutions
+                .Include(s => s.Author)
                 .Include(s => s.Attachments)
                 .ThenInclude(a => a.File)
                 .FirstOrDefaultAsync(s => s.Id == solutionId);

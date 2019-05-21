@@ -16,17 +16,24 @@
         <pre>@Model.Task.Content</pre>
     </section>
     <section>
-        <p><em>Rozwiązanie:</em></p>
+        @if (Model.Solution.Author != null)
+        {
+            <p><em>Rozwiązanie (autor: <a asp-controller="User" asp-action="ShowProfile" asp-route-name="@Model.Solution.Author.UserName">@Model.Solution.Author.UserName</a>):</em></p>
+        }
+        else
+        {
+            <p><em>Rozwiązanie:</em></p>
+        }
         <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;" class="Solution">@Model.Solution.CachedContent</pre>
         <a asp-action="Edit" asp-route-id="@Model.Solution.Id">Edytuj</a>
         <a asp-action="Delete" asp-route-id="@Model.Solution.Id">Usuń</a>
         <h4>Załączniki:</h4>
         @foreach (var file in Model.Attachments)
         {
-        <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.Id">@file.FileName</a>
-        <br/>
+            <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.Id">@file.FileName</a>
+            <br />
         }
-        <hr/>
+        <hr />
         <section>
             <style scoped>
                 .Comment {

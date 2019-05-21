@@ -56,9 +56,10 @@ namespace archive.Controllers
 
             var listOfSolutions = new Dictionary<int, List<Solution>>();
 
+            // FIXME to chyba powinien być SQL
             foreach (var task in tasks)
             {
-                var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
+                var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).Include(s => s.Author).ToListAsync();
                 listOfSolutions.Add(task.Id, solutions);
             }
 
