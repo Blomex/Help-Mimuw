@@ -53,12 +53,20 @@
             @:</ul>
         }
         counter++;
-        <li>
-            <a asp-controller="Solution" asp-action="show"
-               asp-route-solutionId="@solution.Id">
-                rozwiązanie @counter
-            </a>
-        </li>
+      <li>
+          @if (solution.Author != null)
+          {
+              <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
+                  rozwiązanie @counter (by @solution.Author.UserName)
+              </a>
+          }
+          else
+          {
+              <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
+                  rozwiązanie @counter
+              </a>
+          }
+      </li>
     }
 
     if (counter != 0)
