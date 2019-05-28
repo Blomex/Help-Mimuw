@@ -283,15 +283,19 @@ namespace archive.Controllers
 
         [HttpPost]
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
-         public async Task<IActionResult> EditTags(EditTagsViewModel model){
+         public async Task<IActionResult> EditTags([Bind] EditTagsViewModel model){
 
-            var oldTags = await _repository.Tags.Where(t => t.TaskId == model.Task.Id).ToListAsync();
+            var oldTags = await _repository.Tags.Where(t => t.TaskId == model.TaskId).ToListAsync();
+            var task = await _repository.Tasks.Where(t => t.Id == model.TaskId).FirstOrDefaultAsync();
 
-            foreach (var oldTag in oldTags)
-            {
-                _repository.Tags.Remove(oldTag);
-                await _repository.SaveChangesAsync();
-            }
+            //mamy juz wybrane do usuniecia
+            oldTags.RemoveAll(t => true);
+
+            // foreach (var oldTag in oldTags)
+            // {
+            //     _repository.Tags.Remove(oldTag);
+            //     await _repository.SaveChangesAsync();
+            // }
 
             var tags = model.Tags?.Split(", ").ToList<string>();
 
@@ -299,8 +303,9 @@ namespace archive.Controllers
             {
                 var entity = new Tag
                 {
-                    TaskId = model.Task.Id,
-                    Name = newTag
+                    TaskId = model.TaskId,
+                    Name = newTag,
+                    Task = task
                 };
 
                 _repository.Tags.Add(entity);

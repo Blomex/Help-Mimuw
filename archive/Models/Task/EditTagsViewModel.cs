@@ -11,6 +11,8 @@ namespace archive.Models.Task
     {
         public Data.Entities.Task Task { get; set;}
 
+        public int TaskId { get; set;}
+
         [Display(Name = "Tagi")]
         public string Tags { get; set; }
 
