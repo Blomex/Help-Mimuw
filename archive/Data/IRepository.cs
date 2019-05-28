@@ -11,7 +11,7 @@ namespace archive.Data
         DbSet<Task> Tasks { get; }
         DbSet<Solution> Solutions { get; }
         DbSet<SolutionVersion> SolutionsVersions { get; }
-
+        DbSet<Tag> Tags { get; }
         DbSet<Rating> Ratings {get;}
 
         DbSet<Comment> Comments { get; }

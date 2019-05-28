@@ -151,6 +151,9 @@ namespace archive.Controllers
 
             var listOfSolutions = new Dictionary<int, List<Solution>>();
 
+            
+            var tags = model.Tags?.Split(", ").ToList<string>();
+            
             var tasksets = await _repository.Tasksets
                     .Where(s => (model.courseId == 0 || s.CourseId == model.courseId)
                                 && s.Year >= model.yearFrom
@@ -161,7 +164,38 @@ namespace archive.Controllers
            
            foreach(var taskset in tasksets)
            {
+               
+               //trzeba zmienić na SQLa
                var tasks = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
+               if (model.allTags && tags != null)
+               {
+                   //brzydkie - sprawdzamy dla każdego z zadań tagi oddzielnie.
+                   foreach(var task in tasks)
+                   {
+                       foreach (var tag in tags)
+                       {
+                           var taskTags = await _repository.Tags.Where(t => t.Name == tag && t.TaskId == task.Id).ToListAsync();
+                           if (taskTags.Count() < tags.Count())
+                           {
+                               tasks.Remove(task);
+                           }
+                       }
+                   }
+               }
+               else if(tags != null)
+               {
+                   foreach (var task in tasks)
+                   {
+                       foreach (var tag in tags)
+                       {
+                           var taskTags = await _repository.Tags.Where(t => t.Name == tag && t.TaskId == task.Id).ToListAsync();
+                           if (!taskTags.Any())
+                           {
+                               tasks.Remove(task);
+                           }
+                       }
+                   }
+                }
                foreach(var task in tasks){
                     if(model.haveSolutions)
                     {
@@ -169,17 +203,9 @@ namespace archive.Controllers
 
                         foreach(var solution in solutions)
                         {
-                            var ratings = await _repository.Ratings.Where(r => r.IdSolution == solution.Id).ToListAsync();
-
-                            int rating = 0;
-                            int counter = 0;
-                    
-                            foreach (var r in ratings)
-                            {
-                                if(r.Value){rating++;}
-                                counter++;
-                            }
-                            if(rating >= model.minRating && counter >= model.minRatingNumber)
+                            var counter = _repository.Ratings.Count(r => r.IdSolution == solution.Id);
+                            var rating = _repository.Ratings.Count(r => r.IdSolution == solution.Id && r.Value);
+                            if (rating >= model.minRating && counter >= model.minRatingNumber)
                             {
                                 tasksToShow.Add(task);
                                 listOfSolutions.Add(task.Id, solutions);

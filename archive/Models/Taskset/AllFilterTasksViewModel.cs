@@ -28,8 +28,14 @@ namespace archive.Models.Taskset
 
         [Display(Name = "Wybierz przedmiot:")]
         public int courseId {get; set;} = 0;
-        
-        
+
+        [Display(Name = "Wyszukaj zadania o konkretnym tagu (lub tagach, oddzielając je przecinkiem i spacją)")]
+        public string Tags { get; set; }
+
+        [Display(Name="Zaznacz jeśli chcesz wyszukać tylko zadania, które zawierają wszystkie tagi\n" +
+                      "W przeciwnym razie zostaną wyszukane zadania które zawierają przynajmniej jeden z tagów.")]
+        public bool allTags { get; set; }
+
         public List<SelectListItem> Courses { get; set;}
  
         public void AddCourseList(List<Data.Entities.Course> courses)
