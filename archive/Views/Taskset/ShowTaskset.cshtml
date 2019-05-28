@@ -42,6 +42,13 @@
         }
         <text>(</text><a asp-controller="Task" asp-action="AddAttachmentsView" asp-route-taskId="@task.Id">Dodaj/Usuń załączniki</a><text>)</text>
         <hr />
+    <h4>Tagi:</h4>
+    foreach (var tag in task.Tags)
+    {
+        <h5>tag.Name</h5>
+    }
+    <text>(</text><a asp-controller="Task" asp-action="EditTags" asp-route-taskId="@task.Id">Edytuj tagi</a><text>)</text> 
+    <hr/>
 
         <a asp-controller="Solution" asp-action="Create"
            asp-route-forTaskId="@task.Id">
@@ -78,6 +85,27 @@
         {
             @:</ul>
         }
+        counter++;
+      <li>
+          @if (solution.Author != null)
+          {
+              <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
+                  rozwiązanie @counter (by @solution.Author.UserName)
+              </a>
+          }
+          else
+          {
+              <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
+                  rozwiązanie @counter
+              </a>
+          }
+      </li>
+    }
+
+    if (counter != 0)
+    {
+        @:</ul>
+    }
     @:</section>
     <hr />
 }

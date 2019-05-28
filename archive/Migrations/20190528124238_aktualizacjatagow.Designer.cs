@@ -10,8 +10,8 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190515212315_Solutions-attachments")]
-    partial class Solutionsattachments
+    [Migration("20190528124238_aktualizacjatagow")]
+    partial class aktualizacjatagow
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -332,6 +332,25 @@ namespace archive.Migrations
                     b.ToTable("SolutionsFiles");
                 });
 
+            modelBuilder.Entity("archive.Data.Entities.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<int>("TaskId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("archive.Data.Entities.Task", b =>
                 {
                     b.Property<int>("Id")
@@ -507,6 +526,14 @@ namespace archive.Migrations
                     b.HasOne("archive.Data.Entities.Solution", "Solution")
                         .WithMany("Attachments")
                         .HasForeignKey("SolutionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.Tag", b =>
+                {
+                    b.HasOne("archive.Data.Entities.Task", "Task")
+                        .WithMany("Tags")
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

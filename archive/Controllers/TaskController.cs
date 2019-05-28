@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
@@ -261,5 +262,51 @@ namespace archive.Controllers
             await StoreAttachments(task, add.Attachments);
             return await AddAttachmentsView(add.EntityId);
         }
+
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+         public async Task<IActionResult> EditTags(int taskid){
+            _logger.LogDebug($"Requested to edit tags to task id = {taskid} ");
+            var task = await _repository.Tasks.Where(t => t.Id == taskid).FirstOrDefaultAsync();
+            var tags = await _repository.Tags.Where(t => t.TaskId == taskid).ToListAsync();
+
+            StringBuilder allTags = new StringBuilder("");
+
+            foreach (var tag in tags)
+            {
+                allTags.Append("{tag.Name}, ");
+            }
+
+            var model = new EditTagsViewModel(task, allTags.ToString());
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = UserRoles.TRUSTED_USER)]
+         public async Task<IActionResult> EditTags(EditTagsViewModel model){
+
+            var oldTags = await _repository.Tags.Where(t => t.TaskId == model.Task.Id).ToListAsync();
+
+            foreach (var oldTag in oldTags)
+            {
+                _repository.Tags.Remove(oldTag);
+                await _repository.SaveChangesAsync();
+            }
+
+            var tags = model.Tags?.Split(", ").ToList<string>();
+
+            foreach (var newTag in tags)
+            {
+                var entity = new Tag
+                {
+                    TaskId = model.Task.Id,
+                    Name = newTag
+                };
+
+                _repository.Tags.Add(entity);
+                await _repository.SaveChangesAsync();
+            }
+            return RedirectToAction("ShowTaskset", "Taskset", new {id = model.Task.TasksetId});
+         }
     }
 }
