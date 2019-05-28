@@ -64,6 +64,20 @@ namespace archive.Data
                         .HasForeignKey(e => e.CourseId);
                 });
 
+            builder.Entity<Tag>(
+                entity =>
+                {
+                    entity.HasKey(e => e.Id);
+
+                    entity.Property(e => e.TakId).IsRequired();
+                    entity.Property(e => e.Name).IsRequired();
+
+                    entity.HasOne(e => e.Task)
+                        .WithMany(e => e.Tags);
+                    entity.HasIndex(e => e.Name);
+                    entity.HasIndex(e => e.TakId);
+                });
+
             builder.Entity<Comment>(
                 entity =>
                 {

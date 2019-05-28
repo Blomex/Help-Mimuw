@@ -15,5 +15,6 @@ namespace archive.Data.Entities
         public virtual Taskset Taskset { get; set; }
         public virtual ICollection<Solution> Solutions { get; set; } = new HashSet<Solution>();
         public virtual ICollection<TasksFiles> Attachments { get; set; } = new HashSet<TasksFiles>();
+        public virtual ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
     }
 }
