@@ -15,7 +15,7 @@ namespace archive.Data
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Solution> Solutions { get; set; }
         public DbSet<SolutionVersion> SolutionsVersions { get; set; }
-
+        public DbSet<Tag> Tags { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserAvatar> Avatars { get; set; }
@@ -69,13 +69,13 @@ namespace archive.Data
                 {
                     entity.HasKey(e => e.Id);
 
-                    entity.Property(e => e.TakId).IsRequired();
+                    entity.Property(e => e.TaskId).IsRequired();
                     entity.Property(e => e.Name).IsRequired();
 
                     entity.HasOne(e => e.Task)
                         .WithMany(e => e.Tags);
                     entity.HasIndex(e => e.Name);
-                    entity.HasIndex(e => e.TakId);
+                    entity.HasIndex(e => e.TaskId);
                 });
 
             builder.Entity<Comment>(

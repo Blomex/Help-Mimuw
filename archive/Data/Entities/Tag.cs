@@ -11,7 +11,7 @@ namespace archive.Data.Entities
         [Key]
         public int Id { get; set; }
 
-        public int TakId { get; set; }
+        public int TaskId { get; set; }
 
         public string Name { get; set; }
 
