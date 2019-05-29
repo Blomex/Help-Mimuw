@@ -35,8 +35,21 @@ namespace archive.Controllers
         {
             var taskset = await _repository.Tasksets
                 .Include(t => t.Course)
+                
                 .Include(t => t.Attachments)
                 .ThenInclude(a => a.File)
+                
+                .Include(t => t.Tasks)
+                .ThenInclude(t => t.Tags)
+                
+                .Include(t => t.Tasks)
+                .ThenInclude(t => t.Solutions)
+                .ThenInclude(t => t.Author)
+                
+                .Include(t => t.Tasks)
+                .ThenInclude(t => t.Attachments)
+                .ThenInclude(a => a.File)
+                
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (taskset == null)
@@ -49,24 +62,8 @@ namespace archive.Controllers
                 return new StatusCodeResult(403);
             }
 
-            var tasks = await _repository.Tasks // FIXME można tu ładować od razu z tasksetem
-                .Include(t => t.Tags)
-                .Include(t => t.Attachments)
-                .ThenInclude(a => a.File)
-                .Where(t => t.TasksetId == id).ToListAsync();
-
-            var listOfSolutions = new Dictionary<int, List<Solution>>();
-
-            // FIXME to chyba powinien być SQL
-            foreach (var task in tasks)
-            {
-                var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).Include(s => s.Author).ToListAsync();
-                listOfSolutions.Add(task.Id, solutions);
-            }
-
-            var model = new TasksetViewModel {Taskset = taskset, Tasks = tasks, ListOfSolutions = listOfSolutions};
             // We need full path (see Index(id))
-            return View("/Views/Taskset/ShowTaskset.cshtml", model);
+            return View("/Views/Taskset/ShowTaskset.cshtml", taskset);
         }
 
         [Authorize]
