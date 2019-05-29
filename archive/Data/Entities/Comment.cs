@@ -14,6 +14,7 @@ namespace archive.Data.Entities
         [Required]
         [MinLength(1)]
         public string Content { get; set; }
+        public string CachedContent { get; set; }
         public int SolutionId { get; set; }
 
         [Column(TypeName = "timestamp")]

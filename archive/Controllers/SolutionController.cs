@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Task = System.Threading.Tasks.Task;
@@ -149,6 +150,13 @@ namespace archive.Controllers
             // Validate
             if (!ModelState.IsValid)
             {
+                foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        _logger.LogWarning(error.ErrorMessage);
+                    }
+                }
                 _logger.LogDebug($"Model state is not valid");
                 return new StatusCodeResult(400);
             }
@@ -318,6 +326,7 @@ namespace archive.Controllers
             }
             // Update
             comment.CommentDate = DateTime.UtcNow;
+            comment.CachedContent = Markdown.ToHtml(comment.Content, _markdownPipeline);
             comment.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             _repository.Comments.Add(comment);
             await _repository.SaveChangesAsync(); /* FIXME Can it fail? */

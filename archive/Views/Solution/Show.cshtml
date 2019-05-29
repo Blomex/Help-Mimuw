@@ -14,7 +14,7 @@
 <h2>@Model.Task.Name (Rozwiązanie)</h2>
 <article>
     <section>
-        <pre>@Model.Task.Content</pre>
+        @Html.Raw(Model.Task.CachedContent)
     </section>
     <section>
         @if (Model.Solution.Author != null)
@@ -98,7 +98,7 @@
                         </div>
                         <div class="DateHere">@a.CommentDate.AddHours(2)</div>
                         <div class="ContentHere">
-                            @a.Content
+                            @Html.Raw(a.CachedContent)
                         </div>
                     </div>
                 }

@@ -1,4 +1,7 @@
 @model archive.Models.Taskset.TasksetViewModel
+@{
+    ViewData["MathJax"] = true;
+}
 
 <h1>@Model.Taskset.Course.Name</h1>
 <h2>@Model.Taskset.Name (@Model.Taskset.Year):</h2>
@@ -6,10 +9,10 @@
 @foreach (var file in Model.Taskset.Attachments)
 {
     <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.File.Id">@file.File.FileName</a>
-    <br/>
+    <br />
 }
 (<a asp-controller="Taskset" asp-action="AddAttachmentsView" asp-route-tasksetId="@Model.Taskset.Id">Dodaj/Usuń załączniki</a>)
-<hr/>
+<hr />
 
 <a asp-controller="Task" asp-action="Create"
    asp-route-forTasksetId="@Model.Taskset.Id">
@@ -19,60 +22,62 @@
 {
     <a asp-action="Delete" asp-route-id="@Model.Taskset.Id">Usuń egzamin</a>
 }
-<hr/>
+<hr />
 
 @foreach (var task in Model.Tasks)
 {
     @:<section>
-    <h3>
-        @task.Name
-    </h3>
-    <pre style="white-space: pre-wrap; word-wrap: break-word;">@task.Content</pre>
-                                                                            
-    <h4>Załączniki:</h4>
-    foreach (var file in task.Attachments)
-    {
-        <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.File.Id">@file.File.FileName</a>
-        <br/>
-    }
-    <text>(</text><a asp-controller="Task" asp-action="AddAttachmentsView" asp-route-taskId="@task.Id">Dodaj/Usuń załączniki</a><text>)</text> 
-    <hr/>
+        <h3>
+            @task.Name
+        </h3>
+        <div>
+            @Html.Raw(task.CachedContent)
+        </div>
 
-    <a asp-controller="Solution" asp-action="Create"
-       asp-route-forTaskId="@task.Id">
-        Dodaj rozwiązanie
-    </a>
-    <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id">Edytuj</a>
-    <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id">Usuń</a>
-    int counter = 0;
+        <h4>Załączniki:</h4>
+        foreach (var file in task.Attachments)
+        {
+            <a asp-controller="Storage" asp-action="Index" asp-route-id="@file.File.Id">@file.File.FileName</a>
+            <br />
+        }
+        <text>(</text><a asp-controller="Task" asp-action="AddAttachmentsView" asp-route-taskId="@task.Id">Dodaj/Usuń załączniki</a><text>)</text>
+        <hr />
 
-    foreach (var solution in Model.ListOfSolutions[task.Id])
-    {
+        <a asp-controller="Solution" asp-action="Create"
+           asp-route-forTaskId="@task.Id">
+            Dodaj rozwiązanie
+        </a>
+        <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id">Edytuj</a>
+        <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id">Usuń</a>
+        int counter = 0;
+
+        foreach (var solution in Model.ListOfSolutions[task.Id])
+        {
+            if (counter != 0)
+            {
+                @:</ul>
+            }
+            counter++;
+            <li>
+                @if (solution.Author != null)
+                {
+                    <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
+                        rozwiązanie @counter (by @solution.Author.UserName)
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
+                        rozwiązanie @counter
+                    </a>
+                }
+            </li>
+        }
+
         if (counter != 0)
         {
             @:</ul>
         }
-        counter++;
-      <li>
-          @if (solution.Author != null)
-          {
-              <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
-                  rozwiązanie @counter (by @solution.Author.UserName)
-              </a>
-          }
-          else
-          {
-              <a asp-controller="Solution" asp-action="show" asp-route-solutionId="@solution.Id">
-                  rozwiązanie @counter
-              </a>
-          }
-      </li>
-    }
-
-    if (counter != 0)
-    {
-        @:</ul>
-    }
     @:</section>
-    <hr/>
+    <hr />
 }

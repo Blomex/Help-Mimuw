@@ -9,6 +9,7 @@ namespace archive.Data.Entities
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
+        public string CachedContent { get; set; }
         public string Content { get; set; }
    
         public int TasksetId { get; set; }
