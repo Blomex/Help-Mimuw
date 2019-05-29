@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -30,6 +31,16 @@ namespace archive.Tests.Integration
             {
                 // Arrange
                 var repository = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var addedUser = new ApplicationUser()
+                {
+                    HomePage = "mimuw.edu.pl",
+                    LastActive = DateTime.UtcNow,
+                    PhoneNumber = "123456789",
+                    Email = "a@b.c",
+                    UserName = Guid.NewGuid().ToString()
+                };
+                await repository.Users.AddAsync(addedUser);
+                await repository.SaveChangesAsync();
                 var user = await repository.Users.FirstOrDefaultAsync();
                 var solution = new Solution {CachedContent = "Indukcja po $n$.", TaskId = 1};
                 repository.Solutions.Add(solution);
