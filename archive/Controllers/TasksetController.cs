@@ -161,13 +161,17 @@ namespace archive.Controllers
                                 && s.Tasks.Any())
                     .OrderByDescending(s => s.Year)
                     .ToListAsync();
-           
-           foreach(var taskset in tasksets)
-           {
-               
+          
+
+
                //trzeba zmienić na SQLa
-               var tasks2 = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
-               var tasks = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
+               var tasks2 = await _repository.Tasks.Where(t => (t.Taskset.CourseId == model.courseId || model.courseId == 0)
+                                                               && t.Taskset.Year >= model.yearFrom
+                                                               && t.Taskset.Year <= model.yearTo).ToListAsync();
+               var tasks = await _repository.Tasks.Where(t => (t.Taskset.CourseId == model.courseId || model.courseId == 0)
+                                                              && t.Taskset.Year >= model.yearFrom
+                                                              && t.Taskset.Year <= model.yearTo).ToListAsync();
+            /*TODO nie działa
                if (model.allTags && tags != null)
                {
                    //brzydkie - sprawdzamy dla każdego z zadań tagi oddzielnie.
@@ -196,33 +200,68 @@ namespace archive.Controllers
                            }
                        }
                    }
-                }
-               foreach(var task in tasks){
-                    if(model.haveSolutions)
-                    {
-                        var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
+                }*/
+               
+                   _logger.LogDebug($"Przed SQL");
 
-                        foreach(var solution in solutions)
-                        {
-                            var counter = _repository.Ratings.Count(r => r.IdSolution == solution.Id);
-                            var rating = _repository.Ratings.Count(r => r.IdSolution == solution.Id && r.Value);
-                            if (rating >= model.minRating && counter >= model.minRatingNumber)
-                            {
-                                tasksToShow.Add(task);
-                                listOfSolutions.Add(task.Id, solutions);
-                                break;
-                            }
-                        }  
-                    }
-                    else{
-                        tasksToShow.Add(task);
-                        var solutions = await _repository.Solutions.Where(s => s.TaskId == task.Id).ToListAsync();
-                        listOfSolutions.Add(task.Id, solutions);
-                    }
-               }
-           }
+                   var query = (from t in _repository.Tasks
+                       join sol in _repository.Solutions on t.Id equals sol.TaskId
+                       where (from res in _repository.Ratings
+                                 where (res.Value == true && res.IdSolution == sol.Id)
+                                 select res.Id).Count() >= model.minRating &&
+                             (from res2 in _repository.Ratings
+                                 where (res2.IdSolution == sol.Id)
+                                 select res2.Id).Count() >= model.minRatingNumber &&
+                             (t.Taskset.CourseId == model.courseId || model.courseId == 0) &&
+                            t.Taskset.Year >= model.yearFrom &&
+                            t.Taskset.Year <= model.yearTo
+                                select new
+                       {
+                           taskId = t.Id,
+                           solutionId = sol.Id,
+                           solutionAuthorId = sol.AuthorId,
+                           solutionCachedContent = sol.CachedContent,
+                           taskName = t.Name,
+                           taskContent = t.Content,
+                           taskTasksetId = t.TasksetId,
+                       }).ToList();
+                   _logger.LogDebug($"Halo zrobiłem SQLa");
+                   foreach (var result in query)
+                   {
+                       if (!listOfSolutions.ContainsKey(result.taskId))
+                       {
+                           tasksToShow.Add(new archive.Data.Entities.Task
+                           {
+                               Id = result.taskId,
+                               Name = result.taskName,
+                               Content = result.taskContent,
+                               TasksetId = result.taskTasksetId
+                           });
+                           listOfSolutions.Add(result.taskId, new List<Solution>());
+                       }
+                   }
 
-            model.Tasks = tasksToShow;
+                   foreach (var task in tasks)
+                   {
+                       if (!listOfSolutions.ContainsKey(task.Id))
+                       {
+                            listOfSolutions.Add(task.Id, new List<Solution>());
+                            tasksToShow.Add(task);
+                       }
+                   }
+                   foreach (var result in query)
+                   {
+                       listOfSolutions[result.taskId].Add(new archive.Data.Entities.Solution
+                       {
+                           Id = result.solutionId,
+                           CachedContent = result.solutionCachedContent,
+                           AuthorId = result.solutionAuthorId,
+                           TaskId = result.taskId
+                       });
+                   }
+
+
+               model.Tasks = tasksToShow;
             model.ListOfSolutions = listOfSolutions;    
             // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
             return View("/Views/Taskset/AllFilterTasks.cshtml", model);
