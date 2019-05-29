@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using archive.Data.Enums;
 using archive.Services;
 using Microsoft.AspNetCore.Http;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Task = System.Threading.Tasks.Task;
 
 namespace archive.Controllers
@@ -182,7 +183,8 @@ namespace archive.Controllers
 
             }
 
-               var tasks = await _repository.Tasks.Where(t =>
+               var tasks = await _repository.Tasks.
+                   Include(t => t.Solutions).Where(t =>
                    (t.Taskset.CourseId == model.courseId || model.courseId == 0)
                    && t.Taskset.Year >= model.yearFrom
                    && t.Taskset.Year <= model.yearTo &&
@@ -248,8 +250,24 @@ namespace archive.Controllers
                        });
                    }
 
+                   var returnTasks = new List<archive.Data.Entities.Task>();
+                   foreach (var p in tasksToShow)
+                   {
+                       returnTasks.Add(p);
+                   }
 
-               model.Tasks = tasksToShow;
+                   if (model.haveSolutions)
+                   {
+                       foreach (var p in listOfSolutions)
+                       {
+                           if (tasksToShow.Any(e => e.Id == p.Key && !p.Value.Any()))
+                           {
+                               returnTasks.Remove(tasksToShow.FirstOrDefault(e => e.Id == p.Key));
+                           }
+                       }
+                   }
+
+                   model.Tasks = returnTasks;
             model.ListOfSolutions = listOfSolutions;    
             // This is called also from HomeController.Shortcut and becouse of this we need full path to view file
             return View("/Views/Taskset/AllFilterTasks.cshtml", model);
