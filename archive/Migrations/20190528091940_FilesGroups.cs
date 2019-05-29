@@ -8,7 +8,7 @@ namespace archive.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "FileGroupEntry",
+                name: "FileGroupEntries",
                 columns: table => new
                 {
                     FileGroupId = table.Column<Guid>(nullable: false),
@@ -16,9 +16,9 @@ namespace archive.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FileGroupEntry", x => new { x.FileGroupId, x.FileId });
+                    table.PrimaryKey("PK_FileGroupEntries", x => new { x.FileGroupId, x.FileId });
                     table.ForeignKey(
-                        name: "FK_FileGroupEntry_Files_FileId",
+                        name: "FK_FileGroupEntries_Files_FileId",
                         column: x => x.FileId,
                         principalTable: "Files",
                         principalColumn: "Id",
@@ -26,20 +26,20 @@ namespace archive.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FileGroupEntry_FileGroupId",
-                table: "FileGroupEntry",
+                name: "IX_FileGroupEntries_FileGroupId",
+                table: "FileGroupEntries",
                 column: "FileGroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FileGroupEntry_FileId",
-                table: "FileGroupEntry",
+                name: "IX_FileGroupEntries_FileId",
+                table: "FileGroupEntries",
                 column: "FileId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FileGroupEntry");
+                name: "FileGroupEntries");
         }
     }
 }

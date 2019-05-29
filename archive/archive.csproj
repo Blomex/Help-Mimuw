@@ -41,6 +41,8 @@
       <Compile Remove="Migrations\20190430193733_RemovedCircularDependency.Designer.cs" />
       <Compile Remove="Migrations\20190501162413_SolutionAuthorId.cs" />
       <Compile Remove="Migrations\20190501162413_SolutionAuthorId.Designer.cs" />
+      <Compile Remove="Migrations\20190516093828_FilesGroups.cs" />
+      <Compile Remove="Migrations\20190516093828_FilesGroups.Designer.cs" />
     </ItemGroup>
 
     <ItemGroup>

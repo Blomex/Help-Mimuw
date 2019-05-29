@@ -6,12 +6,19 @@ using Microsoft.AspNetCore.Http;
 
 namespace archive.Models.Solution
 {
+    public class AttachmentEditModel
+    {
+        public Guid BaseGroup = Guid.Empty;
+        public string RemovedFiles { get; set; }
+        public List<List<IFormFile>> UploadedFiles { get; set; } = new List<List<IFormFile>>();
+    }
+
     public class SolutionEditModel
     {
         public Data.Entities.Task Task { get; set; }
         public int? SolutionId { get; set; }
         public string NewContent { get; set; }
-        public List<IFormFile> Attachments { get; set; }
+        public AttachmentEditModel Attachments { get; set; } = new AttachmentEditModel();
 
         public bool ValidForEdit()
         {

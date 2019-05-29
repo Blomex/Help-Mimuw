@@ -266,7 +266,7 @@ namespace archive.Migrations
 
                     b.HasIndex("FileId");
 
-                    b.ToTable("FileGroupEntry");
+                    b.ToTable("FileGroupEntries");
                 });
 
             modelBuilder.Entity("archive.Data.Entities.Rating", b =>

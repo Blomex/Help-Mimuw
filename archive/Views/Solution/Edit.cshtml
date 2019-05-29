@@ -25,14 +25,7 @@
                 <textarea asp-for="NewContent" class="form-control" cols="120" rows="20" autofocus required></textarea>
                 <span asp-validation-for="NewContent" class="text-danger"></span>
             </div>
-            @if (Model.SolutionId == null)
-            {
-                <div class="form-group">
-                    <label asp-for="Attachments"></label>
-                    <input asp-for="Attachments" class="form-control" type="file" multiple/>
-                    <span asp-validation-for="Attachments" class="text-danger"></span>
-                </div>
-            }
+            @await Component.InvokeAsync("FilesGroup", new { baseGroupGuid = Guid.Empty })
             <div class="form-group">
                 <input type="submit" value="@(Model.SolutionId == null ? "Dodaj rozwiązanie" : "Zapisz zmiany")" class="btn btn-primary" />
             </div>

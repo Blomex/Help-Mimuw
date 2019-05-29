@@ -10,7 +10,7 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190516093828_FilesGroups")]
+    [Migration("20190528091940_FilesGroups")]
     partial class FilesGroups
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -268,7 +268,7 @@ namespace archive.Migrations
 
                     b.HasIndex("FileId");
 
-                    b.ToTable("FileGroupEntry");
+                    b.ToTable("FileGroupEntries");
                 });
 
             modelBuilder.Entity("archive.Data.Entities.Rating", b =>

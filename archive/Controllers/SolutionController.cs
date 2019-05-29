@@ -229,6 +229,11 @@ namespace archive.Controllers
         public async Task<IActionResult> Edit([Bind] SolutionEditModel edited)
         {
             _logger.LogDebug($"Edited SolutionEditModel({edited.Task}, {edited.SolutionId}, {edited.NewContent})");
+            _logger.LogWarning($"FILES {edited.Attachments}, {edited.Attachments.RemovedFiles}, {edited.Attachments.UploadedFiles.Count}");
+            foreach (var file in edited.Attachments.UploadedFiles)
+            {
+                Console.WriteLine($"->{file[0].FileName}");
+            }
             if (!edited.ValidForEdit())
             {
                 return new StatusCodeResult(400);

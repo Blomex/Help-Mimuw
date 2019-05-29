@@ -1,0 +1,121 @@
+﻿@model IEnumerable<archive.Data.Entities.File>
+
+<fieldset>
+    <style scoped>
+        .AttachmentList {
+            display: table;
+            width: calc(100% - 20px);
+            margin: auto;
+            border-spacing: 3px;
+        }
+
+        .Attachment {
+            display: table-row;
+        }
+
+        .Attachment div {
+            display: table-cell;
+        }
+
+        .Attachment div.Name {
+            width: 100%;
+        }
+
+        .Attachment div.Mime {
+            word-break: keep-all;
+        }
+
+        .Attachment input {
+            display: none;
+        }
+    </style>
+
+    <legend>Edytuj załączniki</legend>
+    @foreach (var file in Model)
+    {
+        <div id="attachment-@file.Id" class="Attachment">
+            <div><a href="/Storage/@file.Id">@file.FileName</a></div>
+            <div>@file.MimeType/@file.MimeSubtype</div>
+            <div>
+                <button onclick="RemoveHandler('@file.Id', this)" type="button">Usuń</button>
+            </div>
+        </div>
+    }
+    <input type="hidden" name="Attachments.RemovedFiles" id="RemovedFiles" value=""/>
+    <div class="form-group">
+        <div id="UploadList" class="AttachmentList">
+            <div class="Attachment">
+                <input class="UploadedFileInput" type="file" onchange="UpdateFileBox(this)"/>
+            </div>
+        </div>
+        <button onclick="NewAttachment()" type="button">Dodaj załącznik</button>
+    </div>
+
+    <script>
+        function RemoveHandler(fileId, targetButton) {
+            targetButton.innerText = "Cofnij usunięcie";
+            targetButton.onclick = () => UndoRemoveHandler(fileId, targetButton);
+            document.getElementById(`attachment-${fileId}`).classList.add("Removed");
+            RemovedFiles.add(fileId);
+            document.getElementById("RemovedFiles").value = Array.from(RemovedFiles).join(" ");
+        }
+
+        function UndoRemoveHandler(fileId, button) {
+            button.innerText = "Usuń";
+            button.onclick = () => RemoveHandler(fileId, button);
+            document.getElementById(`attachment-${fileId}`).classList.remove("Removed");
+            RemovedFiles.delete(fileId);
+            document.getElementById("RemovedFiles").value = Array.from(RemovedFiles).join(" ");
+        }
+
+        function NewAttachment() {
+            let div = document.getElementById("UploadList").lastElementChild;
+            let input = div.lastElementChild;
+            input.click();
+        }
+
+        function UpdateFileBox(inputElement) {
+            let box = inputElement.parentElement;
+            let file = inputElement.files[0];
+            console.log("Change");
+
+            let btnDiv = document.createElement("div");
+            let btn = document.createElement("button");
+            btn.innerText = "Usuń";
+            btn.type = "button";
+            btn.onclick = () => { box.parentElement.removeChild(box); Reindex() };
+            btnDiv.appendChild(btn);
+            box.appendChild(btnDiv);
+
+            let mimeDiv = document.createElement("div");
+            mimeDiv.classList.add("Mime");
+            mimeDiv.innerText = file.type;
+            box.prepend(mimeDiv);
+
+            let nameDiv = document.createElement("div");
+            nameDiv.classList.add("Name");
+            nameDiv.innerText = file.name;
+            box.prepend(nameDiv);
+
+            let newInputBox = document.createElement("div");
+            let newInput = document.createElement("input");
+            newInput.classList.add("UploadedFileInput");
+            newInput.type = "file";
+            newInput.onchange = () => UpdateFileBox(newInput);
+            newInputBox.appendChild(newInput);
+            document.getElementById("UploadList").appendChild(newInputBox);
+            newInputBox.classList.add("Attachment");
+            Reindex();
+        }
+
+        function Reindex() {
+            let i = 0;
+            for (let input of document.getElementsByClassName("UploadedFileInput")) {
+                input.name = `Attachments.UploadedFiles[${i}]`;
+                ++i;
+            }
+        }
+
+        RemovedFiles = new Set();
+    </script>
+</fieldset>
