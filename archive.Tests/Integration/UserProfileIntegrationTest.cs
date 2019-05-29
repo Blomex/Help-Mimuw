@@ -104,16 +104,19 @@ namespace archive.Tests.Integration
                 Assert.AreEqual(user.PhoneNumber, properties[3].TextContent.Trim());
 
                 CultureInfo culture = null;
+                DateTime resultDate;
+                
                 try
                 {
                     culture = new CultureInfo("pl-PL");
+                    resultDate = Convert.ToDateTime(properties[4].TextContent.Trim(), culture);
                 }
                 catch (Exception)
                 {
                     culture = new CultureInfo("en-US");
+                    resultDate = Convert.ToDateTime(properties[4].TextContent.Trim(), culture);
                 }
-                
-                var resultDate = Convert.ToDateTime(properties[4].TextContent.Trim(), culture);
+
 
                 Assert.AreEqual(user.LastActive.AddHours(2).Year, resultDate.Year);
                 Assert.AreEqual(user.LastActive.AddHours(2).Month, resultDate.Month);

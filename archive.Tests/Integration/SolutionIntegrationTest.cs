@@ -45,8 +45,8 @@ namespace archive.Tests.Integration
                 var solution = new Solution {CachedContent = "Indukcja po $n$.", TaskId = 1};
                 repository.Solutions.Add(solution);
                 await repository.SaveChangesAsync();
-                var comment1 = new Comment {CachedContent = "Fajne", SolutionId = solution.Id, ApplicationUserId = user.Id};
-                var comment2 = new Comment {CachedContent = "Niefajne", SolutionId = solution.Id, ApplicationUserId = user.Id};
+                var comment1 = new Comment {Content = "Fajne", CachedContent = "Fajne", SolutionId = solution.Id, ApplicationUserId = user.Id};
+                var comment2 = new Comment {Content = "Niefajne", CachedContent = "Niefajne", SolutionId = solution.Id, ApplicationUserId = user.Id};
                 repository.Comments.Add(comment1);
                 repository.Comments.Add(comment2);
                 await repository.SaveChangesAsync();
