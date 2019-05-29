@@ -3,6 +3,7 @@
 @model archive.Models.Solution.SolutionViewModel
 @{
     ViewData["Title"] = Model.Task.Name + " (Rozwiązanie)";
+    ViewData["MathJax"] = true;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -13,7 +14,7 @@
 <h2>@Model.Task.Name (Rozwiązanie)</h2>
 <article>
     <section>
-        <pre>@Model.Task.Content</pre>
+        @Html.Raw(Model.Task.CachedContent)
     </section>
     <section>
         @if (Model.Solution.Author != null)
@@ -24,7 +25,7 @@
         {
             <p><em>Rozwiązanie:</em></p>
         }
-        <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;" class="Solution">@Model.Solution.CachedContent</pre>
+        <div class="Solution">@Html.Raw(Model.Solution.CachedContent)</div>
         <a asp-action="Edit" asp-route-id="@Model.Solution.Id">Edytuj</a>
         <a asp-action="Delete" asp-route-id="@Model.Solution.Id">Usuń</a>
         <h4>Załączniki:</h4>
@@ -97,7 +98,7 @@
                         </div>
                         <div class="DateHere">@a.CommentDate.AddHours(2)</div>
                         <div class="ContentHere">
-                            @a.Content
+                            @Html.Raw(a.CachedContent)
                         </div>
                     </div>
                 }

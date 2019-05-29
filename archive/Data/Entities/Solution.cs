@@ -13,7 +13,6 @@ namespace archive.Data.Entities
         /* Author is not necessary, and making it required would cause problems with migrations. */
         public virtual ApplicationUser Author { get; set; }
 
-        [Required]
         public string CachedContent { get; set; }
 
         public virtual IEnumerable<SolutionVersion> Versions { get; set; }

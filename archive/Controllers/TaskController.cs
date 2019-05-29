@@ -7,6 +7,7 @@ using archive.Data.Enums;
 using archive.Models.Task;
 using archive.Models.Taskset;
 using archive.Services;
+using Markdig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -23,16 +24,22 @@ namespace archive.Controllers
         private readonly IRepository _repository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IStorageService _storageService;
+        private readonly MarkdownPipeline _markdownPipeline;
 
-        public TaskController(IRepository repository, ILogger<TaskController> logger,
-            IUserActivityService activityService, UserManager<ApplicationUser> userManager,
-            IStorageService storageService)
+        public TaskController(
+            IRepository repository, 
+            ILogger<TaskController> logger,
+            IUserActivityService activityService, 
+            UserManager<ApplicationUser> userManager,
+            IStorageService storageService,
+            MarkdownPipeline markdownPipeline)
             : base(activityService)
         {
             _repository = repository;
             _logger = logger;
             _userManager = userManager;
             _storageService = storageService;
+            _markdownPipeline = markdownPipeline;
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
@@ -75,7 +82,8 @@ namespace archive.Controllers
             {
                 TasksetId = task.TasksetId,
                 Name = task.Name,
-                Content = task.Content
+                Content = task.Content,
+                CachedContent = Markdown.ToHtml(task.Content, _markdownPipeline)
             };
             
             _repository.Tasks.Add(entity);
@@ -143,6 +151,7 @@ namespace archive.Controllers
 
             // Update and save
             task.Content = edited.NewContent;
+            task.CachedContent = Markdown.ToHtml(edited.NewContent, _markdownPipeline);
             task.Name = edited.NewName;
             await _repository.SaveChangesAsync();
 

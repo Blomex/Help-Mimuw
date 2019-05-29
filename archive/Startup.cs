@@ -19,6 +19,8 @@ using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
 using archive.Data.Enums;
 using archive.Commons.Authorization;
+using Markdig;
+using Markdig.Extensions.Mathematics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
@@ -78,6 +80,12 @@ namespace archive
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IUserActivityService, UserActivityService>();
             services.AddScoped<IStorageService, StorageService>();
+            services.AddScoped(typeof(MarkdownPipeline), s =>
+            {
+                var pipeline = new MarkdownPipelineBuilder();
+                pipeline.Use<MathExtension>();
+                return pipeline.Build();
+            });
             services.AddMvc().AddControllersAsServices()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

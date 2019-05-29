@@ -13,12 +13,14 @@ using archive.Models;
 using archive.Models.Comment;
 using archive.Models.Solution;
 using archive.Services;
+using Markdig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Task = System.Threading.Tasks.Task;
@@ -32,16 +34,24 @@ namespace archive.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;
         private readonly IStorageService _storageService;
+        private readonly MarkdownPipeline _markdownPipeline;
 
-        public SolutionController(ILogger<SolutionController> logger, ApplicationDbContext repository, 
-            UserManager<ApplicationUser> userManager, IUserActivityService activityService,
-            IAuthorizationService authorizationService, IStorageService storageService) : base(activityService)
+        public SolutionController(
+            ILogger<SolutionController> logger, 
+            ApplicationDbContext repository, 
+            UserManager<ApplicationUser> userManager, 
+            IUserActivityService activityService,
+            IAuthorizationService authorizationService, 
+            IStorageService storageService,
+            MarkdownPipeline markdownPipeline
+            ) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
             _userManager = userManager;
             _authorizationService = authorizationService;
             _storageService = storageService;
+            _markdownPipeline = markdownPipeline;
         }
 
         [Authorize]
@@ -140,6 +150,13 @@ namespace archive.Controllers
             // Validate
             if (!ModelState.IsValid)
             {
+                foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        _logger.LogWarning(error.ErrorMessage);
+                    }
+                }
                 _logger.LogDebug($"Model state is not valid");
                 return new StatusCodeResult(400);
             }
@@ -151,7 +168,7 @@ namespace archive.Controllers
             {
                 TaskId = edited_solution.Task.Id,
                 Author = user,
-                CachedContent = NewContent
+                CachedContent = Markdown.ToHtml(NewContent, _markdownPipeline)
             };
             var version = new SolutionVersion
             {
@@ -263,7 +280,7 @@ namespace archive.Controllers
                 _repository.SolutionsVersions.Add(version);
                 await _repository.SaveChangesAsync();
                 solution.CurrentVersion = version;
-                solution.CachedContent = edited.NewContent;
+                solution.CachedContent = Markdown.ToHtml(edited.NewContent, _markdownPipeline);
                 await _repository.SaveChangesAsync();
                 transaction.Commit();
             }
@@ -309,6 +326,7 @@ namespace archive.Controllers
             }
             // Update
             comment.CommentDate = DateTime.UtcNow;
+            comment.CachedContent = Markdown.ToHtml(comment.Content, _markdownPipeline);
             comment.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             _repository.Comments.Add(comment);
             await _repository.SaveChangesAsync(); /* FIXME Can it fail? */

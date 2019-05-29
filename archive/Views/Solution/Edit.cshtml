@@ -1,6 +1,7 @@
 ﻿@model archive.Models.Solution.SolutionEditModel
 @{
     ViewData["Title"] = "Nowe rozwiązanie";
+    ViewData["MathJax"] = true;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <h1>@Model.Task.Taskset.Course.Name</h1>
@@ -8,7 +9,7 @@
 <hr/>
 <h2>@Model.Task.Name</h2>
 <section>
-    <pre style="white-space: pre-wrap; word-wrap: break-word;">@Model.Task.Content</pre>
+    @Html.Raw(Model.Task.CachedContent)
 </section>
 <h2>Dodaj rozwiązanie</h2>
 <div>
@@ -22,7 +23,7 @@
             }
             <div class="form-group">
                 <label asp-for="NewContent" class="control-label">Treść rozwiązania</label>
-                <textarea asp-for="NewContent" class="form-control" cols="120" rows="20" autofocus required></textarea>
+                <textarea asp-for="NewContent" class="form-control" style="font-family: monospace" cols="120" rows="20" autofocus required></textarea>
                 <span asp-validation-for="NewContent" class="text-danger"></span>
             </div>
             @if (Model.SolutionId == null)

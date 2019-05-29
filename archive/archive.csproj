@@ -41,9 +41,12 @@
       <Compile Remove="Migrations\20190430193733_RemovedCircularDependency.Designer.cs" />
       <Compile Remove="Migrations\20190501162413_SolutionAuthorId.cs" />
       <Compile Remove="Migrations\20190501162413_SolutionAuthorId.Designer.cs" />
+      <Compile Remove="Migrations\20190529191622_MarkdownInCommentsAndTasks.cs" />
+      <Compile Remove="Migrations\20190529191622_MarkdownInCommentsAndTasks.Designer.cs" />
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Markdig" Version="0.17.0" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
