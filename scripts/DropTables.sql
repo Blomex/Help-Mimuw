@@ -13,4 +13,11 @@ drop table "Solutions" cascade;
 drop table "SolutionsVersions" cascade;
 drop table "Tasks" cascade;
 drop table "Tasksets" cascade;
+drop table "Files" cascade;
+drop table "SolutionsFiles" cascade;
+drop table "Tags" cascade;
+drop table "Tags_Id_seq";
+drop table "TasksFiles";
+drop table "TasksetsFiles";
+
 drop table "__EFMigrationsHistory" cascade;
