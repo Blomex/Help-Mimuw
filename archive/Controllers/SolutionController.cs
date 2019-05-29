@@ -13,6 +13,7 @@ using archive.Models;
 using archive.Models.Comment;
 using archive.Models.Solution;
 using archive.Services;
+using Markdig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Http;
@@ -32,16 +33,24 @@ namespace archive.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;
         private readonly IStorageService _storageService;
+        private readonly MarkdownPipeline _markdownPipeline;
 
-        public SolutionController(ILogger<SolutionController> logger, ApplicationDbContext repository, 
-            UserManager<ApplicationUser> userManager, IUserActivityService activityService,
-            IAuthorizationService authorizationService, IStorageService storageService) : base(activityService)
+        public SolutionController(
+            ILogger<SolutionController> logger, 
+            ApplicationDbContext repository, 
+            UserManager<ApplicationUser> userManager, 
+            IUserActivityService activityService,
+            IAuthorizationService authorizationService, 
+            IStorageService storageService,
+            MarkdownPipeline markdownPipeline
+            ) : base(activityService)
         {
             _logger = logger;
             _repository = repository;
             _userManager = userManager;
             _authorizationService = authorizationService;
             _storageService = storageService;
+            _markdownPipeline = markdownPipeline;
         }
 
         [Authorize]
@@ -151,7 +160,7 @@ namespace archive.Controllers
             {
                 TaskId = edited_solution.Task.Id,
                 Author = user,
-                CachedContent = NewContent
+                CachedContent = Markdown.ToHtml(NewContent, _markdownPipeline)
             };
             var version = new SolutionVersion
             {
@@ -263,7 +272,7 @@ namespace archive.Controllers
                 _repository.SolutionsVersions.Add(version);
                 await _repository.SaveChangesAsync();
                 solution.CurrentVersion = version;
-                solution.CachedContent = edited.NewContent;
+                solution.CachedContent = Markdown.ToHtml(edited.NewContent, _markdownPipeline);
                 await _repository.SaveChangesAsync();
                 transaction.Commit();
             }

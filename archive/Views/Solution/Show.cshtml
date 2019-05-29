@@ -3,6 +3,7 @@
 @model archive.Models.Solution.SolutionViewModel
 @{
     ViewData["Title"] = Model.Task.Name + " (Rozwiązanie)";
+    ViewData["MathJax"] = true;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -24,7 +25,7 @@
         {
             <p><em>Rozwiązanie:</em></p>
         }
-        <pre style="margin-left: 5mm; white-space: pre-wrap; word-wrap: break-word;" class="Solution">@Model.Solution.CachedContent</pre>
+        <div class="Solution">@Html.Raw(Model.Solution.CachedContent)</div>
         <a asp-action="Edit" asp-route-id="@Model.Solution.Id">Edytuj</a>
         <a asp-action="Delete" asp-route-id="@Model.Solution.Id">Usuń</a>
         <h4>Załączniki:</h4>

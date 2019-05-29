@@ -22,7 +22,7 @@
             }
             <div class="form-group">
                 <label asp-for="NewContent" class="control-label">Treść rozwiązania</label>
-                <textarea asp-for="NewContent" class="form-control" cols="120" rows="20" autofocus required></textarea>
+                <textarea asp-for="NewContent" class="form-control" style="font-family: monospace" cols="120" rows="20" autofocus required></textarea>
                 <span asp-validation-for="NewContent" class="text-danger"></span>
             </div>
             @if (Model.SolutionId == null)
