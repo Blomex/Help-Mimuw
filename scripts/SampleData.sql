@@ -1,12 +1,12 @@
 ------ PRZYKŁADOWE PRZEDMIOTY ------
-INSERT INTO "Courses"("Name") VALUES ('Rachunek Prawdopodobieństwa');
-INSERT INTO "Courses"("Name") VALUES ('Inżynieria Oprogramowania');
-INSERT INTO "Courses"("Name") VALUES ('Funkcje Analityczne');
-INSERT INTO "Courses"("Name") VALUES ('Algebra');
-INSERT INTO "Courses"("Name") VALUES ('Systemy Operacyjne');
-INSERT INTO "Courses"("Name") VALUES ('Programowanie Współbieżne');
-INSERT INTO "Courses"("Name") VALUES ('Sieci Komputerowe');
-INSERT INTO "Courses"("Name") VALUES ('Języki, Automaty i Obliczenia');
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Rachunek Prawdopodobieństwa', 'RPIS', FALSE);
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Inżynieria Oprogramowania', 'IO', FALSE);
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Funkcje Analityczne', 'FAN', FALSE);
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Algebra', null, FALSE);
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Systemy Operacyjne', 'SO', FALSE);
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Programowanie Współbieżne', 'PW', FALSE);
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Sieci Komputerowe', 'SIK', 'FALSE');
+INSERT INTO "Courses"("Name", "ShortcutCode", "Archive") VALUES ('Języki, Automaty i Obliczenia', 'JAO', FALSE);
 
 ------ TROCHĘ TASKSETOW ------
 CREATE OR REPLACE FUNCTION InsertSampleTasksets() RETURNS void AS
@@ -42,7 +42,7 @@ BEGIN
                 'Długa i skomplikowana treść zadania o $n$ literach, której i tak nikt nigdy nie przeczyta', taskset_id)
                 RETURNING "Id" INTO task_id; -- Ile czasu można spędzić nie widząc, że ma być INTO zamiast AS...
             IF random() > 0.5 THEN
-                INSERT INTO "Solutions"("Content", "TaskId") VALUES ('To jest... trywialne', task_id);
+                INSERT INTO "Solutions"("CachedContent", "TaskId") VALUES ('To jest... trywialne', task_id);
             END IF;
         END LOOP;
     END LOOP;
