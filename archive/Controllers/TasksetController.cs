@@ -138,6 +138,7 @@ namespace archive.Controllers
         [Authorize]
         public async Task<IActionResult> AllFilterTasks(AllFilterTasksViewModel model)
         {
+            var correctTasks = new List<int>();
             
             var courses = await _repository.Courses.Where(c => c.Archive == false).ToListAsync();
             model.AddCourseList(courses);           
@@ -146,61 +147,49 @@ namespace archive.Controllers
             {
                 model.haveSolutions = true;
             }
-
+        
             var tasksToShow = new List<archive.Data.Entities.Task>();
 
             var listOfSolutions = new Dictionary<int, List<Solution>>();
 
-            
-            var tags = model.Tags?.Split(", ").ToList<string>();
-            
-            var tasksets = await _repository.Tasksets
-                    .Where(s => (model.courseId == 0 || s.CourseId == model.courseId)
-                                && s.Year >= model.yearFrom
-                                && s.Year <= model.yearTo
-                                && s.Tasks.Any())
-                    .OrderByDescending(s => s.Year)
-                    .ToListAsync();
-          
+            var tagNames = model.Tags?.Split(", ").ToList<string>();
+            var listOfTaggedTasks = new Dictionary<string, List<int>>();
+            if (tagNames != null)
+            {
+                foreach (var name in tagNames)
+                {
+                    var tags = await _repository.Tags.Where(t => name == t.Name).
+                        Select(t => t.TaskId).ToListAsync();
+                    listOfTaggedTasks.Add(name, new List<int>(tags));
+                }
 
+                if (model.allTags)
+                {
+                    correctTasks = await _repository.Tags.
+                        Where(t => t.Name == tagNames[0]).Select(t => t.TaskId).ToListAsync();
+                    //Wszystkie tagi
+                    foreach (var key in tagNames)
+                    {
+                        correctTasks = correctTasks?.Intersect(listOfTaggedTasks[key]).ToList();
+                    }
+                }
+                else
+                {
+                    correctTasks = new List<int>();
+                    foreach (var key in tagNames)
+                    {
+                        correctTasks = correctTasks.Concat(listOfTaggedTasks[key]).ToList();
+                    }
+                }
 
-               //trzeba zmienić na SQLa
-               var tasks2 = await _repository.Tasks.Where(t => (t.Taskset.CourseId == model.courseId || model.courseId == 0)
-                                                               && t.Taskset.Year >= model.yearFrom
-                                                               && t.Taskset.Year <= model.yearTo).ToListAsync();
-               var tasks = await _repository.Tasks.Where(t => (t.Taskset.CourseId == model.courseId || model.courseId == 0)
-                                                              && t.Taskset.Year >= model.yearFrom
-                                                              && t.Taskset.Year <= model.yearTo).ToListAsync();
-            /*TODO nie działa
-               if (model.allTags && tags != null)
-               {
-                   //brzydkie - sprawdzamy dla każdego z zadań tagi oddzielnie.
-                   foreach(var task in tasks2)
-                   {
-                       foreach (var tag in tags)
-                       {
-                           var taskTags = await _repository.Tags.Where(t => t.Name == tag && t.TaskId == task.Id).ToListAsync();
-                           if (taskTags.Count() < tags.Count())
-                           {
-                               tasks.Remove(task);
-                           }
-                       }
-                   }
-               }
-               else if(tags != null)
-               {
-                   foreach (var task in tasks2)
-                   {
-                       foreach (var tag in tags)
-                       {
-                           var taskTags = await _repository.Tags.Where(t => t.Name == tag && t.TaskId == task.Id).ToListAsync();
-                           if (!taskTags.Any())
-                           {
-                               tasks.Remove(task);
-                           }
-                       }
-                   }
-                }*/
+            }
+
+               var tasks = await _repository.Tasks.Where(t =>
+                   (t.Taskset.CourseId == model.courseId || model.courseId == 0)
+                   && t.Taskset.Year >= model.yearFrom
+                   && t.Taskset.Year <= model.yearTo &&
+                   (correctTasks.Contains(t.Id) || tagNames == null)
+                   ).ToListAsync();
                
                    _logger.LogDebug($"Przed SQL");
 
@@ -214,7 +203,8 @@ namespace archive.Controllers
                                  select res2.Id).Count() >= model.minRatingNumber &&
                              (t.Taskset.CourseId == model.courseId || model.courseId == 0) &&
                             t.Taskset.Year >= model.yearFrom &&
-                            t.Taskset.Year <= model.yearTo
+                            t.Taskset.Year <= model.yearTo &&
+                             tasks.Contains(t)
                                 select new
                        {
                            taskId = t.Id,
