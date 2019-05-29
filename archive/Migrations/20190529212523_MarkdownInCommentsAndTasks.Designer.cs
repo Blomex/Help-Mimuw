@@ -10,7 +10,7 @@ using archive.Data;
 namespace archive.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190529191801_MarkdownInCommentsAndTasks")]
+    [Migration("20190529212523_MarkdownInCommentsAndTasks")]
     partial class MarkdownInCommentsAndTasks
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -196,8 +196,7 @@ namespace archive.Migrations
                     b.Property<string>("ApplicationUserId")
                         .IsRequired();
 
-                    b.Property<string>("CachedContent")
-                        .IsRequired();
+                    b.Property<string>("CachedContent");
 
                     b.Property<DateTime>("CommentDate")
                         .HasColumnType("timestamp");
@@ -285,8 +284,7 @@ namespace archive.Migrations
 
                     b.Property<string>("AuthorId");
 
-                    b.Property<string>("CachedContent")
-                        .IsRequired();
+                    b.Property<string>("CachedContent");
 
                     b.Property<long?>("CurrentVersionId");
 
@@ -333,6 +331,25 @@ namespace archive.Migrations
                     b.HasIndex("FileId");
 
                     b.ToTable("SolutionsFiles");
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<int>("TaskId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("archive.Data.Entities.Task", b =>
@@ -512,6 +529,14 @@ namespace archive.Migrations
                     b.HasOne("archive.Data.Entities.Solution", "Solution")
                         .WithMany("Attachments")
                         .HasForeignKey("SolutionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("archive.Data.Entities.Tag", b =>
+                {
+                    b.HasOne("archive.Data.Entities.Task", "Task")
+                        .WithMany("Tags")
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

@@ -11,25 +11,16 @@ namespace archive.Migrations
                 table: "Tasks",
                 nullable: true);
 
-            migrationBuilder.Sql("UPDATE \"Tasks\" SET \"CachedContent\" = \"Content\"");
-
             migrationBuilder.AlterColumn<string>(
                 name: "CachedContent",
-                table: "Tasks",
-                nullable: false);
-
+                table: "Solutions",
+                nullable: true,
+                oldClrType: typeof(string));
 
             migrationBuilder.AddColumn<string>(
                 name: "CachedContent",
                 table: "Comments",
                 nullable: true);
-
-            migrationBuilder.Sql("UPDATE \"Comments\" SET \"CachedContent\" = \"Content\"");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "CachedContent",
-                table: "Comments",
-                nullable: false);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -41,6 +32,13 @@ namespace archive.Migrations
             migrationBuilder.DropColumn(
                 name: "CachedContent",
                 table: "Comments");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "CachedContent",
+                table: "Solutions",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldNullable: true);
         }
     }
 }

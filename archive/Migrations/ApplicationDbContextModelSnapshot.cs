@@ -194,8 +194,7 @@ namespace archive.Migrations
                     b.Property<string>("ApplicationUserId")
                         .IsRequired();
 
-                    b.Property<string>("CachedContent")
-                        .IsRequired();
+                    b.Property<string>("CachedContent");
 
                     b.Property<DateTime>("CommentDate")
                         .HasColumnType("timestamp");
@@ -283,8 +282,7 @@ namespace archive.Migrations
 
                     b.Property<string>("AuthorId");
 
-                    b.Property<string>("CachedContent")
-                        .IsRequired();
+                    b.Property<string>("CachedContent");
 
                     b.Property<long?>("CurrentVersionId");
 
