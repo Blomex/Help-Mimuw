@@ -50,6 +50,7 @@ namespace archive.Controllers
             }
 
             var tasks = await _repository.Tasks // FIXME można tu ładować od razu z tasksetem
+                .Include(t => t.Tags)
                 .Include(t => t.Attachments)
                 .ThenInclude(a => a.File)
                 .Where(t => t.TasksetId == id).ToListAsync();

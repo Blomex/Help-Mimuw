@@ -86,7 +86,7 @@ namespace archive.Controllers
                 Content = task.Content,
                 CachedContent = Markdown.ToHtml(task.Content, _markdownPipeline)
             };
-            
+
             _repository.Tasks.Add(entity);
             await _repository.SaveChangesAsync();
             await StoreAttachments(entity, task.Attachments);
@@ -177,7 +177,7 @@ namespace archive.Controllers
         private async System.Threading.Tasks.Task StoreAttachments(Task entity, List<IFormFile> files)
         {
             if (files == null) return;
-            
+
             // Store files attaching them to task
             foreach (var file in files)
             {
@@ -187,11 +187,10 @@ namespace archive.Controllers
 
             await _repository.SaveChangesAsync();
         }
-        
+
         /// FIXME: Metody Add/Remove Attachments to trochę copy pasta z TaksetsController
         /// Ale z drugiej strony nie ma tu wielkiej logiki i częściowo się różnią.
         /// Jednakże warto byłoby wygeneralizować metody niezależnie od typu.
-        
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> AddAttachmentsView(int taskId)
         {
@@ -210,7 +209,7 @@ namespace archive.Controllers
 
             return View("AddAttachments", new AddAttachmentsModel() {Task = task, EntityId = taskId});
         }
-        
+
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> RemoveAttachment(int taskId, string fileId)
         {
@@ -227,7 +226,7 @@ namespace archive.Controllers
 
             var toRemove = task.Attachments
                 .FirstOrDefault(a => a.FileId.ToString() == fileId);
-            
+
             if (toRemove != null)
             {
                 // Detach attachment, remove file — TODO może wystarczy tylko usunąć plik?
@@ -264,54 +263,43 @@ namespace archive.Controllers
         }
 
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
-         public async Task<IActionResult> EditTags(int taskid){
+        public async Task<IActionResult> EditTags(int taskid)
+        {
             _logger.LogDebug($"Requested to edit tags to task id = {taskid} ");
-            var task = await _repository.Tasks.Where(t => t.Id == taskid).FirstOrDefaultAsync();
-            var tags = await _repository.Tags.Where(t => t.TaskId == taskid).ToListAsync();
+            var task = await _repository.Tasks.Where(t => t.Id == taskid)
+                .Include(t => t.Tags)
+                .FirstOrDefaultAsync();
 
             StringBuilder allTags = new StringBuilder("");
-
-            foreach (var tag in tags)
+            foreach (var tag in task.Tags)
             {
-                allTags.Append("{tag.Name}, ");
+                allTags.Append($"{tag.Name}, ");
             }
 
-            var model = new EditTagsViewModel(task, allTags.ToString());
-
-            return View(model);
+            return View(new EditTagsViewModel(task, allTags.ToString()));
         }
 
         [HttpPost]
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
-         public async Task<IActionResult> EditTags([Bind] EditTagsViewModel model){
-
-            var oldTags = await _repository.Tags.Where(t => t.TaskId == model.TaskId).ToListAsync();
-            var task = await _repository.Tasks.Where(t => t.Id == model.TaskId).FirstOrDefaultAsync();
-
-            //mamy juz wybrane do usuniecia
-            oldTags.RemoveAll(t => true);
-
-            // foreach (var oldTag in oldTags)
-            // {
-            //     _repository.Tags.Remove(oldTag);
-            //     await _repository.SaveChangesAsync();
-            // }
-
+        public async Task<IActionResult> EditTags([Bind] EditTagsViewModel model)
+        {
+            var task = await _repository.Tasks.Where(t => t.Id == model.TaskId)
+                .Include(t => t.Tags)
+                .FirstOrDefaultAsync();
             var tags = model.Tags?.Split(", ").ToList<string>();
 
+            task.Tags.Clear();
             foreach (var newTag in tags)
             {
-                var entity = new Tag
+                task.Tags.Add(new Tag
                 {
                     TaskId = model.TaskId,
-                    Name = newTag,
-                    Task = task
-                };
-
-                _repository.Tags.Add(entity);
-                await _repository.SaveChangesAsync();
+                    Name = newTag
+                });
             }
-            return RedirectToAction("ShowTaskset", "Taskset", new {id = model.Task.TasksetId});
-         }
+
+            await _repository.SaveChangesAsync();
+            return RedirectToAction("ShowTaskset", "Taskset", new {id = task.TasksetId});
+        }
     }
 }
