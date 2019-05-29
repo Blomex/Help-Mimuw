@@ -38,7 +38,7 @@ DECLARE
 BEGIN
     FOR taskset_id  IN SELECT "Id" FROM "Tasksets" LOOP
         FOR task_num IN 1 .. round(random() * 3 + 3) LOOP
-            INSERT INTO "Tasks"("Name", "Content", "TasksetId") VALUES ('Zadanie ' || task_num || '.',
+            INSERT INTO "Tasks"("Name", "CachedContent", "TasksetId") VALUES ('Zadanie ' || task_num || '.',
                 'Długa i skomplikowana treść zadania o $n$ literach, której i tak nikt nigdy nie przeczyta', taskset_id)
                 RETURNING "Id" INTO task_id; -- Ile czasu można spędzić nie widząc, że ma być INTO zamiast AS...
             IF random() > 0.5 THEN
