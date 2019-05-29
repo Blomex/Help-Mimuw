@@ -166,11 +166,12 @@ namespace archive.Controllers
            {
                
                //trzeba zmienić na SQLa
+               var tasks2 = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
                var tasks = await _repository.Tasks.Where(t => t.TasksetId == taskset.Id).ToListAsync();
                if (model.allTags && tags != null)
                {
                    //brzydkie - sprawdzamy dla każdego z zadań tagi oddzielnie.
-                   foreach(var task in tasks)
+                   foreach(var task in tasks2)
                    {
                        foreach (var tag in tags)
                        {
@@ -184,7 +185,7 @@ namespace archive.Controllers
                }
                else if(tags != null)
                {
-                   foreach (var task in tasks)
+                   foreach (var task in tasks2)
                    {
                        foreach (var tag in tags)
                        {
