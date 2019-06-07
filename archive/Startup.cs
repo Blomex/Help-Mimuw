@@ -19,11 +19,13 @@ using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
 using archive.Data.Enums;
 using archive.Commons.Authorization;
+using archive.Services.Users;
 using Markdig;
 using Markdig.Extensions.Mathematics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
+using Task = System.Threading.Tasks.Task;
 
 namespace archive
 {
@@ -80,6 +82,7 @@ namespace archive
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IUserActivityService, UserActivityService>();
             services.AddScoped<IStorageService, StorageService>();
+            services.AddScoped<IAchievementsService, AchievementsService>();
             services.AddScoped(typeof(MarkdownPipeline), s =>
             {
                 var pipeline = new MarkdownPipelineBuilder();
@@ -127,8 +130,10 @@ namespace archive
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
 
-            System.Threading.Tasks.Task rolesCreationTask = CreateUserRoles(serviceProvider);
+            Task rolesCreationTask = CreateUserRoles(serviceProvider);
+            Task achievementCreationTask = CreateAchievements(serviceProvider);
             rolesCreationTask.Wait();
+            achievementCreationTask.Wait();
         }
 
         protected void ConfigureIdentityOptions(IdentityOptions options)
@@ -151,7 +156,7 @@ namespace archive
             options.User.RequireUniqueEmail = false;
         }
 
-        protected async System.Threading.Tasks.Task CreateUserRoles(IServiceProvider serviceProvider)
+        protected async Task CreateUserRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var logger = serviceProvider.GetService<ILogger<Startup>>();
@@ -171,6 +176,11 @@ namespace archive
                     }
                 }
             }
+        }
+
+        protected async Task CreateAchievements(IServiceProvider serviceProvider)
+        {
+            // Tu deklarujemy achievementy
         }
     }
 }
