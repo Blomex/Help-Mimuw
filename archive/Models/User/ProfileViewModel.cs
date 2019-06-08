@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using archive.Data.Entities;
 
 namespace archive.Models.User
 {
@@ -22,5 +24,9 @@ namespace archive.Models.User
         
         [Display(Name = "Ostatnio aktywny")]
         public DateTime? LastActive { get; set; }
+
+        [Display(Name = "Achievementy")]
+
+        public ICollection<Achievement> UserAchievements { get; set; }
     }
 }

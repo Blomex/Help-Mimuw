@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Task = System.Threading.Tasks.Task;
+using archive.Services.Users;
 
 namespace archive.Controllers
 {
@@ -35,6 +36,7 @@ namespace archive.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly IStorageService _storageService;
         private readonly MarkdownPipeline _markdownPipeline;
+        private readonly IAchievementsService _achievementsService;
 
         public SolutionController(
             ILogger<SolutionController> logger, 
@@ -43,6 +45,7 @@ namespace archive.Controllers
             IUserActivityService activityService,
             IAuthorizationService authorizationService, 
             IStorageService storageService,
+            IAchievementsService achiemenetService,
             MarkdownPipeline markdownPipeline
             ) : base(activityService)
         {
@@ -51,6 +54,7 @@ namespace archive.Controllers
             _userManager = userManager;
             _authorizationService = authorizationService;
             _storageService = storageService;
+            _achievementsService = achiemenetService;
             _markdownPipeline = markdownPipeline;
         }
 
@@ -186,6 +190,8 @@ namespace archive.Controllers
                 await _repository.SaveChangesAsync();
                 transaction.Commit();
             }
+            //lets give user achievement
+            await _achievementsService.GrantAchievement(user, "REDAKTOR I");
 
             await StoreAttachments(solution, Attachments);
             return RedirectToAction("Show", new { solutionId = solution.Id });

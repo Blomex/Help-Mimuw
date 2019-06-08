@@ -31,7 +31,7 @@ namespace archive.Services.Users
         public async Task GrantAchievement(ApplicationUser user, string achievementIdentifier)
         {
             var achievement = await Find(achievementIdentifier);
-
+            
             if (await HasAchievement(user, achievement.Id))
                 return;
 

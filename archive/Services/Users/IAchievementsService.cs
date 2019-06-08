@@ -7,7 +7,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace archive.Services.Users
 {
-    interface IAchievementsService
+    public interface IAchievementsService
     {
         /// <summary>
         /// Dodaje do bazy danych achievement, jeżeli nie istnieje.

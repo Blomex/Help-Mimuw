@@ -180,6 +180,20 @@ namespace archive
 
         protected async Task CreateAchievements(IServiceProvider serviceProvider)
         {
+            var achievements = serviceProvider.GetRequiredService<IAchievementsService>();
+
+            var redaktor1 = new Data.Entities.Achievement
+            {
+                Id = 1,
+                Name = "Redaktor I",
+                NormalizedName = "REDAKTOR I",
+                Description = "Uzyskany za dodanie pierwszego rozwiązania",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "redaktor1.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+
+            bool x = await achievements.DeclareAchievement(redaktor1);
             // Tu deklarujemy achievementy
         }
     }
