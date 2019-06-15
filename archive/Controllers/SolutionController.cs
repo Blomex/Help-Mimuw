@@ -25,6 +25,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Task = System.Threading.Tasks.Task;
 using archive.Services.Users;
+using Microsoft.CodeAnalysis;
+using Solution = archive.Data.Entities.Solution;
 
 namespace archive.Controllers
 {
@@ -190,8 +192,34 @@ namespace archive.Controllers
                 await _repository.SaveChangesAsync();
                 transaction.Commit();
             }
-            //lets give user achievement
-            await _achievementsService.GrantAchievement(user, "REDAKTOR I");
+
+            if (NewContent.Contains("widać, że"))
+            {
+                _logger.LogDebug($"Achievement 'Sokole oko' granted for user");
+                await _achievementsService.GrantAchievement(user, "SOKOLE OKO");
+            }
+            var userSolutions = await _repository.Solutions.Where(t => t.Author == user).ToListAsync();
+            if (userSolutions.Count >= 1)
+            {
+                await _achievementsService.GrantAchievement(user, "REDAKTOR I");
+            }
+            if (userSolutions.Count >= 3)
+            {
+                await _achievementsService.GrantAchievement(user, "REDAKTOR II");
+            }
+            if (userSolutions.Count >= 6)
+            {
+                await _achievementsService.GrantAchievement(user, "REDAKTOR III");
+            }
+            if (userSolutions.Count >= 10)
+            {
+                await _achievementsService.GrantAchievement(user, "REDAKTOR IV");
+            }
+            if (userSolutions.Count >= 20)
+            {
+                await _achievementsService.GrantAchievement(user, "REDAKTOR V");
+            }
+
 
             await StoreAttachments(solution, Attachments);
             return RedirectToAction("Show", new { solutionId = solution.Id });
@@ -335,7 +363,17 @@ namespace archive.Controllers
             comment.CachedContent = Markdown.ToHtml(comment.Content, _markdownPipeline);
             comment.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             _repository.Comments.Add(comment);
-            await _repository.SaveChangesAsync(); /* FIXME Can it fail? */
+            await _repository.SaveChangesAsync();
+            var commentForThisSolution =
+                await _repository.Comments.Where(t => t.SolutionId == comment.SolutionId).ToListAsync();
+            var solution = await _repository.Solutions.Include("Users").Where(t => t.Id == comment.SolutionId).FirstOrDefaultAsync();
+            var author = solution.Author;
+            if (commentForThisSolution.Count == 42 && author!= null)
+            {
+                //FIXME czy takie wyciąganie autora rozwiązania jest ok?
+                await _achievementsService.GrantAchievement(author, "GORĄCY TEMAT");
+
+            }
             return RedirectToAction("Show", new { solutionId = comment.SolutionId });
 
         }
