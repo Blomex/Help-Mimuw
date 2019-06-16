@@ -199,7 +199,7 @@ namespace archive
                 NormalizedName = "REDAKTOR II",
                 Description = "Uzyskany za dodanie 3 rozwiązań",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "redaktor2.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             var redaktor3 = new Data.Entities.Achievement
@@ -209,7 +209,7 @@ namespace archive
                 NormalizedName = "REDAKTOR III",
                 Description = "Uzyskany za dodanie 6 rozwiązań",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "redaktor3.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             var redaktor4 = new Data.Entities.Achievement
@@ -219,7 +219,7 @@ namespace archive
                 NormalizedName = "REDAKTOR IV",
                 Description = "Uzyskany za dodanie 10 rozwiązań",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "redaktor4.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             var redaktor5 = new Data.Entities.Achievement
@@ -229,7 +229,7 @@ namespace archive
                 NormalizedName = "REDAKTOR V",
                 Description = "Uzyskany za dodanie 20 rozwiązań",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "redaktor5.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             
@@ -240,7 +240,7 @@ namespace archive
                 NormalizedName = "GORĄCY TEMAT",
                 Description = "Uzyskany, gdy pod jednym z twoich rozwiązań pojawiło się 42 komentarzy",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "goracyTemat.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
 
@@ -251,7 +251,7 @@ namespace archive
                 NormalizedName = "SOKOLE OKO",
                 Description = "Uzyskany, za użycie sformułowania 'widać, że' w rozwiązaniu",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "sokoleOko.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             var IdealneRozwiazanie = new Data.Entities.Achievement
@@ -261,7 +261,7 @@ namespace archive
                 NormalizedName = "IDEALNE ROZWIĄZANIE",
                 Description = "Jedno z twoich rozwiązań otrzymało 10 głosów i wszystkie były pozytywne!",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "idealneRozwiazanie.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             var PierwszeKroki = new Data.Entities.Achievement
@@ -272,7 +272,7 @@ namespace archive
                 Description = "Uzyskany za dodanie przynajmniej jednego komentarza," +
                               " dodanie przynajmniej jednego zadania lub rozwiązania, oraz ocenienie przynajmniej 3 rozwiązań",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "pierwszeKroki.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             var SzczescieWnieszczesciu = new Data.Entities.Achievement
@@ -282,7 +282,7 @@ namespace archive
                 NormalizedName = "SZCZĘŚCIE W NIESZCZĘŚCIU",
                 Description = "Przy dodawaniu pliku udało ci się wygenerować konflikt GUID. Gratulacje, nie zdarza się to zbyt często",
                 AchievementFlags = AchievementFlags.None,
-                IconPath = "redaktor1.ico",
+                IconPath = "szczescieWnieszczesciu.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
             };
             bool x = await achievements.DeclareAchievement(redaktor1);

@@ -79,25 +79,37 @@ else
 </pre>
 
 <label asp-for="UserAchievements"></label>
-<pre>
+<div>
 @if (Model.UserAchievements != null)
 {
     foreach (var achievement in Model.UserAchievements)
     {
     <div class="icon">
         <img src="/icons/@achievement.IconPath" />
-        <div class="name">@achievement.Name
-            <div class="description">@achievement.Description</div>
-        </div>
+
+       
+        <div class="name">@achievement.Name: @achievement.Description</div>
     </div>
     }
 }
-</pre>
+</div>
 <section>
     <style scoped>
         .icon {
             position: relative;
             display: inline-block;
+        }
+        .icon:hover div{
+            display: block;
+            z-index: 2;
+        }
+        .icon div {
+            position: absolute;
+            display: none;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 200px;
         }
         .icon .name {
             visibility: hidden;
@@ -107,7 +119,7 @@ else
             border-radius: 6px/20px;
             padding: 20px;
         }
-        .icon:hover .name{
+        .icon .name{
             text-align: center;
             visibility: visible;
         }
