@@ -6,6 +6,7 @@ using archive.Data;
 using archive.Models.Taskset;
 using archive.Models.User;
 using archive.Services;
+using archive.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -19,10 +20,13 @@ namespace archive.Controllers
         private readonly ILogger _logger;
         private readonly IRepository _repository;
         private readonly IUserActivityService _activityService;
+        private readonly IAchievementsService _achievementsService;
 
         public UserController(IRepository repository, ILogger<UserController> logger,
+            IAchievementsService achievementsService,
             IUserActivityService activityService) : base(activityService)
         {
+            _achievementsService = achievementsService;
             _repository = repository;
             _logger = logger;
             _activityService = activityService;
@@ -43,7 +47,8 @@ namespace archive.Controllers
             }
 
             var lastActive = await _activityService.GetLastActionTimeAsync(name);
-            
+
+            var achievements = await _achievementsService.UsersAchievements(user);
             return View("/Views/User/ShowProfile.cshtml", new ProfileViewModel
             {
                 UserName = user.UserName,
@@ -51,7 +56,8 @@ namespace archive.Controllers
                 Email = user.Email,
                 HomePage = user.HomePage,
                 Phone = user.PhoneNumber,
-                LastActive = lastActive
+                LastActive = lastActive,
+                UserAchievements = achievements
             });
         }
     }

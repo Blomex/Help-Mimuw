@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using archive.Data;
 using archive.Data.Entities;
+using archive.Services.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -20,16 +23,18 @@ namespace archive.Areas.Identity.Pages.Account.Manage
         private readonly SignInManager<archive.Data.Entities.ApplicationUser> _signInManager;
         private readonly IRepository _repository;
         private readonly IEmailSender _emailSender;
-
+        private readonly IAchievementsService _achievementsService;
         public IndexModel(
             UserManager<archive.Data.Entities.ApplicationUser> userManager,
             SignInManager<archive.Data.Entities.ApplicationUser> signInManager,
-            IEmailSender emailSender, IRepository repository)
+            IEmailSender emailSender, IRepository repository,
+            IAchievementsService achievementsService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _repository = repository;
+            _achievementsService = achievementsService;
         }
 
         [Display(Name = "Nazwa użytkownika")]
@@ -42,7 +47,8 @@ namespace archive.Areas.Identity.Pages.Account.Manage
 
         [Display(Name = "Awatar")]
         public byte[] AvatarImage { get; set; }
-
+        [Display(Name = "Achievementy")]
+        public ICollection<Achievement> UserAchievements { get; set; }
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -62,6 +68,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "Ustaw nowy awatar")]
             public IFormFile AvatarImage { get; set; }
+
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -71,7 +78,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
+            UserAchievements = await _achievementsService.UsersAchievements(user);
             Username = user.UserName;
             AvatarImage = (await _repository.Users
                     .Include(u => u.Avatar)
@@ -82,7 +89,7 @@ namespace archive.Areas.Identity.Pages.Account.Manage
             {
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                HomePage = user.HomePage,
+                HomePage = user.HomePage
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);

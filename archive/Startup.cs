@@ -19,11 +19,13 @@ using archive.Data.Entities;
 using Microsoft.Extensions.Logging;
 using archive.Data.Enums;
 using archive.Commons.Authorization;
+using archive.Services.Users;
 using Markdig;
 using Markdig.Extensions.Mathematics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
+using Task = System.Threading.Tasks.Task;
 
 namespace archive
 {
@@ -80,6 +82,7 @@ namespace archive
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IUserActivityService, UserActivityService>();
             services.AddScoped<IStorageService, StorageService>();
+            services.AddScoped<IAchievementsService, AchievementsService>();
             services.AddScoped(typeof(MarkdownPipeline), s =>
             {
                 var pipeline = new MarkdownPipelineBuilder();
@@ -127,8 +130,10 @@ namespace archive
                     .MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
 
-            System.Threading.Tasks.Task rolesCreationTask = CreateUserRoles(serviceProvider);
+            Task rolesCreationTask = CreateUserRoles(serviceProvider);
+            Task achievementCreationTask = CreateAchievements(serviceProvider);
             rolesCreationTask.Wait();
+            achievementCreationTask.Wait();
         }
 
         protected void ConfigureIdentityOptions(IdentityOptions options)
@@ -151,7 +156,7 @@ namespace archive
             options.User.RequireUniqueEmail = false;
         }
 
-        protected async System.Threading.Tasks.Task CreateUserRoles(IServiceProvider serviceProvider)
+        protected async Task CreateUserRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var logger = serviceProvider.GetService<ILogger<Startup>>();
@@ -171,6 +176,126 @@ namespace archive
                     }
                 }
             }
+        }
+
+        protected async Task CreateAchievements(IServiceProvider serviceProvider)
+        {
+            var achievements = serviceProvider.GetRequiredService<IAchievementsService>();
+            //TODO : ustalenie jakiejś arbitralnej wielkości ikon i dodanie ikon do achievementów
+            var redaktor1 = new Data.Entities.Achievement
+            {
+                Id = 1,
+                Name = "Redaktor I",
+                NormalizedName = "REDAKTOR I",
+                Description = "Uzyskany za dodanie pierwszego rozwiązania",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "redaktor1.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            var redaktor2 = new Data.Entities.Achievement
+            {
+                Id = 2,
+                Name = "Redaktor II",
+                NormalizedName = "REDAKTOR II",
+                Description = "Uzyskany za dodanie 3 rozwiązań",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "redaktor2.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            var redaktor3 = new Data.Entities.Achievement
+            {
+                Id = 3,
+                Name = "Redaktor III",
+                NormalizedName = "REDAKTOR III",
+                Description = "Uzyskany za dodanie 6 rozwiązań",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "redaktor3.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            var redaktor4 = new Data.Entities.Achievement
+            {
+                Id = 4,
+                Name = "Redaktor IV",
+                NormalizedName = "REDAKTOR IV",
+                Description = "Uzyskany za dodanie 10 rozwiązań",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "redaktor4.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            var redaktor5 = new Data.Entities.Achievement
+            {
+                Id = 5,
+                Name = "Redaktor V",
+                NormalizedName = "REDAKTOR V",
+                Description = "Uzyskany za dodanie 20 rozwiązań",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "redaktor5.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            
+            var GoracyTemat = new Data.Entities.Achievement
+            {
+                Id = 6,
+                Name = "Gorący Temat",
+                NormalizedName = "GORĄCY TEMAT",
+                Description = "Uzyskany, gdy pod jednym z twoich rozwiązań pojawiło się 42 komentarzy",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "goracyTemat.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+
+            var SokoleOko = new Data.Entities.Achievement
+            {
+                Id = 7,
+                Name = "Sokole Oko",
+                NormalizedName = "SOKOLE OKO",
+                Description = "Uzyskany, za użycie sformułowania 'widać, że' w rozwiązaniu",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "sokoleOko.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            var IdealneRozwiazanie = new Data.Entities.Achievement
+            {
+                Id = 8,
+                Name = "Idealne Rozwiązanie",
+                NormalizedName = "IDEALNE ROZWIĄZANIE",
+                Description = "Jedno z twoich rozwiązań otrzymało 10 głosów i wszystkie były pozytywne!",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "idealneRozwiazanie.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            var PierwszeKroki = new Data.Entities.Achievement
+            {
+                Id = 6,
+                Name = "Pierwsze Kroki",
+                NormalizedName = "PIERWSZE KROKI",
+                Description = "Uzyskany za dodanie przynajmniej jednego komentarza," +
+                              " dodanie przynajmniej jednego rozwiązania, oraz ocenienie przynajmniej 3 rozwiązań",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "pierwszeKroki.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            var SzczescieWnieszczesciu = new Data.Entities.Achievement
+            {
+                Id = 6,
+                Name = "Szczęście w nieszczęściu",
+                NormalizedName = "SZCZĘŚCIE W NIESZCZĘŚCIU",
+                Description = "Przy dodawaniu pliku udało ci się wygenerować konflikt GUID. Gratulacje, nie zdarza się to zbyt często",
+                AchievementFlags = AchievementFlags.None,
+                IconPath = "szczescieWnieszczesciu.ico",
+                UsersAchievements = new HashSet<UsersAchievements>()
+            };
+            bool x = await achievements.DeclareAchievement(redaktor1);
+            await achievements.DeclareAchievement(redaktor2);
+            await achievements.DeclareAchievement(redaktor3);
+            await achievements.DeclareAchievement(redaktor4);
+            await achievements.DeclareAchievement(redaktor5);
+            await achievements.DeclareAchievement(GoracyTemat);
+            await achievements.DeclareAchievement(SokoleOko);
+            await achievements.DeclareAchievement(IdealneRozwiazanie);
+            await achievements.DeclareAchievement(PierwszeKroki);
+            await achievements.DeclareAchievement(SzczescieWnieszczesciu);
+            // Tu deklarujemy achievementy
         }
     }
 }

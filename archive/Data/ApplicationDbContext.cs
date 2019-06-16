@@ -20,6 +20,10 @@ namespace archive.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserAvatar> Avatars { get; set; }
 
+        public DbSet<Achievement> Achievements { get; set; }
+
+        public DbSet<UsersAchievements> UsersAchievements { get; set; }
+
         public DbSet<File> Files { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -177,6 +181,19 @@ namespace archive.Data
                     .HasForeignKey(tf => tf.SolutionId);
 
                 entity.HasKey(t => new {t.SolutionId, t.FileId});
+            });
+
+            builder.Entity<Achievement>(entity => { entity.HasAlternateKey(e => e.NormalizedName); });
+
+            builder.Entity<UsersAchievements>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.AchievementId });
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.UsersAchievements)
+                    .HasForeignKey(e => e.UserId);
+                entity.HasOne(e => e.Achievement).
+                    WithMany(a => a.UsersAchievements)
+                    .HasForeignKey(e => e.AchievementId);
             });
         }
 
