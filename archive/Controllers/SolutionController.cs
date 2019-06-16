@@ -132,12 +132,12 @@ namespace archive.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(String NewContent, Data.Entities.Task Task,
-            List<IFormFile> Attachments)
+        public async Task<IActionResult> Create(String newContent, Data.Entities.Task task,
+            List<IFormFile> attachments)
         {
-            SolutionEditModel edited_solution = new SolutionEditModel() { NewContent = NewContent, Task = Task };
-            _logger.LogDebug($"Requested to add solution for {edited_solution.Task}; " +
-                $"content: length={edited_solution.NewContent?.Length}, hash={edited_solution.NewContent?.GetHashCode()}");
+            SolutionEditModel editedSolution = new SolutionEditModel() { NewContent = newContent, Task = task };
+            _logger.LogDebug($"Requested to add solution for {editedSolution.Task}; " +
+                $"content: length={editedSolution.NewContent?.Length}, hash={editedSolution.NewContent?.GetHashCode()}");
             // Authorize
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, null, 
                 new RolesAuthorizationRequirement(new string[] { UserRoles.TRUSTED_USER }));
@@ -147,9 +147,9 @@ namespace archive.Controllers
             }
             
             // Check if such task exists
-            if (await _repository.Tasks.FindAsync(edited_solution.Task.Id) == null)
+            if (await _repository.Tasks.FindAsync(editedSolution.Task.Id) == null)
             {
-                _logger.LogDebug($"Task not found {edited_solution.Task.Id}, no solution can be added");
+                _logger.LogDebug($"Task not found {editedSolution.Task.Id}, no solution can be added");
                 return new StatusCodeResult(400);
             }
 
@@ -172,15 +172,15 @@ namespace archive.Controllers
             /*  BTW doing it this^ way we assure that user is still in DB, I suppose. */
             var solution = new Solution
             {
-                TaskId = edited_solution.Task.Id,
+                TaskId = editedSolution.Task.Id,
                 Author = user,
-                CachedContent = Markdown.ToHtml(NewContent, _markdownPipeline)
+                CachedContent = Markdown.ToHtml(newContent, _markdownPipeline)
             };
             var version = new SolutionVersion
             {
                 Solution = solution,
                 Created = DateTime.Now,
-                Content = edited_solution.NewContent
+                Content = editedSolution.NewContent
             };
             using (var transaction = _repository.Database.BeginTransaction())
             {
@@ -193,7 +193,7 @@ namespace archive.Controllers
                 transaction.Commit();
             }
 
-            if (NewContent.Contains("widać, że"))
+            if (newContent.Contains("widać, że"))
             {
                 _logger.LogDebug($"Achievement 'Sokole oko' granted for user");
                 await _achievementsService.GrantAchievement(user, "SOKOLE OKO");
@@ -220,8 +220,8 @@ namespace archive.Controllers
                 await _achievementsService.GrantAchievement(user, "REDAKTOR V");
             }
 
-
-            await StoreAttachments(solution, Attachments);
+            await GrantFirstStepsAchievement();
+            await StoreAttachments(solution, attachments);
             return RedirectToAction("Show", new { solutionId = solution.Id });
         }
         
@@ -366,7 +366,7 @@ namespace archive.Controllers
             await _repository.SaveChangesAsync();
             var commentForThisSolution =
                 await _repository.Comments.Where(t => t.SolutionId == comment.SolutionId).ToListAsync();
-            var solution = await _repository.Solutions.Include("Users").Where(t => t.Id == comment.SolutionId).FirstOrDefaultAsync();
+            var solution = await _repository.Solutions.Where(t => t.Id == comment.SolutionId).FirstOrDefaultAsync();
             var author = solution.Author;
             if (commentForThisSolution.Count == 42 && author!= null)
             {
@@ -374,10 +374,27 @@ namespace archive.Controllers
                 await _achievementsService.GrantAchievement(author, "GORĄCY TEMAT");
 
             }
+
+            await GrantFirstStepsAchievement();
+
+
             return RedirectToAction("Show", new { solutionId = comment.SolutionId });
 
         }
 
+        public async Task GrantFirstStepsAchievement()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userComments = await _repository.Comments.Where(t => t.ApplicationUser == user).ToListAsync();
+            var userRatings = await _repository.Ratings.Where(t => t.NameUser == user.Id).ToListAsync();
+            var userSolutions = await _repository.Solutions.Where(t => t.Author == user).ToListAsync();
+            if (userComments.Count > 0 && userRatings.Count() > 2 && userSolutions.Count() > 0)
+            {
+                await _achievementsService.GrantAchievement(user, "PIERWSZE KROKI");
+            }
+
+            return;
+        }
         [Authorize(Roles = UserRoles.TRUSTED_USER)]
         public async Task<IActionResult> AddRating(bool rating, int solutionId)
         {
@@ -392,25 +409,27 @@ namespace archive.Controllers
             }
 
             //sprawdzamy czy już oceniał wcześniej
-            var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var old_rating = await _repository.Ratings.Where(r => r.IdSolution == solutionId && r.NameUser == userID).ToListAsync();
-            if(old_rating.Count == 0){
-                _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userID, Value=rating});
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var oldRating = await _repository.Ratings.Where(r => r.IdSolution == solutionId && r.NameUser == userId).ToListAsync();
+            if(oldRating.Count == 0){
+                _repository.Ratings.Add(new Rating{IdSolution=solutionId, NameUser=userId, Value=rating});
                 await _repository.SaveChangesAsync();
             }
             else{
                 //wystarczy zrobić tak, nie trzeba robić żadnej magii w stylu usuwanie poprzedniego rekordu
                 //i dodawanie nowego
-                old_rating[0].Value = rating;
+                oldRating[0].Value = rating;
                 await _repository.SaveChangesAsync();
-
             }
+
+            await GrantFirstStepsAchievement();
             // Validate
             if (!ModelState.IsValid)
             {
                 _logger.LogDebug($"Model state is not valid");
                 return new StatusCodeResult(400);
             }
+
 
             return RedirectToAction("Show", new { solutionId = solutionId });
         }

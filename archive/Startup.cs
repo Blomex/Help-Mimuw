@@ -270,7 +270,7 @@ namespace archive
                 Name = "Pierwsze Kroki",
                 NormalizedName = "PIERWSZE KROKI",
                 Description = "Uzyskany za dodanie przynajmniej jednego komentarza," +
-                              " dodanie przynajmniej jednego zadania lub rozwiązania, oraz ocenienie przynajmniej 3 rozwiązań",
+                              " dodanie przynajmniej jednego rozwiązania, oraz ocenienie przynajmniej 3 rozwiązań",
                 AchievementFlags = AchievementFlags.None,
                 IconPath = "pierwszeKroki.ico",
                 UsersAchievements = new HashSet<UsersAchievements>()
